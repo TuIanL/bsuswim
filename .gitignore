@@ -1,0 +1,11 @@
+.conda/
+outputs/
+weights/*.pth
+weights/*.pt
+weights/*.ckpt
+data/swim_coco/images/
+data/swim_coco/annotations/*.json
+__pycache__/
+*.pyc
+.DS_Store
+
