@@ -1,0 +1,67 @@
+
+> zhiyong-yunshu-frontend@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3000
+
+  ▲ Next.js 14.2.30
+  - Local:        http://127.0.0.1:3000
+  - Network:      http://127.0.0.1:3000
+
+ ✓ Starting...
+ ✓ Ready in 11.3s
+ ○ Compiling / ...
+ ✓ Compiled / in 1151ms (554 modules)
+ GET / 200 in 1231ms
+ GET / 200 in 21ms
+ ✓ Compiled /platform in 219ms (591 modules)
+ GET /platform 200 in 273ms
+ GET /platform?view=workspace 200 in 13ms
+ GET / 200 in 17ms
+ GET /platform 200 in 37ms
+ GET / 200 in 34ms
+ GET /platform 200 in 17ms
+ ✓ Compiled in 308ms (591 modules)
+ ✓ Compiled in 132ms (591 modules)
+ ✓ Compiled in 140ms (591 modules)
+ GET / 200 in 40ms
+ ✓ Compiled /_not-found in 130ms (580 modules)
+ GET /_next/static/css/app/layout.css?v=1781529974198 404 in 168ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 163ms
+ GET /_next/static/chunks/app/page.js 404 in 163ms
+ GET /_next/static/chunks/main-app.js?v=1781529974198 404 in 164ms
+ GET /_next/static/chunks/webpack.js?v=1781529974198 404 in 168ms
+ GET /platform?view=workspace 200 in 17ms
+ GET /_next/static/css/app/layout.css?v=1781529974492 404 in 10ms
+ GET /_next/static/chunks/main-app.js?v=1781529974492 404 in 15ms
+ GET /_next/static/chunks/app/platform/page.js 404 in 14ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 14ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /_next/static/webpack/023abca3527597ad.webpack.hot-update.json 404 in 20ms
+ GET /platform 200 in 53ms
+ GET /_next/static/css/app/layout.css?v=1781529985677 404 in 48ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 50ms
+ GET /_next/static/chunks/main-app.js?v=1781529985677 404 in 51ms
+ GET /_next/static/chunks/app/platform/page.js 404 in 51ms
+ GET /platform 200 in 16ms
+ GET /_next/static/chunks/main-app.js?v=1781529988405 404 in 15ms
+ GET /_next/static/css/app/layout.css?v=1781529988405 404 in 16ms
+ GET /_next/static/chunks/app/platform/page.js 404 in 14ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 14ms
+ GET /platform 200 in 26ms
+ GET /_next/static/css/app/layout.css?v=1781529998277 404 in 10ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 12ms
+ GET /_next/static/chunks/main-app.js?v=1781529998277 404 in 13ms
+ GET /_next/static/chunks/app/platform/page.js 404 in 11ms
+ GET /platform? 200 in 18ms
+ GET /_next/static/css/app/layout.css?v=1781530001000 404 in 20ms
+ GET /_next/static/chunks/main-app.js?v=1781530001000 404 in 26ms
+ GET /_next/static/chunks/app/platform/page.js 404 in 20ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 22ms
+ GET / 200 in 57ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 17ms
+ GET /_next/static/chunks/app/page.js 404 in 17ms
+ GET /_next/static/css/app/layout.css?v=1781530002924 404 in 12ms
+ GET /_next/static/chunks/main-app.js?v=1781530002924 404 in 14ms
+ ✓ Compiled in 428ms (594 modules)
+ GET / 200 in 56ms
+ GET /_next/static/chunks/main-app.js?v=1781530009453 404 in 12ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 11ms
