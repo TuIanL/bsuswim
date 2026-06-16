@@ -65,3 +65,4 @@
  GET / 200 in 56ms
  GET /_next/static/chunks/main-app.js?v=1781530009453 404 in 12ms
  GET /_next/static/chunks/app-pages-internals.js 404 in 11ms
+[?25h
