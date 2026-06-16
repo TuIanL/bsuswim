@@ -1,0 +1,1125 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 7,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "frontend/app/platform/page.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 9,
+      "nonEmptyLines": 7,
+      "functions": [
+        {
+          "name": "PlatformPage",
+          "startLine": 7,
+          "endLine": 9,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "metadata",
+          "line": 3,
+          "isDefault": false
+        },
+        {
+          "name": "PlatformPage",
+          "line": 7,
+          "isDefault": true
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 2,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/components/platform/PlatformShell.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 172,
+      "nonEmptyLines": 157,
+      "functions": [
+        {
+          "name": "PlatformShell",
+          "startLine": 28,
+          "endLine": 143,
+          "params": [
+            "{ activeView, children, onNavigate }"
+          ]
+        },
+        {
+          "name": "PlatformPageHeader",
+          "startLine": 145,
+          "endLine": 168,
+          "params": [
+            "{\n  eyebrow,\n  title,\n  description,\n  action\n}"
+          ]
+        },
+        {
+          "name": "PlatformPanel",
+          "startLine": 170,
+          "endLine": 172,
+          "params": [
+            "{ children, className = \"\" }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "platformNavigation",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "PlatformShell",
+          "line": 28,
+          "isDefault": false
+        },
+        {
+          "name": "PlatformPageHeader",
+          "line": 145,
+          "isDefault": false
+        },
+        {
+          "name": "PlatformPanel",
+          "line": 170,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "PlatformShell",
+          "callee": "useState",
+          "lineNumber": 29
+        },
+        {
+          "caller": "handleNavigate",
+          "callee": "onNavigate",
+          "lineNumber": 32
+        },
+        {
+          "caller": "handleNavigate",
+          "callee": "setMobileOpen",
+          "lineNumber": 33
+        },
+        {
+          "caller": "PlatformShell",
+          "callee": "platformNavigation.map",
+          "lineNumber": 54
+        },
+        {
+          "caller": "PlatformShell",
+          "callee": "handleNavigate",
+          "lineNumber": 62
+        },
+        {
+          "caller": "PlatformShell",
+          "callee": "handleNavigate",
+          "lineNumber": 82
+        },
+        {
+          "caller": "PlatformShell",
+          "callee": "setMobileOpen",
+          "lineNumber": 93
+        },
+        {
+          "caller": "PlatformShell",
+          "callee": "platformNavigation.map",
+          "lineNumber": 101
+        },
+        {
+          "caller": "PlatformShell",
+          "callee": "handleNavigate",
+          "lineNumber": 109
+        },
+        {
+          "caller": "PlatformShell",
+          "callee": "platformNavigation.map",
+          "lineNumber": 123
+        },
+        {
+          "caller": "PlatformShell",
+          "callee": "handleNavigate",
+          "lineNumber": 127
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 4,
+        "functionCount": 3,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/components/platform/SwimPlatformApp.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 640,
+      "nonEmptyLines": 601,
+      "functions": [
+        {
+          "name": "isView",
+          "startLine": 53,
+          "endLine": 55,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "SwimPlatformApp",
+          "startLine": 57,
+          "endLine": 143,
+          "params": []
+        },
+        {
+          "name": "UploadView",
+          "startLine": 145,
+          "endLine": 241,
+          "params": [
+            "{ onCreated, onOpenTasks }"
+          ]
+        },
+        {
+          "name": "Field",
+          "startLine": 243,
+          "endLine": 265,
+          "params": [
+            "{\n  label,\n  value,\n  onChange,\n  type = \"text\"\n}"
+          ]
+        },
+        {
+          "name": "SelectField",
+          "startLine": 267,
+          "endLine": 294,
+          "params": [
+            "{\n  label,\n  value,\n  onChange,\n  options\n}"
+          ]
+        },
+        {
+          "name": "TasksView",
+          "startLine": 296,
+          "endLine": 359,
+          "params": [
+            "{\n  jobs,\n  onRefresh,\n  onNavigate\n}"
+          ]
+        },
+        {
+          "name": "JobView",
+          "startLine": 361,
+          "endLine": 427,
+          "params": [
+            "{\n  job,\n  onNavigate\n}"
+          ]
+        },
+        {
+          "name": "WorkspaceView",
+          "startLine": 429,
+          "endLine": 479,
+          "params": [
+            "{\n  job,\n  report,\n  onNavigate,\n  onSeedDemo\n}"
+          ]
+        },
+        {
+          "name": "ReportView",
+          "startLine": 481,
+          "endLine": 556,
+          "params": [
+            "{\n  job,\n  report,\n  onNavigate\n}"
+          ]
+        },
+        {
+          "name": "TrainingView",
+          "startLine": 558,
+          "endLine": 605,
+          "params": [
+            "{\n  job,\n  report,\n  onNavigate\n}"
+          ]
+        },
+        {
+          "name": "MetricCard",
+          "startLine": 607,
+          "endLine": 616,
+          "params": [
+            "{ metric }"
+          ]
+        },
+        {
+          "name": "EmptyState",
+          "startLine": 618,
+          "endLine": 640,
+          "params": [
+            "{\n  title,\n  body,\n  actionLabel,\n  onAction\n}"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "SwimPlatformApp",
+          "line": 57,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "isView",
+          "callee": "Boolean",
+          "lineNumber": 54
+        },
+        {
+          "caller": "isView",
+          "callee": "[\"upload\", \"tasks\", \"job\", \"workspace\", \"report\", \"training\"].includes",
+          "lineNumber": 54
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "useState",
+          "lineNumber": 58
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "useState",
+          "lineNumber": 59
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "useState",
+          "lineNumber": 60
+        },
+        {
+          "caller": "refreshJobs",
+          "callee": "setJobs",
+          "lineNumber": 62
+        },
+        {
+          "caller": "refreshJobs",
+          "callee": "listSwimAnalysisJobs",
+          "lineNumber": 62
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "useEffect",
+          "lineNumber": 64
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "params.get",
+          "lineNumber": 66
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "params.get",
+          "lineNumber": 67
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "isView",
+          "lineNumber": 68
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "setView",
+          "lineNumber": 69
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "setActiveJobId",
+          "lineNumber": 72
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "refreshJobs",
+          "lineNumber": 74
+        },
+        {
+          "caller": "onRecent",
+          "callee": "refreshJobs",
+          "lineNumber": 76
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "window.addEventListener",
+          "lineNumber": 77
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "window.addEventListener",
+          "lineNumber": 78
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "window.removeEventListener",
+          "lineNumber": 80
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "window.removeEventListener",
+          "lineNumber": 81
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "useMemo",
+          "lineNumber": 85
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "getSwimAnalysisJob",
+          "lineNumber": 87
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "getRecentSwimAnalysisJob",
+          "lineNumber": 89
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "getSwimAnalysisReport",
+          "lineNumber": 92
+        },
+        {
+          "caller": "navigate",
+          "callee": "setView",
+          "lineNumber": 95
+        },
+        {
+          "caller": "navigate",
+          "callee": "setActiveJobId",
+          "lineNumber": 97
+        },
+        {
+          "caller": "navigate",
+          "callee": "params.set",
+          "lineNumber": 101
+        },
+        {
+          "caller": "navigate",
+          "callee": "window.history.pushState",
+          "lineNumber": 103
+        },
+        {
+          "caller": "navigate",
+          "callee": "params.toString",
+          "lineNumber": 103
+        },
+        {
+          "caller": "navigate",
+          "callee": "window.scrollTo",
+          "lineNumber": 104
+        },
+        {
+          "caller": "handleCreated",
+          "callee": "refreshJobs",
+          "lineNumber": 108
+        },
+        {
+          "caller": "handleCreated",
+          "callee": "navigate",
+          "lineNumber": 109
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "seedDemoSwimJob",
+          "lineNumber": 124
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "refreshJobs",
+          "lineNumber": 125
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "navigate",
+          "lineNumber": 126
+        },
+        {
+          "caller": "SwimPlatformApp",
+          "callee": "navigate",
+          "lineNumber": 135
+        },
+        {
+          "caller": "UploadView",
+          "callee": "useState",
+          "lineNumber": 146
+        },
+        {
+          "caller": "UploadView",
+          "callee": "useState",
+          "lineNumber": 147
+        },
+        {
+          "caller": "update",
+          "callee": "setMetadata",
+          "lineNumber": 151
+        },
+        {
+          "caller": "submit",
+          "callee": "event.preventDefault",
+          "lineNumber": 155
+        },
+        {
+          "caller": "submit",
+          "callee": "onCreated",
+          "lineNumber": 159
+        },
+        {
+          "caller": "submit",
+          "callee": "createSwimAnalysisJob",
+          "lineNumber": 159
+        },
+        {
+          "caller": "handleFile",
+          "callee": "setFile",
+          "lineNumber": 163
+        },
+        {
+          "caller": "UploadView",
+          "callee": "formatFileSize",
+          "lineNumber": 200
+        },
+        {
+          "caller": "UploadView",
+          "callee": "update",
+          "lineNumber": 209
+        },
+        {
+          "caller": "UploadView",
+          "callee": "update",
+          "lineNumber": 210
+        },
+        {
+          "caller": "UploadView",
+          "callee": "update",
+          "lineNumber": 211
+        },
+        {
+          "caller": "UploadView",
+          "callee": "update",
+          "lineNumber": 212
+        },
+        {
+          "caller": "UploadView",
+          "callee": "update",
+          "lineNumber": 216
+        },
+        {
+          "caller": "UploadView",
+          "callee": "update",
+          "lineNumber": 219
+        },
+        {
+          "caller": "UploadView",
+          "callee": "update",
+          "lineNumber": 223
+        },
+        {
+          "caller": "Field",
+          "callee": "onChange",
+          "lineNumber": 259
+        },
+        {
+          "caller": "SelectField",
+          "callee": "onChange",
+          "lineNumber": 283
+        },
+        {
+          "caller": "SelectField",
+          "callee": "Object.entries(options).map",
+          "lineNumber": 286
+        },
+        {
+          "caller": "SelectField",
+          "callee": "Object.entries",
+          "lineNumber": 286
+        },
+        {
+          "caller": "TasksView",
+          "callee": "jobs.map",
+          "lineNumber": 321
+        },
+        {
+          "caller": "TasksView",
+          "callee": "onNavigate",
+          "lineNumber": 335
+        },
+        {
+          "caller": "TasksView",
+          "callee": "onNavigate",
+          "lineNumber": 338
+        },
+        {
+          "caller": "TasksView",
+          "callee": "onNavigate",
+          "lineNumber": 341
+        },
+        {
+          "caller": "TasksView",
+          "callee": "onNavigate",
+          "lineNumber": 354
+        },
+        {
+          "caller": "JobView",
+          "callee": "onNavigate",
+          "lineNumber": 374
+        },
+        {
+          "caller": "JobView",
+          "callee": "formatFileSize",
+          "lineNumber": 392
+        },
+        {
+          "caller": "JobView",
+          "callee": "job.stages.map",
+          "lineNumber": 397
+        },
+        {
+          "caller": "JobView",
+          "callee": "onNavigate",
+          "lineNumber": 411
+        },
+        {
+          "caller": "JobView",
+          "callee": "onNavigate",
+          "lineNumber": 415
+        },
+        {
+          "caller": "JobView",
+          "callee": "onNavigate",
+          "lineNumber": 419
+        },
+        {
+          "caller": "WorkspaceView",
+          "callee": "onNavigate",
+          "lineNumber": 455
+        },
+        {
+          "caller": "WorkspaceView",
+          "callee": "onNavigate",
+          "lineNumber": 456
+        },
+        {
+          "caller": "WorkspaceView",
+          "callee": "onNavigate",
+          "lineNumber": 457
+        },
+        {
+          "caller": "WorkspaceView",
+          "callee": "onNavigate",
+          "lineNumber": 473
+        },
+        {
+          "caller": "WorkspaceView",
+          "callee": "onNavigate",
+          "lineNumber": 474
+        },
+        {
+          "caller": "WorkspaceView",
+          "callee": "onNavigate",
+          "lineNumber": 475
+        },
+        {
+          "caller": "ReportView",
+          "callee": "onNavigate",
+          "lineNumber": 498
+        },
+        {
+          "caller": "ReportView",
+          "callee": "report.metrics.map",
+          "lineNumber": 512
+        },
+        {
+          "caller": "ReportView",
+          "callee": "report.diagnostics.map",
+          "lineNumber": 521
+        },
+        {
+          "caller": "ReportView",
+          "callee": "report.keyFindings.map",
+          "lineNumber": 542
+        },
+        {
+          "caller": "ReportView",
+          "callee": "onNavigate",
+          "lineNumber": 549
+        },
+        {
+          "caller": "TrainingView",
+          "callee": "onNavigate",
+          "lineNumber": 574
+        },
+        {
+          "caller": "TrainingView",
+          "callee": "report.recommendations.map",
+          "lineNumber": 580
+        },
+        {
+          "caller": "TrainingView",
+          "callee": "Math.min",
+          "lineNumber": 591
+        }
+      ],
+      "metrics": {
+        "importCount": 5,
+        "exportCount": 1,
+        "functionCount": 12,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/components/platform/SwimVisualWorkspace.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 179,
+      "nonEmptyLines": 166,
+      "functions": [
+        {
+          "name": "SwimVisualWorkspace",
+          "startLine": 14,
+          "endLine": 162,
+          "params": [
+            "{\n  job,\n  report,\n  onOpenReport,\n  onOpenTraining,\n  onOpenTasks\n}"
+          ]
+        },
+        {
+          "name": "StatusBadge",
+          "startLine": 164,
+          "endLine": 179,
+          "params": [
+            "{ status }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "SwimVisualWorkspace",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "StatusBadge",
+          "line": 164,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "SwimVisualWorkspace",
+          "callee": "[16, 27, 39, 51, 63, 75, 86].map",
+          "lineNumber": 78
+        },
+        {
+          "caller": "SwimVisualWorkspace",
+          "callee": "report.overlayCues.map",
+          "lineNumber": 83
+        },
+        {
+          "caller": "SwimVisualWorkspace",
+          "callee": "report.rhythmTicks.map",
+          "lineNumber": 97
+        },
+        {
+          "caller": "SwimVisualWorkspace",
+          "callee": "[\n              [\"泳姿\", strokeLabels[session.strokeType]],\n              [\"采集\", captureModeLabels[session.captureMode]],\n              [\"运动员\", session.swimmerLabel],\n              [\"场地\", session.venue]\n            ].map",
+          "lineNumber": 116
+        },
+        {
+          "caller": "SwimVisualWorkspace",
+          "callee": "report.visualLayers.map",
+          "lineNumber": 133
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/lib/swim-analysis-client.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 141,
+      "nonEmptyLines": 117,
+      "functions": [
+        {
+          "name": "canUseStorage",
+          "startLine": 19,
+          "endLine": 21,
+          "params": []
+        },
+        {
+          "name": "readJson",
+          "startLine": 23,
+          "endLine": 34,
+          "params": [
+            "key",
+            "fallback"
+          ]
+        },
+        {
+          "name": "writeJson",
+          "startLine": 36,
+          "endLine": 42,
+          "params": [
+            "key",
+            "value"
+          ]
+        },
+        {
+          "name": "formatFileSize",
+          "startLine": 44,
+          "endLine": 54,
+          "params": [
+            "bytes"
+          ]
+        },
+        {
+          "name": "listSwimAnalysisJobs",
+          "startLine": 56,
+          "endLine": 60,
+          "params": []
+        },
+        {
+          "name": "getRecentSwimAnalysisJob",
+          "startLine": 62,
+          "endLine": 64,
+          "params": []
+        },
+        {
+          "name": "rememberSwimAnalysisJob",
+          "startLine": 66,
+          "endLine": 71,
+          "params": [
+            "job"
+          ]
+        },
+        {
+          "name": "saveJob",
+          "startLine": 73,
+          "endLine": 80,
+          "params": [
+            "job",
+            "report"
+          ]
+        },
+        {
+          "name": "getSwimAnalysisJob",
+          "startLine": 82,
+          "endLine": 84,
+          "params": [
+            "jobId"
+          ]
+        },
+        {
+          "name": "getSwimAnalysisReport",
+          "startLine": 86,
+          "endLine": 93,
+          "params": [
+            "jobId"
+          ]
+        },
+        {
+          "name": "createSwimAnalysisJob",
+          "startLine": 95,
+          "endLine": 121,
+          "params": [
+            "input"
+          ]
+        },
+        {
+          "name": "seedDemoSwimJob",
+          "startLine": 123,
+          "endLine": 141,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "RECENT_SWIM_ANALYSIS_JOB_EVENT",
+          "line": 15,
+          "isDefault": false
+        },
+        {
+          "name": "formatFileSize",
+          "line": 44,
+          "isDefault": false
+        },
+        {
+          "name": "listSwimAnalysisJobs",
+          "line": 56,
+          "isDefault": false
+        },
+        {
+          "name": "getRecentSwimAnalysisJob",
+          "line": 62,
+          "isDefault": false
+        },
+        {
+          "name": "rememberSwimAnalysisJob",
+          "line": 66,
+          "isDefault": false
+        },
+        {
+          "name": "getSwimAnalysisJob",
+          "line": 82,
+          "isDefault": false
+        },
+        {
+          "name": "getSwimAnalysisReport",
+          "line": 86,
+          "isDefault": false
+        },
+        {
+          "name": "createSwimAnalysisJob",
+          "line": 95,
+          "isDefault": false
+        },
+        {
+          "name": "seedDemoSwimJob",
+          "line": 123,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "canUseStorage",
+          "callee": "Boolean",
+          "lineNumber": 20
+        },
+        {
+          "caller": "readJson",
+          "callee": "canUseStorage",
+          "lineNumber": 24
+        },
+        {
+          "caller": "readJson",
+          "callee": "window.localStorage.getItem",
+          "lineNumber": 29
+        },
+        {
+          "caller": "readJson",
+          "callee": "JSON.parse",
+          "lineNumber": 30
+        },
+        {
+          "caller": "writeJson",
+          "callee": "canUseStorage",
+          "lineNumber": 37
+        },
+        {
+          "caller": "writeJson",
+          "callee": "window.localStorage.setItem",
+          "lineNumber": 41
+        },
+        {
+          "caller": "writeJson",
+          "callee": "JSON.stringify",
+          "lineNumber": 41
+        },
+        {
+          "caller": "formatFileSize",
+          "callee": "(bytes / 1024).toFixed",
+          "lineNumber": 50
+        },
+        {
+          "caller": "formatFileSize",
+          "callee": "(bytes / 1024 / 1024).toFixed",
+          "lineNumber": 53
+        },
+        {
+          "caller": "listSwimAnalysisJobs",
+          "callee": "readJson<SwimAnalysisJob[]>(JOBS_KEY, []).sort",
+          "lineNumber": 57
+        },
+        {
+          "caller": "listSwimAnalysisJobs",
+          "callee": "readJson",
+          "lineNumber": 57
+        },
+        {
+          "caller": "listSwimAnalysisJobs",
+          "callee": "Date.parse",
+          "lineNumber": 58
+        },
+        {
+          "caller": "listSwimAnalysisJobs",
+          "callee": "Date.parse",
+          "lineNumber": 58
+        },
+        {
+          "caller": "getRecentSwimAnalysisJob",
+          "callee": "readJson",
+          "lineNumber": 63
+        },
+        {
+          "caller": "rememberSwimAnalysisJob",
+          "callee": "writeJson",
+          "lineNumber": 67
+        },
+        {
+          "caller": "rememberSwimAnalysisJob",
+          "callee": "window.dispatchEvent",
+          "lineNumber": 69
+        },
+        {
+          "caller": "saveJob",
+          "callee": "listSwimAnalysisJobs().filter",
+          "lineNumber": 74
+        },
+        {
+          "caller": "saveJob",
+          "callee": "listSwimAnalysisJobs",
+          "lineNumber": 74
+        },
+        {
+          "caller": "saveJob",
+          "callee": "readJson",
+          "lineNumber": 75
+        },
+        {
+          "caller": "saveJob",
+          "callee": "writeJson",
+          "lineNumber": 77
+        },
+        {
+          "caller": "saveJob",
+          "callee": "writeJson",
+          "lineNumber": 78
+        },
+        {
+          "caller": "saveJob",
+          "callee": "rememberSwimAnalysisJob",
+          "lineNumber": 79
+        },
+        {
+          "caller": "getSwimAnalysisJob",
+          "callee": "listSwimAnalysisJobs().find",
+          "lineNumber": 83
+        },
+        {
+          "caller": "getSwimAnalysisJob",
+          "callee": "listSwimAnalysisJobs",
+          "lineNumber": 83
+        },
+        {
+          "caller": "getSwimAnalysisReport",
+          "callee": "readJson",
+          "lineNumber": 91
+        },
+        {
+          "caller": "createSwimAnalysisJob",
+          "callee": "new Date().toISOString",
+          "lineNumber": 96
+        },
+        {
+          "caller": "createSwimAnalysisJob",
+          "callee": "Date.now().toString",
+          "lineNumber": 97
+        },
+        {
+          "caller": "createSwimAnalysisJob",
+          "callee": "Date.now",
+          "lineNumber": 97
+        },
+        {
+          "caller": "createSwimAnalysisJob",
+          "callee": "id.toUpperCase",
+          "lineNumber": 98
+        },
+        {
+          "caller": "createSwimAnalysisJob",
+          "callee": "saveJob",
+          "lineNumber": 119
+        },
+        {
+          "caller": "createSwimAnalysisJob",
+          "callee": "cloneReportForSession",
+          "lineNumber": 119
+        },
+        {
+          "caller": "seedDemoSwimJob",
+          "callee": "getRecentSwimAnalysisJob",
+          "lineNumber": 124
+        },
+        {
+          "caller": "seedDemoSwimJob",
+          "callee": "createSwimAnalysisJob",
+          "lineNumber": 129
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 9,
+        "functionCount": 12,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/lib/swim-demo-data.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 281,
+      "nonEmptyLines": 276,
+      "functions": [
+        {
+          "name": "cloneReportForSession",
+          "startLine": 273,
+          "endLine": 281,
+          "params": [
+            "reportId",
+            "session"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "strokeLabels",
+          "line": 9,
+          "isDefault": false
+        },
+        {
+          "name": "captureModeLabels",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "swimStageBlueprint",
+          "line": 24,
+          "isDefault": false
+        },
+        {
+          "name": "demoSwimReport",
+          "line": 90,
+          "isDefault": false
+        },
+        {
+          "name": "cloneReportForSession",
+          "line": 273,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 5,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/lib/swim-types.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 126,
+      "nonEmptyLines": 108,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    }
+  ]
+}

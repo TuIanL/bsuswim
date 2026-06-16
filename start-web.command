@@ -2,8 +2,8 @@
 set -e
 
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
-FRONTEND_DIR="$ROOT_DIR/frontend"
-PORT="${PORT:-3000}"
+FRONTEND_DIR="$ROOT_DIR/frontend-vue"
+PORT="${PORT:-5173}"
 HOST="127.0.0.1"
 PID_FILE="$ROOT_DIR/.web-dev.pid"
 LOG_FILE="$ROOT_DIR/.web-dev.log"
@@ -14,8 +14,23 @@ echo "项目目录: $ROOT_DIR"
 echo "访问地址: $URL"
 echo
 
+if command -v docker >/dev/null 2>&1; then
+  if docker info >/dev/null 2>&1; then
+    echo "正在启动本地数据库容器 postgres..."
+    docker compose -f "$ROOT_DIR/docker-compose.yml" up -d postgres
+    echo
+  else
+    echo "Docker 当前没有运行，已跳过数据库容器启动。"
+    echo "如果需要连接后端，请先打开 Docker Desktop 后再运行本脚本。"
+    echo
+  fi
+else
+  echo "未找到 docker 命令，已跳过数据库容器启动。"
+  echo
+fi
+
 if [ ! -d "$FRONTEND_DIR" ]; then
-  echo "找不到 frontend 目录: $FRONTEND_DIR"
+  echo "找不到 frontend-vue 目录: $FRONTEND_DIR"
   echo "按任意键退出..."
   read -k 1
   exit 1
@@ -41,8 +56,8 @@ if [ ! -d "node_modules" ]; then
   echo
 fi
 
-echo "正在启动 Next.js 开发服务器..."
-nohup npm run dev -- --hostname "$HOST" --port "$PORT" > "$LOG_FILE" 2>&1 &
+echo "正在启动 Vue/Vite 开发服务器..."
+nohup npm run dev -- --host "$HOST" --port "$PORT" > "$LOG_FILE" 2>&1 &
 SERVER_PID=$!
 echo "$SERVER_PID" > "$PID_FILE"
 

@@ -1,18 +1,4 @@
-# swim-analysis-platform-navigation Specification
-
-## Purpose
-TBD - created by archiving change port-pickleball-platform-to-swim-analysis. Update Purpose after archive.
-## Requirements
-### Requirement: Dark platform shell
-The frontend SHALL provide a platform shell for 智泳云枢 analysis workflows that preserves the existing dark sports-tech visual style.
-
-#### Scenario: User opens a platform view
-- **WHEN** a user opens any swim analysis platform view
-- **THEN** the page uses black or near-black backgrounds, white primary text, muted secondary text, thin dividers, restrained status accents, and compact panel styling consistent with the existing homepage
-
-#### Scenario: User navigates from platform back to home
-- **WHEN** a user activates the 智泳云枢 brand control in the platform shell
-- **THEN** the system returns to the brand/home surface without losing the platform visual language
+## MODIFIED Requirements
 
 ### Requirement: App-style analysis navigation
 The frontend SHALL provide app-style navigation for the swim analysis workflow and Vue business workflow while keeping the homepage entry points available.
@@ -28,13 +14,6 @@ The frontend SHALL provide app-style navigation for the swim analysis workflow a
 #### Scenario: User returns from business workflow to analysis output
 - **WHEN** a user completes or opens a training session with uploaded videos
 - **THEN** the navigation provides stable entry points to the visual workspace and report surfaces for the related analysis context
-
-### Requirement: Domain-safe migration boundary
-The platform shell SHALL avoid user-facing pickleball domain concepts.
-
-#### Scenario: User reviews platform navigation and labels
-- **WHEN** the user reads navigation labels, section labels, and primary actions
-- **THEN** the system uses swim-analysis language such as video analysis, training session, stroke, keypoints, posture, rhythm, and coach feedback instead of pickleball terms such as court, rally, serve, shot, or paddle
 
 ### Requirement: Stable platform layout
 The platform SHALL provide stable responsive layout frames for repeated-use analysis and business workflows.

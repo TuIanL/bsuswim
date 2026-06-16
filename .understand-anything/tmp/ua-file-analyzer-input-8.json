@@ -1,0 +1,10 @@
+{
+  "projectRoot": "/Users/tuian/Documents/大学/竞赛/大创/游泳/swim",
+  "batchFiles": [
+    {"path": ".env.example", "language": "config", "sizeLines": 15, "fileCategory": "config"},
+    {"path": "README.md", "language": "markdown", "sizeLines": 162, "fileCategory": "docs"},
+    {"path": "docker-compose.yml", "language": "yaml", "sizeLines": 38, "fileCategory": "infra"},
+    {"path": "requirements-lock.txt", "language": "txt", "sizeLines": 19, "fileCategory": "docs"}
+  ],
+  "batchImportData": {}
+}

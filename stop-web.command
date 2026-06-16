@@ -2,7 +2,7 @@
 set -e
 
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PORT="${PORT:-3000}"
+PORT="${PORT:-5173}"
 PID_FILE="$ROOT_DIR/.web-dev.pid"
 LOG_FILE="$ROOT_DIR/.web-dev.log"
 

@@ -1,0 +1,15 @@
+{
+  "projectRoot": "/Users/tuian/Documents/大学/竞赛/大创/游泳/swim",
+  "batchFiles": [
+    {"path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/.openspec.yaml", "language": "yaml", "sizeLines": 2, "fileCategory": "config"},
+    {"path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/design.md", "language": "markdown", "sizeLines": 88, "fileCategory": "docs"},
+    {"path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/proposal.md", "language": "markdown", "sizeLines": 36, "fileCategory": "docs"},
+    {"path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/tasks.md", "language": "markdown", "sizeLines": 63, "fileCategory": "docs"}
+  ],
+  "batchImportData": {
+    "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/.openspec.yaml": [],
+    "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/design.md": [],
+    "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/proposal.md": [],
+    "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/tasks.md": []
+  }
+}

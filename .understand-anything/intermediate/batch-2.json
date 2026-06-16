@@ -1,0 +1,1262 @@
+{
+  "nodes": [
+    {
+      "id": "file:frontend-vue/src/App.vue",
+      "type": "file",
+      "name": "App.vue",
+      "filePath": "frontend-vue/src/App.vue",
+      "summary": "Vue 应用根组件，包含侧边导航栏和路由视图。根据当前路由判断是否渲染登录/注册页面，否则显示包含品牌标识、菜单导航和用户信息的应用外壳布局。",
+      "tags": ["component", "layout", "root"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend-vue/src/main.ts",
+      "type": "file",
+      "name": "main.ts",
+      "filePath": "frontend-vue/src/main.ts",
+      "summary": "Vue 应用入口文件，创建 Vue 实例并挂载 Pinia 状态管理、Vue Router 路由和 Element Plus UI 库。",
+      "tags": ["entry-point", "bootstrap", "vue"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend-vue/src/router.ts",
+      "type": "file",
+      "name": "router.ts",
+      "filePath": "frontend-vue/src/router.ts",
+      "summary": "Vue Router 路由配置，定义所有页面路径（登录、注册、运动员管理、测试任务、工作台、报告），并在全局 beforeEach 守卫中处理认证状态和 Demo 模式重定向。",
+      "tags": ["router", "authentication", "guard"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend-vue/src/services/api.ts",
+      "type": "file",
+      "name": "api.ts",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "summary": "API 服务层，封装所有后端接口调用（认证、运动员、测试任务、视频上传、分析报告）。在 Demo 模式下自动切换为本地模拟数据，无需后端即可运行。",
+      "tags": ["api-handler", "service", "authentication", "http-client"],
+      "complexity": "moderate",
+      "languageNotes": "使用 axios 实例统一处理 Authorization 请求头，所有接口函数遵循 demoMode 短路模式：无后端 URL 时自动返回 mock 数据。"
+    },
+    {
+      "id": "file:frontend-vue/src/services/demoData.ts",
+      "type": "file",
+      "name": "demoData.ts",
+      "filePath": "frontend-vue/src/services/demoData.ts",
+      "summary": "Demo 模式下的本地模拟数据层，预置运动员、训练测试、视频绑定、分析任务和工作台数据，并提供完整的 CRUD 操作函数以在无后端时模拟业务行为。",
+      "tags": ["mock-data", "testing", "demo"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:frontend-vue/src/stores/auth.ts",
+      "type": "file",
+      "name": "auth.ts",
+      "filePath": "frontend-vue/src/stores/auth.ts",
+      "summary": "Pinia 认证状态管理 Store，管理 token 持久化、用户信息存储与恢复，提供登录、注册、登出和会话恢复功能，支持 localStorage 持久化和 Demo 模式。",
+      "tags": ["store", "authentication", "state-management", "pinia"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend-vue/src/stores/tasks.ts",
+      "type": "file",
+      "name": "tasks.ts",
+      "filePath": "frontend-vue/src/stores/tasks.ts",
+      "summary": "Pinia 测试任务状态管理 Store，封装分析任务列表的获取和刷新操作，供任务管理页面使用。",
+      "tags": ["store", "state-management", "pinia"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend-vue/src/types.ts",
+      "type": "file",
+      "name": "types.ts",
+      "filePath": "frontend-vue/src/types.ts",
+      "summary": "TypeScript 类型定义文件，包含运动员、训练测试、视频文件、分析任务、报告等核心业务实体的接口和联合类型定义。",
+      "tags": ["type-definition", "interface", "typescript"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend-vue/src/views/AthleteProfileView.vue",
+      "type": "file",
+      "name": "AthleteProfileView.vue",
+      "filePath": "frontend-vue/src/views/AthleteProfileView.vue",
+      "summary": "运动员档案详情页面，展示基础信息、最近技术评分、核心指标趋势折线图（使用 ECharts）和历史测试记录表格。",
+      "tags": ["view", "athlete", "profile", "chart"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend-vue/src/views/AthletesView.vue",
+      "type": "file",
+      "name": "AthletesView.vue",
+      "filePath": "frontend-vue/src/views/AthletesView.vue",
+      "summary": "运动员管理列表页面，支持按姓名、泳姿、队伍和评分范围筛选过滤，内嵌新建运动员对话框表单。",
+      "tags": ["view", "athlete", "list", "filter"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend-vue/src/views/CreateSessionView.vue",
+      "type": "file",
+      "name": "CreateSessionView.vue",
+      "filePath": "frontend-vue/src/views/CreateSessionView.vue",
+      "summary": "创建测试任务页面，提供表单选择运动员、填写测试标题、泳姿、距离、泳池长度和场景等信息，创建后跳转到多机位上传页。",
+      "tags": ["view", "session", "form", "create"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend-vue/src/views/LoginView.vue",
+      "type": "file",
+      "name": "LoginView.vue",
+      "filePath": "frontend-vue/src/views/LoginView.vue",
+      "summary": "用户登录页面，包含用户名密码表单和记住登录状态选项，登录成功后跳转到运动员管理页或之前访问的页面。",
+      "tags": ["view", "authentication", "login", "form"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend-vue/src/views/RegisterView.vue",
+      "type": "file",
+      "name": "RegisterView.vue",
+      "filePath": "frontend-vue/src/views/RegisterView.vue",
+      "summary": "用户注册页面，提供姓名、用户名、手机号、邮箱、密码和角色选择表单，支持教练/运动员/管理员三种角色。",
+      "tags": ["view", "authentication", "register", "form"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend-vue/src/views/ReportView.vue",
+      "type": "file",
+      "name": "ReportView.vue",
+      "filePath": "frontend-vue/src/views/ReportView.vue",
+      "summary": "分析报告展示页面，渲染后端返回的报告数据（综合评分、核心指标雷达图、诊断与建议时间线），支持 Demo 数据和真实模型输出两种来源。",
+      "tags": ["view", "report", "chart", "diagnostics"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend-vue/src/views/SessionUploadView.vue",
+      "type": "file",
+      "name": "SessionUploadView.vue",
+      "filePath": "frontend-vue/src/views/SessionUploadView.vue",
+      "summary": "多机位视频上传页面，支持侧面、正面、俯视、水下和半水下五个机位的视频文件选择和上传，管理同步偏移、FPS 和分辨率参数。",
+      "tags": ["view", "upload", "video", "session"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:frontend-vue/src/views/TasksView.vue",
+      "type": "file",
+      "name": "TasksView.vue",
+      "filePath": "frontend-vue/src/views/TasksView.vue",
+      "summary": "测试任务管理页面，以表格展示所有训练测试记录，包含状态标签、进度条和上传/工作台/报告操作按钮。",
+      "tags": ["view", "task", "list", "status"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend-vue/src/views/WorkspaceView.vue",
+      "type": "file",
+      "name": "WorkspaceView.vue",
+      "filePath": "frontend-vue/src/views/WorkspaceView.vue",
+      "summary": "可视化分析工作台页面，集成视频播放器和 OverlayCanvas 叠加层组件展示分析结果，显示任务状态、阶段、进度和核心指标。",
+      "tags": ["view", "workspace", "visualization", "video"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:setAuthToken",
+      "type": "function",
+      "name": "setAuthToken",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [47, 49],
+      "summary": "设置或清除 HTTP 请求的 Bearer 认证令牌。",
+      "tags": ["authentication", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:login",
+      "type": "function",
+      "name": "login",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [58, 70],
+      "summary": "用户登录，Demo 模式返回模拟 token，否则以表单格式 POST 到认证接口获取真实 token。",
+      "tags": ["authentication", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:register",
+      "type": "function",
+      "name": "register",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [72, 86],
+      "summary": "用户注册，Demo 模式返回基于 demoUser 的本地用户对象，否则 POST 到注册接口。",
+      "tags": ["authentication", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:getCurrentUser",
+      "type": "function",
+      "name": "getCurrentUser",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [88, 92],
+      "summary": "获取当前登录用户信息，Demo 模式直接返回预置的 demoUser。",
+      "tags": ["authentication", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:listAthletes",
+      "type": "function",
+      "name": "listAthletes",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [94, 98],
+      "summary": "获取运动员列表，Demo 模式从本地模拟数据返回。",
+      "tags": ["athlete", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:createAthlete",
+      "type": "function",
+      "name": "createAthlete",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [100, 104],
+      "summary": "创建新运动员，Demo 模式调用本地模拟函数。",
+      "tags": ["athlete", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:getAthlete",
+      "type": "function",
+      "name": "getAthlete",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [106, 110],
+      "summary": "根据 ID 获取单个运动员详情，Demo 模式从本地数据查找。",
+      "tags": ["athlete", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:listAthleteSessions",
+      "type": "function",
+      "name": "listAthleteSessions",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [112, 116],
+      "summary": "获取指定运动员的所有测试记录列表。",
+      "tags": ["session", "athlete", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:getAthleteTrend",
+      "type": "function",
+      "name": "getAthleteTrend",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [118, 121],
+      "summary": "获取运动员核心指标趋势数据，Demo 模式从本地数据返回。",
+      "tags": ["trend", "athlete", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:createSession",
+      "type": "function",
+      "name": "createSession",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [123, 140],
+      "summary": "创建训练测试任务，校验运动员必填后构造载荷并发送请求，Demo 模式调用本地模拟创建。",
+      "tags": ["session", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:listSessions",
+      "type": "function",
+      "name": "listSessions",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [142, 146],
+      "summary": "获取所有训练测试记录列表。",
+      "tags": ["session", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:getSession",
+      "type": "function",
+      "name": "getSession",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [148, 152],
+      "summary": "根据 ID 获取单个训练测试详情。",
+      "tags": ["session", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:uploadVideo",
+      "type": "function",
+      "name": "uploadVideo",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [154, 163],
+      "summary": "上传视频文件，Demo 模式调用本地模拟创建视频记录，否则以 multipart/form-data 上传到后端。",
+      "tags": ["video", "upload", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:bindSessionVideo",
+      "type": "function",
+      "name": "bindSessionVideo",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [165, 182],
+      "summary": "将已上传的视频与训练测试绑定，设置机位类型、FPS、分辨率和同步偏移等参数。",
+      "tags": ["video", "session", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:bindUploadedSessionVideo",
+      "type": "function",
+      "name": "bindUploadedSessionVideo",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [184, 191],
+      "summary": "在已有 VideoFile 对象的情况下直接绑定到训练测试，是 bindSessionVideo 的便捷包装。",
+      "tags": ["video", "session", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:listSessionVideos",
+      "type": "function",
+      "name": "listSessionVideos",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [193, 197],
+      "summary": "获取指定训练测试关联的所有机位视频列表。",
+      "tags": ["video", "session", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:createAnalysisTask",
+      "type": "function",
+      "name": "createAnalysisTask",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [199, 205],
+      "summary": "创建视频分析任务，设置视频 ID 和训练元数据，Demo 模式返回预置 demoTask。",
+      "tags": ["analysis", "task", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:listTasks",
+      "type": "function",
+      "name": "listTasks",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [207, 211],
+      "summary": "获取所有分析任务列表。",
+      "tags": ["task", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:getTask",
+      "type": "function",
+      "name": "getTask",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [213, 217],
+      "summary": "根据 ID 获取单个分析任务详情。",
+      "tags": ["task", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:getWorkspace",
+      "type": "function",
+      "name": "getWorkspace",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [219, 223],
+      "summary": "获取可视化工作台数据，包含分析任务和分析结果。",
+      "tags": ["workspace", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:getReport",
+      "type": "function",
+      "name": "getReport",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [225, 229],
+      "summary": "获取分析报告数据，Demo 模式返回预置的 demoReport。",
+      "tags": ["report", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/api.ts:resolveMediaUrl",
+      "type": "function",
+      "name": "resolveMediaUrl",
+      "filePath": "frontend-vue/src/services/api.ts",
+      "lineRange": [231, 235],
+      "summary": "解析媒体资源的完整 URL，对相对路径拼接后端基础地址。",
+      "tags": ["utility", "media", "url"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/demoData.ts:resetDemoBusinessData",
+      "type": "function",
+      "name": "resetDemoBusinessData",
+      "filePath": "frontend-vue/src/services/demoData.ts",
+      "lineRange": [289, 293],
+      "summary": "重置所有 Demo 业务数据到初始状态。",
+      "tags": ["demo", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/demoData.ts:getDemoAthletes",
+      "type": "function",
+      "name": "getDemoAthletes",
+      "filePath": "frontend-vue/src/services/demoData.ts",
+      "lineRange": [295, 297],
+      "summary": "返回预置的 Demo 运动员列表。",
+      "tags": ["demo", "athlete"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/demoData.ts:createDemoAthlete",
+      "type": "function",
+      "name": "createDemoAthlete",
+      "filePath": "frontend-vue/src/services/demoData.ts",
+      "lineRange": [299, 320],
+      "summary": "在本地模拟数据中创建新运动员并返回完整对象。",
+      "tags": ["demo", "athlete", "crud"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/demoData.ts:getDemoAthlete",
+      "type": "function",
+      "name": "getDemoAthlete",
+      "filePath": "frontend-vue/src/services/demoData.ts",
+      "lineRange": [322, 324],
+      "summary": "根据 ID 从本地数据查找单个运动员。",
+      "tags": ["demo", "athlete"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/demoData.ts:getDemoAthleteSessions",
+      "type": "function",
+      "name": "getDemoAthleteSessions",
+      "filePath": "frontend-vue/src/services/demoData.ts",
+      "lineRange": [326, 328],
+      "summary": "根据运动员 ID 筛选其所有训练测试记录。",
+      "tags": ["demo", "session", "athlete"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/demoData.ts:getDemoAthleteTrend",
+      "type": "function",
+      "name": "getDemoAthleteTrend",
+      "filePath": "frontend-vue/src/services/demoData.ts",
+      "lineRange": [330, 332],
+      "summary": "返回预置的运动员趋势数据。",
+      "tags": ["demo", "trend", "athlete"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/demoData.ts:getDemoSessions",
+      "type": "function",
+      "name": "getDemoSessions",
+      "filePath": "frontend-vue/src/services/demoData.ts",
+      "lineRange": [334, 336],
+      "summary": "返回按日期排序的所有 Demo 训练测试列表。",
+      "tags": ["demo", "session"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/demoData.ts:getDemoSession",
+      "type": "function",
+      "name": "getDemoSession",
+      "filePath": "frontend-vue/src/services/demoData.ts",
+      "lineRange": [338, 340],
+      "summary": "根据 ID 从本地数据查找单个训练测试。",
+      "tags": ["demo", "session"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/demoData.ts:createDemoSession",
+      "type": "function",
+      "name": "createDemoSession",
+      "filePath": "frontend-vue/src/services/demoData.ts",
+      "lineRange": [342, 363],
+      "summary": "在本地模拟数据中创建训练测试，自动拼接标题并返回完整记录。",
+      "tags": ["demo", "session", "crud"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/demoData.ts:createDemoVideo",
+      "type": "function",
+      "name": "createDemoVideo",
+      "filePath": "frontend-vue/src/services/demoData.ts",
+      "lineRange": [365, 377],
+      "summary": "在本地模拟数据中创建视频文件记录并返回 VideoFile 对象。",
+      "tags": ["demo", "video", "crud"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/demoData.ts:bindDemoSessionVideo",
+      "type": "function",
+      "name": "bindDemoSessionVideo",
+      "filePath": "frontend-vue/src/services/demoData.ts",
+      "lineRange": [379, 401],
+      "summary": "在本地模拟数据中将视频与训练测试绑定，创建 SessionVideo 记录并更新测试状态。",
+      "tags": ["demo", "video", "session"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/services/demoData.ts:getDemoSessionVideos",
+      "type": "function",
+      "name": "getDemoSessionVideos",
+      "filePath": "frontend-vue/src/services/demoData.ts",
+      "lineRange": [403, 405],
+      "summary": "根据测试 ID 从本地数据筛选关联的视频列表。",
+      "tags": ["demo", "video", "session"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend-vue/src/stores/auth.ts:useAuthStore",
+      "type": "function",
+      "name": "useAuthStore",
+      "filePath": "frontend-vue/src/stores/auth.ts",
+      "lineRange": [17, 91],
+      "summary": "Pinia 认证 Store，管理用户 token、个人信息和登录状态，提供 login、register、logout、restore 和 persist 等认证操作。",
+      "tags": ["store", "authentication", "pinia"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend-vue/src/stores/tasks.ts:useTasksStore",
+      "type": "function",
+      "name": "useTasksStore",
+      "filePath": "frontend-vue/src/stores/tasks.ts",
+      "lineRange": [5, 20],
+      "summary": "Pinia 任务列表 Store，管理与刷新分析任务列表。",
+      "tags": ["store", "task", "pinia"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:frontend-vue/src/main.ts",
+      "target": "file:frontend-vue/src/App.vue",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/main.ts",
+      "target": "file:frontend-vue/src/router.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/main.ts",
+      "target": "file:frontend-vue/src/styles.css",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/router.ts",
+      "target": "file:frontend-vue/src/services/api.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/router.ts",
+      "target": "file:frontend-vue/src/stores/auth.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/router.ts",
+      "target": "file:frontend-vue/src/views/AthleteProfileView.vue",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/router.ts",
+      "target": "file:frontend-vue/src/views/AthletesView.vue",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/router.ts",
+      "target": "file:frontend-vue/src/views/CreateSessionView.vue",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/router.ts",
+      "target": "file:frontend-vue/src/views/LoginView.vue",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/router.ts",
+      "target": "file:frontend-vue/src/views/RegisterView.vue",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/router.ts",
+      "target": "file:frontend-vue/src/views/ReportView.vue",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/router.ts",
+      "target": "file:frontend-vue/src/views/SessionUploadView.vue",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/router.ts",
+      "target": "file:frontend-vue/src/views/TasksView.vue",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/router.ts",
+      "target": "file:frontend-vue/src/views/WorkspaceView.vue",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "file:frontend-vue/src/services/demoData.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "file:frontend-vue/src/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "file:frontend-vue/src/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/stores/auth.ts",
+      "target": "file:frontend-vue/src/services/api.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/stores/auth.ts",
+      "target": "file:frontend-vue/src/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/stores/tasks.ts",
+      "target": "file:frontend-vue/src/services/api.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/stores/tasks.ts",
+      "target": "file:frontend-vue/src/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:setAuthToken",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:login",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:register",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:getCurrentUser",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:listAthletes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:createAthlete",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:getAthlete",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:listAthleteSessions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:getAthleteTrend",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:createSession",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:listSessions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:getSession",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:uploadVideo",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:bindSessionVideo",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:bindUploadedSessionVideo",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:listSessionVideos",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:createAnalysisTask",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:listTasks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:getTask",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:getWorkspace",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:getReport",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:resolveMediaUrl",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:resetDemoBusinessData",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:getDemoAthletes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:createDemoAthlete",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:getDemoAthlete",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:getDemoAthleteSessions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:getDemoAthleteTrend",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:getDemoSessions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:getDemoSession",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:createDemoSession",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:createDemoVideo",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:bindDemoSessionVideo",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:getDemoSessionVideos",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/stores/auth.ts",
+      "target": "function:frontend-vue/src/stores/auth.ts:useAuthStore",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/stores/tasks.ts",
+      "target": "function:frontend-vue/src/stores/tasks.ts:useTasksStore",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:setAuthToken",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:login",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:register",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:getCurrentUser",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:listAthletes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:createAthlete",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:getAthlete",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:listAthleteSessions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:getAthleteTrend",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:createSession",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:listSessions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:getSession",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:uploadVideo",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:bindSessionVideo",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:bindUploadedSessionVideo",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:listSessionVideos",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:createAnalysisTask",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:listTasks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:getTask",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:getWorkspace",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:getReport",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/api.ts",
+      "target": "function:frontend-vue/src/services/api.ts:resolveMediaUrl",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:resetDemoBusinessData",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:getDemoAthletes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:createDemoAthlete",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:getDemoAthlete",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:getDemoAthleteSessions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:getDemoAthleteTrend",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:getDemoSessions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:getDemoSession",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:createDemoSession",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:createDemoVideo",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:bindDemoSessionVideo",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/services/demoData.ts",
+      "target": "function:frontend-vue/src/services/demoData.ts:getDemoSessionVideos",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/stores/auth.ts",
+      "target": "function:frontend-vue/src/stores/auth.ts:useAuthStore",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/stores/tasks.ts",
+      "target": "function:frontend-vue/src/stores/tasks.ts:useTasksStore",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend-vue/src/App.vue",
+      "target": "file:frontend-vue/src/services/api.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend-vue/src/App.vue",
+      "target": "file:frontend-vue/src/stores/auth.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend-vue/src/views/AthleteProfileView.vue",
+      "target": "file:frontend-vue/src/services/api.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend-vue/src/views/AthleteProfileView.vue",
+      "target": "file:frontend-vue/src/stores/auth.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend-vue/src/views/AthletesView.vue",
+      "target": "file:frontend-vue/src/services/api.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend-vue/src/views/AthletesView.vue",
+      "target": "file:frontend-vue/src/stores/auth.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend-vue/src/views/CreateSessionView.vue",
+      "target": "file:frontend-vue/src/services/api.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend-vue/src/views/LoginView.vue",
+      "target": "file:frontend-vue/src/stores/auth.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend-vue/src/views/RegisterView.vue",
+      "target": "file:frontend-vue/src/stores/auth.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend-vue/src/views/ReportView.vue",
+      "target": "file:frontend-vue/src/services/api.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend-vue/src/views/SessionUploadView.vue",
+      "target": "file:frontend-vue/src/services/api.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend-vue/src/views/TasksView.vue",
+      "target": "file:frontend-vue/src/services/api.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend-vue/src/views/WorkspaceView.vue",
+      "target": "file:frontend-vue/src/services/api.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}

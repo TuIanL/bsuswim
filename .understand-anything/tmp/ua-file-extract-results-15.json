@@ -1,0 +1,201 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 4,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/.openspec.yaml",
+      "language": "yaml",
+      "fileCategory": "config",
+      "totalLines": 2,
+      "nonEmptyLines": 2,
+      "sections": [
+        {
+          "heading": "schema",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "created",
+          "level": 1,
+          "line": 2
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 2
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/design.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 88,
+      "nonEmptyLines": 55,
+      "sections": [
+        {
+          "heading": "Context",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Goals / Non-Goals",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Decisions",
+          "level": 2,
+          "line": 26
+        },
+        {
+          "heading": "使用 PostgreSQL + psycopg 作为同步 SQLAlchemy 驱动",
+          "level": 3,
+          "line": 28
+        },
+        {
+          "heading": "使用 Alembic 管理 schema 演进",
+          "level": 3,
+          "line": 34
+        },
+        {
+          "heading": "以 `training_sessions` 作为业务中心",
+          "level": 3,
+          "line": 40
+        },
+        {
+          "heading": "分离 `video_files` 和 `session_videos`",
+          "level": 3,
+          "line": 46
+        },
+        {
+          "heading": "先用 JWT Bearer token 完成平台认证",
+          "level": 3,
+          "line": 52
+        },
+        {
+          "heading": "报告 API 面向 `session_id`",
+          "level": 3,
+          "line": 58
+        },
+        {
+          "heading": "Risks / Trade-offs",
+          "level": 2,
+          "line": 64
+        },
+        {
+          "heading": "Migration Plan",
+          "level": 2,
+          "line": 72
+        },
+        {
+          "heading": "Open Questions",
+          "level": 2,
+          "line": 84
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/proposal.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 36,
+      "nonEmptyLines": 26,
+      "sections": [
+        {
+          "heading": "Why",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "What Changes",
+          "level": 2,
+          "line": 5
+        },
+        {
+          "heading": "Capabilities",
+          "level": 2,
+          "line": 16
+        },
+        {
+          "heading": "New Capabilities",
+          "level": 3,
+          "line": 18
+        },
+        {
+          "heading": "Modified Capabilities",
+          "level": 3,
+          "line": 22
+        },
+        {
+          "heading": "Impact",
+          "level": 2,
+          "line": 29
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/tasks.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 63,
+      "nonEmptyLines": 52,
+      "sections": [
+        {
+          "heading": "1. PostgreSQL 与本地环境",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "2. Alembic 与模型结构",
+          "level": 2,
+          "line": 9
+        },
+        {
+          "heading": "3. 认证与用户接口",
+          "level": 2,
+          "line": 19
+        },
+        {
+          "heading": "4. 运动员、训练记录与视频绑定",
+          "level": 2,
+          "line": 28
+        },
+        {
+          "heading": "5. Session 级分析与报告",
+          "level": 2,
+          "line": 42
+        },
+        {
+          "heading": "6. 验证与兼容收尾",
+          "level": 2,
+          "line": 55
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    }
+  ]
+}

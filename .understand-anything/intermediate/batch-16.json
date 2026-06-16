@@ -1,0 +1,346 @@
+{
+  "nodes": [
+    {
+      "id": "document:.claude/skills/openspec-apply-change/SKILL.md",
+      "type": "document",
+      "name": "openspec-apply-change SKILL.md",
+      "filePath": ".claude/skills/openspec-apply-change/SKILL.md",
+      "summary": "OpenSpec 工单实施技能的完整说明文档，定义 AI 助手根据规范工单逐步实现代码变更的 7 步流程，包括选择变更、检查状态、读取上下文、循环实施任务和完成宣告。",
+      "tags": ["documentation", "workflow", "development", "spec-driven"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:.claude/skills/openspec-archive-change/SKILL.md",
+      "type": "document",
+      "name": "openspec-archive-change SKILL.md",
+      "filePath": ".claude/skills/openspec-archive-change/SKILL.md",
+      "summary": "OpenSpec 变更归档技能文档，定义归档完成的开发变更的 6 步流程，包括选择变更、检查工件完成状态、检查任务完成状态、评估 delta spec 同步状态、执行归档和展示总结。",
+      "tags": ["documentation", "workflow", "development", "archiving"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:.claude/skills/openspec-explore/SKILL.md",
+      "type": "document",
+      "name": "openspec-explore SKILL.md",
+      "filePath": ".claude/skills/openspec-explore/SKILL.md",
+      "summary": "OpenSpec 探索模式技能文档，定义 AI 助手作为思维伙伴的立场和行为指南，支持问题空间探索、代码库调研、方案对比和可视化表达，禁止在探索模式下实施代码变更。",
+      "tags": ["documentation", "workflow", "exploration", "thinking-partner"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:.claude/skills/openspec-propose/SKILL.md",
+      "type": "document",
+      "name": "openspec-propose SKILL.md",
+      "filePath": ".claude/skills/openspec-propose/SKILL.md",
+      "summary": "OpenSpec 变更提案技能文档，定义一键生成完整变更提案的 5 步流程，包括理解需求、创建变更目录、按依赖顺序生成所有工件（proposal/design/tasks）并验证完成状态。",
+      "tags": ["documentation", "workflow", "development", "proposal"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:.codex/skills/openspec-apply-change/SKILL.md",
+      "type": "document",
+      "name": "openspec-apply-change SKILL.md",
+      "filePath": ".codex/skills/openspec-apply-change/SKILL.md",
+      "summary": "OpenSpec 工单实施技能的完整说明文档（Codex 版本），与 .claude/skills 版本内容一致，定义 AI 助手根据规范工单逐步实现代码变更的流程。",
+      "tags": ["documentation", "workflow", "development", "spec-driven"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:.codex/skills/openspec-archive-change/SKILL.md",
+      "type": "document",
+      "name": "openspec-archive-change SKILL.md",
+      "filePath": ".codex/skills/openspec-archive-change/SKILL.md",
+      "summary": "OpenSpec 变更归档技能文档（Codex 版本），与 .claude/skills 版本内容一致，定义归档完成的开发变更的完整流程。",
+      "tags": ["documentation", "workflow", "development", "archiving"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:.codex/skills/openspec-explore/SKILL.md",
+      "type": "document",
+      "name": "openspec-explore SKILL.md",
+      "filePath": ".codex/skills/openspec-explore/SKILL.md",
+      "summary": "OpenSpec 探索模式技能文档（Codex 版本），与 .claude/skills 版本内容一致，定义 AI 助手作为思维伙伴的立场和行为指南。",
+      "tags": ["documentation", "workflow", "exploration", "thinking-partner"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:.codex/skills/openspec-propose/SKILL.md",
+      "type": "document",
+      "name": "openspec-propose SKILL.md",
+      "filePath": ".codex/skills/openspec-propose/SKILL.md",
+      "summary": "OpenSpec 变更提案技能文档（Codex 版本），与 .claude/skills 版本内容一致，定义一键生成完整变更提案的流程。",
+      "tags": ["documentation", "workflow", "development", "proposal"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:.understand-anything/.understandignore",
+      "type": "file",
+      "name": ".understandignore",
+      "filePath": ".understand-anything/.understandignore",
+      "summary": "Understand Anything 分析工具的忽略规则配置文件，使用与 .gitignore 相同的 glob 语法定义需要排除的文件和目录模式，包含内置默认排除项和项目特定的注释建议。",
+      "tags": ["configuration", "ignore-patterns", "code-analysis"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.understand-anything/config.json",
+      "type": "config",
+      "name": "config.json",
+      "filePath": ".understand-anything/config.json",
+      "summary": "Understand Anything 分析工具的全局配置，指定输出语言为中文（zh），控制分析结果的本地化输出。",
+      "tags": ["configuration", "localization", "code-analysis"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:backend/alembic.ini",
+      "type": "config",
+      "name": "alembic.ini",
+      "filePath": "backend/alembic.ini",
+      "summary": "Alembic 数据库迁移工具的配置文件，指定迁移脚本位置、日志记录器配置（root/sqlalchemy/alembic）和控制台输出格式。",
+      "tags": ["configuration", "database", "migration", "alembic"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/alembic/script.py.mako",
+      "type": "file",
+      "name": "script.py.mako",
+      "filePath": "backend/alembic/script.py.mako",
+      "summary": "Alembic 迁移脚本的 Mako 模板文件，定义自动生成新迁移文件的代码骨架结构，包含 revision 元数据、upgrade/downgrade 函数占位和标准导入语句。",
+      "tags": ["template", "migration", "alembic", "code-generation"],
+      "complexity": "simple",
+      "languageNotes": "Mako 模板使用 Mako 模板语法（${variable}）动态填充 revision ID、时间戳和导入语句。"
+    },
+    {
+      "id": "file:backend/alembic/versions/20260616_0001_create_platform_core_tables.py",
+      "type": "file",
+      "name": "20260616_0001_create_platform_core_tables.py",
+      "filePath": "backend/alembic/versions/20260616_0001_create_platform_core_tables.py",
+      "summary": "平台核心数据库的初始 Alembic 迁移脚本，创建 8 张核心业务表（users、teams、video_files、athletes、training_sessions、session_videos、analysis_tasks、analysis_results、report_metadata）、5 个 PostgreSQL 枚举类型以及相应的索引和外键约束。",
+      "tags": ["database", "migration", "alembic", "postgresql", "schema-definition"],
+      "complexity": "complex",
+      "languageNotes": "使用 Alembic + SQLAlchemy 的声明式 API（op.create_table/sa.Column）定义表结构，结合 PostgreSQL 原生 ENUM 类型实现枚举字段。"
+    },
+    {
+      "id": "function:backend/alembic/versions/20260616_0001_create_platform_core_tables.py:upgrade",
+      "type": "function",
+      "name": "upgrade",
+      "filePath": "backend/alembic/versions/20260616_0001_create_platform_core_tables.py",
+      "lineRange": [52, 224],
+      "summary": "Alembic 升级函数，创建 PostgreSQL 枚举类型（分析任务状态、泳姿、训练会话状态、用户角色、视角类型）并按依赖顺序创建 8 张业务表及其索引和约束。",
+      "tags": ["database", "migration", "schema-creation", "postgresql"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:backend/alembic/versions/20260616_0001_create_platform_core_tables.py:downgrade",
+      "type": "function",
+      "name": "downgrade",
+      "filePath": "backend/alembic/versions/20260616_0001_create_platform_core_tables.py",
+      "lineRange": [227, 265],
+      "summary": "Alembic 降级函数，按与 upgrade 相反的依赖顺序删除所有表、索引和 PostgreSQL 枚举类型，实现迁移的完整回滚。",
+      "tags": ["database", "migration", "rollback", "postgresql"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:backend/app/api/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "backend/app/api/__init__.py",
+      "summary": "Python 包标识文件，将 backend/app/api 标记为 Python 包，当前为空（无任何导入或导出）。",
+      "tags": ["package-init", "python", "empty"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/app/core/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "backend/app/core/__init__.py",
+      "summary": "Python 包标识文件，将 backend/app/core 标记为 Python 包，当前为空（无任何导入或导出）。",
+      "tags": ["package-init", "python", "empty"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/app/db/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "backend/app/db/__init__.py",
+      "summary": "Python 包标识文件，将 backend/app/db 标记为 Python 包，当前为空（无任何导入或导出）。",
+      "tags": ["package-init", "python", "empty"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/app/services/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "backend/app/services/__init__.py",
+      "summary": "Python 包标识文件，将 backend/app/services 标记为 Python 包，当前为空（无任何导入或导出）。",
+      "tags": ["package-init", "python", "empty"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:backend/requirements.txt",
+      "type": "document",
+      "name": "requirements.txt",
+      "filePath": "backend/requirements.txt",
+      "summary": "Python 后端依赖清单，列出 FastAPI、SQLAlchemy、Pydantic、PostgreSQL 适配器（psycopg）、JWT 认证（python-jose/passlib/bcrypt）和 Alembic 等 12 个核心运行时依赖。",
+      "tags": ["documentation", "dependencies", "python", "backend"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:configs/.gitkeep",
+      "type": "file",
+      "name": ".gitkeep",
+      "filePath": "configs/.gitkeep",
+      "summary": "空占位文件，确保 configs/ 目录在版本控制中被保留。",
+      "tags": ["placeholder", "directory-structure", "gitkeep"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:data/swim_coco/annotations/.gitkeep",
+      "type": "file",
+      "name": ".gitkeep",
+      "filePath": "data/swim_coco/annotations/.gitkeep",
+      "summary": "空占位文件，确保数据标注目录在版本控制中被保留。",
+      "tags": ["placeholder", "directory-structure", "gitkeep"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend-vue/src/components/OverlayCanvas.vue",
+      "type": "file",
+      "name": "OverlayCanvas.vue",
+      "filePath": "frontend-vue/src/components/OverlayCanvas.vue",
+      "summary": "Vue 3 画布叠加组件，在视频之上绘制检测框、骨架关键点和泳姿阶段标签，使用 requestAnimationFrame 驱动逐帧渲染，支持高清屏（devicePixelRatio）适配。",
+      "tags": ["component", "canvas", "visualization", "keypoint-overlay", "vue"],
+      "complexity": "moderate",
+      "languageNotes": "Vue 3 Composition API（<script setup>）配合 requestAnimationFrame 实现实时动画循环。"
+    },
+    {
+      "id": "file:frontend-vue/src/styles.css",
+      "type": "file",
+      "name": "styles.css",
+      "filePath": "frontend-vue/src/styles.css",
+      "summary": "Vue 前端全局样式表，定义品牌色彩体系、认证页面布局、侧边导航、表单布局、指标网格、视频舞台和相机卡片等组件样式，包含响应式断点适配（900px）。",
+      "tags": ["styles", "css", "frontend", "ui", "responsive"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:frontend-vue/src/views/UploadView.vue",
+      "type": "file",
+      "name": "UploadView.vue",
+      "filePath": "frontend-vue/src/views/UploadView.vue",
+      "summary": "视频上传与分析任务创建页面，包含拖拽上传表单（训练标题、泳姿、场地、运动员信息）、四步分析链路展示和提交逻辑，创建成功自动跳转到工作台。",
+      "tags": ["component", "upload", "form", "vue", "api-integration"],
+      "complexity": "moderate",
+      "languageNotes": "Vue 3 Composition API 结合 Element Plus 组件库实现表单验证与异步提交。"
+    },
+    {
+      "id": "file:frontend-vue/vite.config.ts",
+      "type": "file",
+      "name": "vite.config.ts",
+      "filePath": "frontend-vue/vite.config.ts",
+      "summary": "Vite 构建配置文件，启用 Vue 3 插件并将开发服务器绑定到 5173 端口。",
+      "tags": ["configuration", "build-system", "vite", "vue"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/app/globals.css",
+      "type": "file",
+      "name": "globals.css",
+      "filePath": "frontend/app/globals.css",
+      "summary": "Next.js 前端全局样式表，定义暗色主题色彩变量、自定义滚动条样式、platform-action 按钮交互动效和 scrollCue 关键帧动画，集成 Tailwind CSS 基础层。",
+      "tags": ["styles", "css", "frontend", "tailwind", "dark-theme"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:backend/alembic/versions/20260616_0001_create_platform_core_tables.py",
+      "target": "function:backend/alembic/versions/20260616_0001_create_platform_core_tables.py:upgrade",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/alembic/versions/20260616_0001_create_platform_core_tables.py",
+      "target": "function:backend/alembic/versions/20260616_0001_create_platform_core_tables.py:downgrade",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "config:backend/alembic.ini",
+      "target": "file:backend/alembic/versions/20260616_0001_create_platform_core_tables.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:backend/alembic.ini",
+      "target": "file:backend/alembic/script.py.mako",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend-vue/vite.config.ts",
+      "target": "file:frontend-vue/src/views/UploadView.vue",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:frontend-vue/vite.config.ts",
+      "target": "file:frontend-vue/src/components/OverlayCanvas.vue",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:backend/requirements.txt",
+      "target": "file:backend/alembic/versions/20260616_0001_create_platform_core_tables.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:.claude/skills/openspec-apply-change/SKILL.md",
+      "target": "document:.codex/skills/openspec-apply-change/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:.claude/skills/openspec-archive-change/SKILL.md",
+      "target": "document:.codex/skills/openspec-archive-change/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:.claude/skills/openspec-explore/SKILL.md",
+      "target": "document:.codex/skills/openspec-explore/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:.claude/skills/openspec-propose/SKILL.md",
+      "target": "document:.codex/skills/openspec-propose/SKILL.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:frontend-vue/src/styles.css",
+      "target": "file:frontend-vue/src/main.ts",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:frontend/app/globals.css",
+      "target": "file:frontend/app/layout.tsx",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

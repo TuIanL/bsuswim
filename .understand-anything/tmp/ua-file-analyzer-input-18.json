@@ -1,0 +1,39 @@
+{
+  "projectRoot": "/Users/tuian/Documents/大学/竞赛/大创/游泳/swim",
+  "batchFiles": [
+    {"path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/swim-interactive-performance-report/spec.md", "language": "markdown", "sizeLines": 36, "fileCategory": "docs"},
+    {"path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/swim-video-analysis-job-flow/spec.md", "language": "markdown", "sizeLines": 47, "fileCategory": "docs"},
+    {"path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/swim-visual-analysis-workspace/spec.md", "language": "markdown", "sizeLines": 36, "fileCategory": "docs"},
+    {"path": "openspec/config.yaml", "language": "yaml", "sizeLines": 25, "fileCategory": "config"},
+    {"path": "openspec/specs/backend-platform-core/spec.md", "language": "markdown", "sizeLines": 117, "fileCategory": "docs"},
+    {"path": "openspec/specs/heavy-model-analysis-architecture/spec.md", "language": "markdown", "sizeLines": 91, "fileCategory": "docs"},
+    {"path": "openspec/specs/swim-analysis-platform-navigation/spec.md", "language": "markdown", "sizeLines": 41, "fileCategory": "docs"},
+    {"path": "openspec/specs/swim-interactive-performance-report/spec.md", "language": "markdown", "sizeLines": 96, "fileCategory": "docs"},
+    {"path": "openspec/specs/swim-video-analysis-job-flow/spec.md", "language": "markdown", "sizeLines": 115, "fileCategory": "docs"},
+    {"path": "openspec/specs/swim-visual-analysis-workspace/spec.md", "language": "markdown", "sizeLines": 104, "fileCategory": "docs"},
+    {"path": "openspec/specs/zhiyong-yunshu-landing-page/spec.md", "language": "markdown", "sizeLines": 79, "fileCategory": "docs"},
+    {"path": "start-web.command", "language": "command", "sizeLines": 87, "fileCategory": "code"},
+    {"path": "stop-web.command", "language": "command", "sizeLines": 56, "fileCategory": "code"},
+    {"path": "tools/.gitkeep", "language": "unknown", "sizeLines": 1, "fileCategory": "code"},
+    {"path": "uploads/.gitkeep", "language": "unknown", "sizeLines": 1, "fileCategory": "code"},
+    {"path": "weights/.gitkeep", "language": "unknown", "sizeLines": 1, "fileCategory": "code"}
+  ],
+  "batchImportData": {
+    "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/swim-interactive-performance-report/spec.md": [],
+    "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/swim-video-analysis-job-flow/spec.md": [],
+    "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/swim-visual-analysis-workspace/spec.md": [],
+    "openspec/config.yaml": [],
+    "openspec/specs/backend-platform-core/spec.md": [],
+    "openspec/specs/heavy-model-analysis-architecture/spec.md": [],
+    "openspec/specs/swim-analysis-platform-navigation/spec.md": [],
+    "openspec/specs/swim-interactive-performance-report/spec.md": [],
+    "openspec/specs/swim-video-analysis-job-flow/spec.md": [],
+    "openspec/specs/swim-visual-analysis-workspace/spec.md": [],
+    "openspec/specs/zhiyong-yunshu-landing-page/spec.md": [],
+    "start-web.command": [],
+    "stop-web.command": [],
+    "tools/.gitkeep": [],
+    "uploads/.gitkeep": [],
+    "weights/.gitkeep": []
+  }
+}

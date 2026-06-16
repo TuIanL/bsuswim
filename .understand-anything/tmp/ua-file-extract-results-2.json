@@ -1,0 +1,1077 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 17,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "frontend-vue/src/App.vue",
+      "language": "vue",
+      "fileCategory": "code",
+      "totalLines": 55,
+      "nonEmptyLines": 51,
+      "metrics": {}
+    },
+    {
+      "path": "frontend-vue/src/main.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 9,
+      "nonEmptyLines": 8,
+      "metrics": {
+        "importCount": 3,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend-vue/src/router.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 46,
+      "nonEmptyLines": 40,
+      "exports": [
+        {
+          "name": "router",
+          "line": 16,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 11,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend-vue/src/services/api.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 235,
+      "nonEmptyLines": 206,
+      "functions": [
+        {
+          "name": "setAuthToken",
+          "startLine": 47,
+          "endLine": 49,
+          "params": [
+            "token"
+          ]
+        },
+        {
+          "name": "login",
+          "startLine": 58,
+          "endLine": 70,
+          "params": [
+            "input"
+          ]
+        },
+        {
+          "name": "register",
+          "startLine": 72,
+          "endLine": 86,
+          "params": [
+            "input"
+          ]
+        },
+        {
+          "name": "getCurrentUser",
+          "startLine": 88,
+          "endLine": 92,
+          "params": []
+        },
+        {
+          "name": "listAthletes",
+          "startLine": 94,
+          "endLine": 98,
+          "params": []
+        },
+        {
+          "name": "createAthlete",
+          "startLine": 100,
+          "endLine": 104,
+          "params": [
+            "input"
+          ]
+        },
+        {
+          "name": "getAthlete",
+          "startLine": 106,
+          "endLine": 110,
+          "params": [
+            "athleteId"
+          ]
+        },
+        {
+          "name": "listAthleteSessions",
+          "startLine": 112,
+          "endLine": 116,
+          "params": [
+            "athleteId"
+          ]
+        },
+        {
+          "name": "getAthleteTrend",
+          "startLine": 118,
+          "endLine": 121,
+          "params": [
+            "athleteId"
+          ]
+        },
+        {
+          "name": "createSession",
+          "startLine": 123,
+          "endLine": 140,
+          "params": [
+            "input"
+          ]
+        },
+        {
+          "name": "listSessions",
+          "startLine": 142,
+          "endLine": 146,
+          "params": []
+        },
+        {
+          "name": "getSession",
+          "startLine": 148,
+          "endLine": 152,
+          "params": [
+            "sessionId"
+          ]
+        },
+        {
+          "name": "uploadVideo",
+          "startLine": 154,
+          "endLine": 163,
+          "params": [
+            "file"
+          ]
+        },
+        {
+          "name": "bindSessionVideo",
+          "startLine": 165,
+          "endLine": 182,
+          "params": [
+            "sessionId",
+            "input"
+          ]
+        },
+        {
+          "name": "bindUploadedSessionVideo",
+          "startLine": 184,
+          "endLine": 191,
+          "params": [
+            "sessionId",
+            "video",
+            "input"
+          ]
+        },
+        {
+          "name": "listSessionVideos",
+          "startLine": 193,
+          "endLine": 197,
+          "params": [
+            "sessionId"
+          ]
+        },
+        {
+          "name": "createAnalysisTask",
+          "startLine": 199,
+          "endLine": 205,
+          "params": [
+            "videoId",
+            "metadata"
+          ]
+        },
+        {
+          "name": "listTasks",
+          "startLine": 207,
+          "endLine": 211,
+          "params": []
+        },
+        {
+          "name": "getTask",
+          "startLine": 213,
+          "endLine": 217,
+          "params": [
+            "taskId"
+          ]
+        },
+        {
+          "name": "getWorkspace",
+          "startLine": 219,
+          "endLine": 223,
+          "params": [
+            "taskId"
+          ]
+        },
+        {
+          "name": "getReport",
+          "startLine": 225,
+          "endLine": 229,
+          "params": [
+            "taskId"
+          ]
+        },
+        {
+          "name": "resolveMediaUrl",
+          "startLine": 231,
+          "endLine": 235,
+          "params": [
+            "path"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "demoMode",
+          "line": 39,
+          "isDefault": false
+        },
+        {
+          "name": "setAuthToken",
+          "line": 47,
+          "isDefault": false
+        },
+        {
+          "name": "login",
+          "line": 58,
+          "isDefault": false
+        },
+        {
+          "name": "register",
+          "line": 72,
+          "isDefault": false
+        },
+        {
+          "name": "getCurrentUser",
+          "line": 88,
+          "isDefault": false
+        },
+        {
+          "name": "listAthletes",
+          "line": 94,
+          "isDefault": false
+        },
+        {
+          "name": "createAthlete",
+          "line": 100,
+          "isDefault": false
+        },
+        {
+          "name": "getAthlete",
+          "line": 106,
+          "isDefault": false
+        },
+        {
+          "name": "listAthleteSessions",
+          "line": 112,
+          "isDefault": false
+        },
+        {
+          "name": "getAthleteTrend",
+          "line": 118,
+          "isDefault": false
+        },
+        {
+          "name": "createSession",
+          "line": 123,
+          "isDefault": false
+        },
+        {
+          "name": "listSessions",
+          "line": 142,
+          "isDefault": false
+        },
+        {
+          "name": "getSession",
+          "line": 148,
+          "isDefault": false
+        },
+        {
+          "name": "uploadVideo",
+          "line": 154,
+          "isDefault": false
+        },
+        {
+          "name": "bindSessionVideo",
+          "line": 165,
+          "isDefault": false
+        },
+        {
+          "name": "bindUploadedSessionVideo",
+          "line": 184,
+          "isDefault": false
+        },
+        {
+          "name": "listSessionVideos",
+          "line": 193,
+          "isDefault": false
+        },
+        {
+          "name": "createAnalysisTask",
+          "line": 199,
+          "isDefault": false
+        },
+        {
+          "name": "listTasks",
+          "line": 207,
+          "isDefault": false
+        },
+        {
+          "name": "getTask",
+          "line": 213,
+          "isDefault": false
+        },
+        {
+          "name": "getWorkspace",
+          "line": 219,
+          "isDefault": false
+        },
+        {
+          "name": "getReport",
+          "line": 225,
+          "isDefault": false
+        },
+        {
+          "name": "resolveMediaUrl",
+          "line": 231,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "login",
+          "callee": "form.set",
+          "lineNumber": 64
+        },
+        {
+          "caller": "login",
+          "callee": "form.set",
+          "lineNumber": 65
+        },
+        {
+          "caller": "login",
+          "callee": "await client.post",
+          "lineNumber": 66
+        },
+        {
+          "caller": "register",
+          "callee": "await client.post",
+          "lineNumber": 84
+        },
+        {
+          "caller": "getCurrentUser",
+          "callee": "await client.get",
+          "lineNumber": 90
+        },
+        {
+          "caller": "listAthletes",
+          "callee": "getDemoAthletes",
+          "lineNumber": 95
+        },
+        {
+          "caller": "listAthletes",
+          "callee": "await client.get",
+          "lineNumber": 96
+        },
+        {
+          "caller": "createAthlete",
+          "callee": "createDemoAthlete",
+          "lineNumber": 101
+        },
+        {
+          "caller": "createAthlete",
+          "callee": "await client.post",
+          "lineNumber": 102
+        },
+        {
+          "caller": "getAthlete",
+          "callee": "getDemoAthlete",
+          "lineNumber": 107
+        },
+        {
+          "caller": "getAthlete",
+          "callee": "await client.get",
+          "lineNumber": 108
+        },
+        {
+          "caller": "listAthleteSessions",
+          "callee": "getDemoAthleteSessions",
+          "lineNumber": 113
+        },
+        {
+          "caller": "listAthleteSessions",
+          "callee": "await client.get",
+          "lineNumber": 114
+        },
+        {
+          "caller": "getAthleteTrend",
+          "callee": "getDemoAthleteTrend",
+          "lineNumber": 119
+        },
+        {
+          "caller": "createSession",
+          "callee": "createDemoSession",
+          "lineNumber": 137
+        },
+        {
+          "caller": "createSession",
+          "callee": "await client.post",
+          "lineNumber": 138
+        },
+        {
+          "caller": "listSessions",
+          "callee": "getDemoSessions",
+          "lineNumber": 143
+        },
+        {
+          "caller": "listSessions",
+          "callee": "await client.get",
+          "lineNumber": 144
+        },
+        {
+          "caller": "getSession",
+          "callee": "getDemoSession",
+          "lineNumber": 149
+        },
+        {
+          "caller": "getSession",
+          "callee": "await client.get",
+          "lineNumber": 150
+        },
+        {
+          "caller": "uploadVideo",
+          "callee": "createDemoVideo",
+          "lineNumber": 156
+        },
+        {
+          "caller": "uploadVideo",
+          "callee": "form.append",
+          "lineNumber": 160
+        },
+        {
+          "caller": "uploadVideo",
+          "callee": "await client.post",
+          "lineNumber": 161
+        },
+        {
+          "caller": "bindSessionVideo",
+          "callee": "new Date().toISOString",
+          "lineNumber": 175
+        },
+        {
+          "caller": "bindSessionVideo",
+          "callee": "bindDemoSessionVideo",
+          "lineNumber": 178
+        },
+        {
+          "caller": "bindSessionVideo",
+          "callee": "await client.post",
+          "lineNumber": 180
+        },
+        {
+          "caller": "bindUploadedSessionVideo",
+          "callee": "bindDemoSessionVideo",
+          "lineNumber": 189
+        },
+        {
+          "caller": "bindUploadedSessionVideo",
+          "callee": "bindSessionVideo",
+          "lineNumber": 190
+        },
+        {
+          "caller": "listSessionVideos",
+          "callee": "getDemoSessionVideos",
+          "lineNumber": 194
+        },
+        {
+          "caller": "listSessionVideos",
+          "callee": "await client.get",
+          "lineNumber": 195
+        },
+        {
+          "caller": "createAnalysisTask",
+          "callee": "await client.post",
+          "lineNumber": 203
+        },
+        {
+          "caller": "listTasks",
+          "callee": "await client.get",
+          "lineNumber": 209
+        },
+        {
+          "caller": "getTask",
+          "callee": "await client.get",
+          "lineNumber": 215
+        },
+        {
+          "caller": "getWorkspace",
+          "callee": "await client.get",
+          "lineNumber": 221
+        },
+        {
+          "caller": "getReport",
+          "callee": "await client.get",
+          "lineNumber": 227
+        },
+        {
+          "caller": "resolveMediaUrl",
+          "callee": "path.startsWith",
+          "lineNumber": 233
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 23,
+        "functionCount": 22,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend-vue/src/services/demoData.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 405,
+      "nonEmptyLines": 383,
+      "functions": [
+        {
+          "name": "resetDemoBusinessData",
+          "startLine": 289,
+          "endLine": 293,
+          "params": []
+        },
+        {
+          "name": "getDemoAthletes",
+          "startLine": 295,
+          "endLine": 297,
+          "params": []
+        },
+        {
+          "name": "createDemoAthlete",
+          "startLine": 299,
+          "endLine": 320,
+          "params": [
+            "input"
+          ]
+        },
+        {
+          "name": "getDemoAthlete",
+          "startLine": 322,
+          "endLine": 324,
+          "params": [
+            "id"
+          ]
+        },
+        {
+          "name": "getDemoAthleteSessions",
+          "startLine": 326,
+          "endLine": 328,
+          "params": [
+            "athleteId"
+          ]
+        },
+        {
+          "name": "getDemoAthleteTrend",
+          "startLine": 330,
+          "endLine": 332,
+          "params": [
+            "athleteId"
+          ]
+        },
+        {
+          "name": "getDemoSessions",
+          "startLine": 334,
+          "endLine": 336,
+          "params": []
+        },
+        {
+          "name": "getDemoSession",
+          "startLine": 338,
+          "endLine": 340,
+          "params": [
+            "id"
+          ]
+        },
+        {
+          "name": "createDemoSession",
+          "startLine": 342,
+          "endLine": 363,
+          "params": [
+            "input"
+          ]
+        },
+        {
+          "name": "createDemoVideo",
+          "startLine": 365,
+          "endLine": 377,
+          "params": [
+            "file"
+          ]
+        },
+        {
+          "name": "bindDemoSessionVideo",
+          "startLine": 379,
+          "endLine": 401,
+          "params": [
+            "sessionId",
+            "video",
+            "input"
+          ]
+        },
+        {
+          "name": "getDemoSessionVideos",
+          "startLine": 403,
+          "endLine": 405,
+          "params": [
+            "sessionId"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "demoUser",
+          "line": 15,
+          "isDefault": false
+        },
+        {
+          "name": "demoAthletes",
+          "line": 27,
+          "isDefault": false
+        },
+        {
+          "name": "demoSessions",
+          "line": 84,
+          "isDefault": false
+        },
+        {
+          "name": "demoSessionVideos",
+          "line": 121,
+          "isDefault": false
+        },
+        {
+          "name": "demoAthleteTrends",
+          "line": 168,
+          "isDefault": false
+        },
+        {
+          "name": "demoTask",
+          "line": 186,
+          "isDefault": false
+        },
+        {
+          "name": "demoWorkspace",
+          "line": 206,
+          "isDefault": false
+        },
+        {
+          "name": "demoReport",
+          "line": 250,
+          "isDefault": false
+        },
+        {
+          "name": "resetDemoBusinessData",
+          "line": 289,
+          "isDefault": false
+        },
+        {
+          "name": "getDemoAthletes",
+          "line": 295,
+          "isDefault": false
+        },
+        {
+          "name": "createDemoAthlete",
+          "line": 299,
+          "isDefault": false
+        },
+        {
+          "name": "getDemoAthlete",
+          "line": 322,
+          "isDefault": false
+        },
+        {
+          "name": "getDemoAthleteSessions",
+          "line": 326,
+          "isDefault": false
+        },
+        {
+          "name": "getDemoAthleteTrend",
+          "line": 330,
+          "isDefault": false
+        },
+        {
+          "name": "getDemoSessions",
+          "line": 334,
+          "isDefault": false
+        },
+        {
+          "name": "getDemoSession",
+          "line": 338,
+          "isDefault": false
+        },
+        {
+          "name": "createDemoSession",
+          "line": 342,
+          "isDefault": false
+        },
+        {
+          "name": "createDemoVideo",
+          "line": 365,
+          "isDefault": false
+        },
+        {
+          "name": "bindDemoSessionVideo",
+          "line": 379,
+          "isDefault": false
+        },
+        {
+          "name": "getDemoSessionVideos",
+          "line": 403,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "createDemoAthlete",
+          "callee": "new Date().toISOString",
+          "lineNumber": 315
+        },
+        {
+          "caller": "createDemoAthlete",
+          "callee": "new Date().toISOString",
+          "lineNumber": 316
+        },
+        {
+          "caller": "getDemoAthlete",
+          "callee": "athletes.find",
+          "lineNumber": 323
+        },
+        {
+          "caller": "getDemoAthleteSessions",
+          "callee": "sessions.filter",
+          "lineNumber": 327
+        },
+        {
+          "caller": "getDemoSessions",
+          "callee": "[...sessions].sort",
+          "lineNumber": 335
+        },
+        {
+          "caller": "getDemoSessions",
+          "callee": "Date.parse",
+          "lineNumber": 335
+        },
+        {
+          "caller": "getDemoSessions",
+          "callee": "Date.parse",
+          "lineNumber": 335
+        },
+        {
+          "caller": "getDemoSession",
+          "callee": "sessions.find",
+          "lineNumber": 339
+        },
+        {
+          "caller": "createDemoSession",
+          "callee": "new Date().toISOString",
+          "lineNumber": 343
+        },
+        {
+          "caller": "createDemoSession",
+          "callee": "Number",
+          "lineNumber": 346
+        },
+        {
+          "caller": "createDemoSession",
+          "callee": "createdAt.slice",
+          "lineNumber": 349
+        },
+        {
+          "caller": "createDemoVideo",
+          "callee": "new Date().toISOString",
+          "lineNumber": 374
+        },
+        {
+          "caller": "bindDemoSessionVideo",
+          "callee": "new Date().toISOString",
+          "lineNumber": 392
+        },
+        {
+          "caller": "bindDemoSessionVideo",
+          "callee": "sessionVideos.filter",
+          "lineNumber": 396
+        },
+        {
+          "caller": "bindDemoSessionVideo",
+          "callee": "sessions.map",
+          "lineNumber": 397
+        },
+        {
+          "caller": "bindDemoSessionVideo",
+          "callee": "new Date().toISOString",
+          "lineNumber": 398
+        },
+        {
+          "caller": "getDemoSessionVideos",
+          "callee": "sessionVideos.filter",
+          "lineNumber": 404
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 20,
+        "functionCount": 12,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend-vue/src/stores/auth.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 91,
+      "nonEmptyLines": 88,
+      "functions": [
+        {
+          "name": "readStoredUser",
+          "startLine": 8,
+          "endLine": 15,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "useAuthStore",
+          "line": 17,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "readStoredUser",
+          "callee": "window.localStorage.getItem",
+          "lineNumber": 10
+        },
+        {
+          "caller": "readStoredUser",
+          "callee": "JSON.parse",
+          "lineNumber": 11
+        },
+        {
+          "caller": "persist",
+          "callee": "setAuthToken",
+          "lineNumber": 31
+        },
+        {
+          "caller": "persist",
+          "callee": "window.localStorage.setItem",
+          "lineNumber": 33
+        },
+        {
+          "caller": "persist",
+          "callee": "window.localStorage.removeItem",
+          "lineNumber": 35
+        },
+        {
+          "caller": "persist",
+          "callee": "window.localStorage.setItem",
+          "lineNumber": 38
+        },
+        {
+          "caller": "persist",
+          "callee": "JSON.stringify",
+          "lineNumber": 38
+        },
+        {
+          "caller": "persist",
+          "callee": "window.localStorage.removeItem",
+          "lineNumber": 40
+        },
+        {
+          "caller": "restore",
+          "callee": "setAuthToken",
+          "lineNumber": 47
+        },
+        {
+          "caller": "restore",
+          "callee": "getCurrentUser",
+          "lineNumber": 49
+        },
+        {
+          "caller": "restore",
+          "callee": "this.persist",
+          "lineNumber": 53
+        },
+        {
+          "caller": "restore",
+          "callee": "this.logout",
+          "lineNumber": 56
+        },
+        {
+          "caller": "login",
+          "callee": "login",
+          "lineNumber": 65
+        },
+        {
+          "caller": "login",
+          "callee": "setAuthToken",
+          "lineNumber": 67
+        },
+        {
+          "caller": "login",
+          "callee": "getCurrentUser",
+          "lineNumber": 68
+        },
+        {
+          "caller": "login",
+          "callee": "this.persist",
+          "lineNumber": 69
+        },
+        {
+          "caller": "register",
+          "callee": "register",
+          "lineNumber": 77
+        },
+        {
+          "caller": "register",
+          "callee": "this.login",
+          "lineNumber": 78
+        },
+        {
+          "caller": "logout",
+          "callee": "setAuthToken",
+          "lineNumber": 86
+        },
+        {
+          "caller": "logout",
+          "callee": "window.localStorage.removeItem",
+          "lineNumber": 87
+        },
+        {
+          "caller": "logout",
+          "callee": "window.localStorage.removeItem",
+          "lineNumber": 88
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend-vue/src/stores/tasks.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 20,
+      "nonEmptyLines": 19,
+      "exports": [
+        {
+          "name": "useTasksStore",
+          "line": 5,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "refresh",
+          "callee": "listTasks",
+          "lineNumber": 14
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend-vue/src/types.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 197,
+      "nonEmptyLines": 174,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend-vue/src/views/AthleteProfileView.vue",
+      "language": "vue",
+      "fileCategory": "code",
+      "totalLines": 172,
+      "nonEmptyLines": 157,
+      "metrics": {}
+    },
+    {
+      "path": "frontend-vue/src/views/AthletesView.vue",
+      "language": "vue",
+      "fileCategory": "code",
+      "totalLines": 207,
+      "nonEmptyLines": 192,
+      "metrics": {}
+    },
+    {
+      "path": "frontend-vue/src/views/CreateSessionView.vue",
+      "language": "vue",
+      "fileCategory": "code",
+      "totalLines": 134,
+      "nonEmptyLines": 125,
+      "metrics": {}
+    },
+    {
+      "path": "frontend-vue/src/views/LoginView.vue",
+      "language": "vue",
+      "fileCategory": "code",
+      "totalLines": 59,
+      "nonEmptyLines": 55,
+      "metrics": {}
+    },
+    {
+      "path": "frontend-vue/src/views/RegisterView.vue",
+      "language": "vue",
+      "fileCategory": "code",
+      "totalLines": 80,
+      "nonEmptyLines": 76,
+      "metrics": {}
+    },
+    {
+      "path": "frontend-vue/src/views/ReportView.vue",
+      "language": "vue",
+      "fileCategory": "code",
+      "totalLines": 83,
+      "nonEmptyLines": 77,
+      "metrics": {}
+    },
+    {
+      "path": "frontend-vue/src/views/SessionUploadView.vue",
+      "language": "vue",
+      "fileCategory": "code",
+      "totalLines": 216,
+      "nonEmptyLines": 194,
+      "metrics": {}
+    },
+    {
+      "path": "frontend-vue/src/views/TasksView.vue",
+      "language": "vue",
+      "fileCategory": "code",
+      "totalLines": 78,
+      "nonEmptyLines": 70,
+      "metrics": {}
+    },
+    {
+      "path": "frontend-vue/src/views/WorkspaceView.vue",
+      "language": "vue",
+      "fileCategory": "code",
+      "totalLines": 88,
+      "nonEmptyLines": 79,
+      "metrics": {}
+    }
+  ]
+}

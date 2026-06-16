@@ -1,0 +1,201 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 4,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/.openspec.yaml",
+      "language": "yaml",
+      "fileCategory": "config",
+      "totalLines": 2,
+      "nonEmptyLines": 2,
+      "sections": [
+        {
+          "heading": "schema",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "created",
+          "level": 1,
+          "line": 2
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 2
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/design.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 85,
+      "nonEmptyLines": 54,
+      "sections": [
+        {
+          "heading": "Context",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Goals / Non-Goals",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Decisions",
+          "level": 2,
+          "line": 25
+        },
+        {
+          "heading": "Keep Next.js As The Host Application",
+          "level": 3,
+          "line": 27
+        },
+        {
+          "heading": "Port Patterns, Not Domain Objects",
+          "level": 3,
+          "line": 33
+        },
+        {
+          "heading": "Use A Local Demo Analysis Client First",
+          "level": 3,
+          "line": 44
+        },
+        {
+          "heading": "Preserve The Dark Design System Across Platform Views",
+          "level": 3,
+          "line": 50
+        },
+        {
+          "heading": "Separate Landing Surface From Analysis Workspace",
+          "level": 3,
+          "line": 56
+        },
+        {
+          "heading": "Risks / Trade-offs",
+          "level": 2,
+          "line": 62
+        },
+        {
+          "heading": "Migration Plan",
+          "level": 2,
+          "line": 70
+        },
+        {
+          "heading": "Open Questions",
+          "level": 2,
+          "line": 81
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 11
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/proposal.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 34,
+      "nonEmptyLines": 24,
+      "sections": [
+        {
+          "heading": "Why",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "What Changes",
+          "level": 2,
+          "line": 5
+        },
+        {
+          "heading": "Capabilities",
+          "level": 2,
+          "line": 14
+        },
+        {
+          "heading": "New Capabilities",
+          "level": 3,
+          "line": 16
+        },
+        {
+          "heading": "Modified Capabilities",
+          "level": 3,
+          "line": 23
+        },
+        {
+          "heading": "Impact",
+          "level": 2,
+          "line": 27
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/tasks.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 52,
+      "nonEmptyLines": 39,
+      "sections": [
+        {
+          "heading": "1. Swim Platform Foundation",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "2. Platform Shell And Navigation",
+          "level": 2,
+          "line": 9
+        },
+        {
+          "heading": "3. Swim Video Analysis Job Flow",
+          "level": 2,
+          "line": 16
+        },
+        {
+          "heading": "4. Swim Visual Analysis Workspace",
+          "level": 2,
+          "line": 24
+        },
+        {
+          "heading": "5. Reports And Training Feedback",
+          "level": 2,
+          "line": 32
+        },
+        {
+          "heading": "6. Homepage Integration",
+          "level": 2,
+          "line": 40
+        },
+        {
+          "heading": "7. Verification",
+          "level": 2,
+          "line": 46
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 7
+      }
+    }
+  ]
+}

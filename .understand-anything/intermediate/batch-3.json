@@ -1,0 +1,876 @@
+{
+  "nodes": [
+    {
+      "id": "file:frontend/app/page.tsx",
+      "type": "file",
+      "name": "page.tsx",
+      "filePath": "frontend/app/page.tsx",
+      "summary": "应用首页入口组件，组合导航栏、英雄区、工作流程、特性展示、规格表、分析输出、用户推荐、视频高亮、FAQ、CTA 和页脚共 11 个区块构成完整营销落地页。",
+      "tags": ["entry-point", "landing-page", "landing"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/app/page.tsx:Home",
+      "type": "function",
+      "name": "Home",
+      "filePath": "frontend/app/page.tsx",
+      "lineRange": [13, 29],
+      "summary": "默认导出的首页组件，依次渲染 Navbar、Hero、SystemFlow 等 11 个子组件组成完整页面布局。",
+      "tags": ["landing-page", "component", "entry-point"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/components/ActionVideo.tsx",
+      "type": "file",
+      "name": "ActionVideo.tsx",
+      "filePath": "frontend/components/ActionVideo.tsx",
+      "summary": "展示双路视频采集高亮片段的组件，通过 MediaFrame 呈现 videoHighlights 数据中的采集亮点。",
+      "tags": ["component", "video", "media"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/ActionVideo.tsx:ActionVideo",
+      "type": "function",
+      "name": "ActionVideo",
+      "filePath": "frontend/components/ActionVideo.tsx",
+      "lineRange": [5, 35],
+      "summary": "遍历 videoHighlights 数据，使用 MediaFrame 渲染每条高亮片段及其图标，展示双路采集与 AI 识别成果。",
+      "tags": ["component", "video", "media"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/components/AnalysisOutputs.tsx",
+      "type": "file",
+      "name": "AnalysisOutputs.tsx",
+      "filePath": "frontend/components/AnalysisOutputs.tsx",
+      "summary": "AI 分析输出类型展示组件，列出关键点轨迹、身体角度、划水节奏等六类分析结果。",
+      "tags": ["component", "analysis", "visualization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/AnalysisOutputs.tsx:AnalysisOutputs",
+      "type": "function",
+      "name": "AnalysisOutputs",
+      "filePath": "frontend/components/AnalysisOutputs.tsx",
+      "lineRange": [4, 29],
+      "summary": "遍历 analysisOutputs 数据，使用 Section 组件渲染每个分析输出项的标题、描述和图标。",
+      "tags": ["component", "analysis", "visualization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/components/CTA.tsx",
+      "type": "file",
+      "name": "CTA.tsx",
+      "filePath": "frontend/components/CTA.tsx",
+      "summary": "行动召唤区块，使用 Section 包裹「进入分析平台」按钮引导用户跳转主平台。",
+      "tags": ["component", "cta", "landing-page"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/CTA.tsx:CTA",
+      "type": "function",
+      "name": "CTA",
+      "filePath": "frontend/components/CTA.tsx",
+      "lineRange": [3, 25],
+      "summary": "渲染居中式 Call-to-Action 区块，内含一个链接到平台页面的主要操作按钮。",
+      "tags": ["component", "cta", "landing-page"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/components/FAQ.tsx",
+      "type": "file",
+      "name": "FAQ.tsx",
+      "filePath": "frontend/components/FAQ.tsx",
+      "summary": "常见问题折叠面板组件，使用 useState 管理展开状态，支持点击切换问答可见性。",
+      "tags": ["component", "faq", "accordion"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/FAQ.tsx:FAQ",
+      "type": "function",
+      "name": "FAQ",
+      "filePath": "frontend/components/FAQ.tsx",
+      "lineRange": [8, 43],
+      "summary": "可折叠 FAQ 列表组件，遍历 faqItems 数据，点击问题时切换展开/收起状态显示答案。",
+      "tags": ["component", "faq", "accordion"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/components/Features.tsx",
+      "type": "file",
+      "name": "Features.tsx",
+      "filePath": "frontend/components/Features.tsx",
+      "summary": "产品核心特性展示组件，列出双摄采集、岸边追踪和 AI 姿态分析三大功能。",
+      "tags": ["component", "features", "landing-page"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/Features.tsx:Features",
+      "type": "function",
+      "name": "Features",
+      "filePath": "frontend/components/Features.tsx",
+      "lineRange": [4, 27],
+      "summary": "遍历 features 数据渲染三个核心功能卡片，每项包含标题、描述文字和对应图标。",
+      "tags": ["component", "features", "landing-page"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/components/Footer.tsx",
+      "type": "file",
+      "name": "Footer.tsx",
+      "filePath": "frontend/components/Footer.tsx",
+      "summary": "网站页脚组件，包含品牌介绍、产品/支持链接组、社交媒体图标、邮件订阅表单和版权信息。",
+      "tags": ["component", "footer", "navigation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/components/Footer.tsx:Footer",
+      "type": "function",
+      "name": "Footer",
+      "filePath": "frontend/components/Footer.tsx",
+      "lineRange": [5, 68],
+      "summary": "四列网格布局页脚组件，遍历 footerGroups 渲染链接列表，提供社交媒体图标按钮和邮件订阅表单。",
+      "tags": ["component", "footer", "navigation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend/components/Hero.tsx",
+      "type": "file",
+      "name": "Hero.tsx",
+      "filePath": "frontend/components/Hero.tsx",
+      "summary": "首页英雄区域，展示产品示意图（纯 CSS 绘制的双摄采集车）、品牌标语和两个 CTA 按钮。",
+      "tags": ["component", "hero", "landing-page"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/components/Hero.tsx:ProductSchematic",
+      "type": "function",
+      "name": "ProductSchematic",
+      "filePath": "frontend/components/Hero.tsx",
+      "lineRange": [3, 33],
+      "summary": "使用纯 CSS 和 MediaFrame 绘制的双摄采集车示意图，通过相对定位和边框模拟设备结构与拼接画面。",
+      "tags": ["component", "illustration", "schematic"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/components/Hero.tsx:Hero",
+      "type": "function",
+      "name": "Hero",
+      "filePath": "frontend/components/Hero.tsx",
+      "lineRange": [35, 70],
+      "summary": "主页 Hero 区域，展示品牌英文标语、中文名称「智泳云枢」、产品说明文字及两个操作按钮，内嵌 ProductSchematic 示意图。",
+      "tags": ["component", "hero", "landing-page"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend/components/Navbar.tsx",
+      "type": "file",
+      "name": "Navbar.tsx",
+      "filePath": "frontend/components/Navbar.tsx",
+      "summary": "固定顶部导航栏组件，桌面端显示导航链接和操作按钮，移动端响应式含汉堡菜单，滚动时切换模糊背景效果。",
+      "tags": ["component", "navbar", "navigation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/components/Navbar.tsx:Navbar",
+      "type": "function",
+      "name": "Navbar",
+      "filePath": "frontend/components/Navbar.tsx",
+      "lineRange": [8, 86],
+      "summary": "响应式导航栏组件，使用 useState 管理移动端菜单和滚动状态，useEffect 监听滚动事件，桌面端显示导航链接和操作按钮，移动端支持汉堡菜单展开。",
+      "tags": ["component", "navbar", "navigation", "responsive"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend/components/Specs.tsx",
+      "type": "file",
+      "name": "Specs.tsx",
+      "filePath": "frontend/components/Specs.tsx",
+      "summary": "系统技术规格表格组件，展示摄像头配置、采集视角、视频输出、分析引擎等七项参数。",
+      "tags": ["component", "specs", "landing-page"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/Specs.tsx:Specs",
+      "type": "function",
+      "name": "Specs",
+      "filePath": "frontend/components/Specs.tsx",
+      "lineRange": [4, 46],
+      "summary": "遍历 specs 数据渲染系统规格列表，每项包含参数名称和对应值（如双摄配置、侧面视角等）。",
+      "tags": ["component", "specs", "landing-page"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/components/SystemFlow.tsx",
+      "type": "file",
+      "name": "SystemFlow.tsx",
+      "filePath": "frontend/components/SystemFlow.tsx",
+      "summary": "工作流程步骤展示组件，呈现从岸边移动采集、双摄录制、视频拼接到 AI 分析的四步工作流。",
+      "tags": ["component", "workflow", "landing-page"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/SystemFlow.tsx:SystemFlow",
+      "type": "function",
+      "name": "SystemFlow",
+      "filePath": "frontend/components/SystemFlow.tsx",
+      "lineRange": [4, 24],
+      "summary": "遍历 workflowSteps 数据渲染四步工作流卡片，每步包含序号、标题、描述和图标。",
+      "tags": ["component", "workflow", "landing-page"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/components/Testimonials.tsx",
+      "type": "file",
+      "name": "Testimonials.tsx",
+      "filePath": "frontend/components/Testimonials.tsx",
+      "summary": "用户推荐语展示组件，以编号卡片形式展示来自高校教练、运动实验室和青训俱乐部的三条反馈。",
+      "tags": ["component", "testimonials", "social-proof"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/Testimonials.tsx:Testimonials",
+      "type": "function",
+      "name": "Testimonials",
+      "filePath": "frontend/components/Testimonials.tsx",
+      "lineRange": [4, 29],
+      "summary": "遍历 testimonials 数据渲染带编号的引用卡片，包含引文内容、评价者姓名和角色。",
+      "tags": ["component", "testimonials", "social-proof"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/components/ui.tsx",
+      "type": "file",
+      "name": "ui.tsx",
+      "filePath": "frontend/components/ui.tsx",
+      "summary": "基础 UI 组件库，提供 Section 布局容器、Eyebrow 装饰文本、AnchorButton/IconButton 按钮、MediaFrame 媒体框架和 Divider 分割线共 6 个可复用组件。",
+      "tags": ["component", "ui", "utility"],
+      "complexity": "moderate",
+      "languageNotes": "导出 6 个独立 UI 组件，均使用 Tailwind CSS 原子化样式和 TypeScript 类型约束，AnchorButton 支持 solid/outline 变体模式。"
+    },
+    {
+      "id": "function:frontend/components/ui.tsx:Section",
+      "type": "function",
+      "name": "Section",
+      "filePath": "frontend/components/ui.tsx",
+      "lineRange": [12, 42],
+      "summary": "通用区块容器组件，接受 eyebrow、title、description 和 children，可选渲染装饰文本和标题，统一区块样式和间距。",
+      "tags": ["component", "layout", "container"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/components/ui.tsx:Eyebrow",
+      "type": "function",
+      "name": "Eyebrow",
+      "filePath": "frontend/components/ui.tsx",
+      "lineRange": [44, 50],
+      "summary": "装饰性上标文字组件，渲染小号大写字母样式的提示文本，用于 Section 头部。",
+      "tags": ["component", "typography", "decoration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/ui.tsx:AnchorButton",
+      "type": "function",
+      "name": "AnchorButton",
+      "filePath": "frontend/components/ui.tsx",
+      "lineRange": [61, 80],
+      "summary": "链接按钮组件，支持 solid（实心）和 outline（描边）两种变体，通过 variant 属性切换样式。",
+      "tags": ["component", "button", "interaction"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/ui.tsx:IconButton",
+      "type": "function",
+      "name": "IconButton",
+      "filePath": "frontend/components/ui.tsx",
+      "lineRange": [87, 98],
+      "summary": "图标按钮组件，接收 aria-label 用于无障碍访问，支持传入自定义图标的按钮容器。",
+      "tags": ["component", "button", "icon", "accessibility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/ui.tsx:MediaFrame",
+      "type": "function",
+      "name": "MediaFrame",
+      "filePath": "frontend/components/ui.tsx",
+      "lineRange": [100, 107],
+      "summary": "媒体内容容器，带网格装饰线背景和边框，用于包裹视频或示意图等内容。",
+      "tags": ["component", "media", "container"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/ui.tsx:Divider",
+      "type": "function",
+      "name": "Divider",
+      "filePath": "frontend/components/ui.tsx",
+      "lineRange": [109, 111],
+      "summary": "水平分割线组件，使用半透明白色细线分隔页面区块。",
+      "tags": ["component", "divider", "layout"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/lib/content.ts",
+      "type": "file",
+      "name": "content.ts",
+      "filePath": "frontend/lib/content.ts",
+      "summary": "营销页面内容数据层，集中定义导航链接、工作流程步骤、功能列表、技术规格、分析输出项、用户推荐、视频高亮、FAQ 和页脚链接等全部展示数据。",
+      "tags": ["content", "data", "landing-page"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:frontend/app/page.tsx",
+      "target": "file:frontend/components/ActionVideo.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/app/page.tsx",
+      "target": "file:frontend/components/AnalysisOutputs.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/app/page.tsx",
+      "target": "file:frontend/components/CTA.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/app/page.tsx",
+      "target": "file:frontend/components/FAQ.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/app/page.tsx",
+      "target": "file:frontend/components/Features.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/app/page.tsx",
+      "target": "file:frontend/components/Footer.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/app/page.tsx",
+      "target": "file:frontend/components/Hero.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/app/page.tsx",
+      "target": "file:frontend/components/Navbar.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/app/page.tsx",
+      "target": "file:frontend/components/Specs.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/app/page.tsx",
+      "target": "file:frontend/components/SystemFlow.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/app/page.tsx",
+      "target": "file:frontend/components/Testimonials.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/ActionVideo.tsx",
+      "target": "file:frontend/components/ui.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/ActionVideo.tsx",
+      "target": "file:frontend/lib/content.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/AnalysisOutputs.tsx",
+      "target": "file:frontend/components/ui.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/AnalysisOutputs.tsx",
+      "target": "file:frontend/lib/content.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/CTA.tsx",
+      "target": "file:frontend/components/ui.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/FAQ.tsx",
+      "target": "file:frontend/components/ui.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/FAQ.tsx",
+      "target": "file:frontend/lib/content.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/Features.tsx",
+      "target": "file:frontend/components/ui.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/Features.tsx",
+      "target": "file:frontend/lib/content.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/Footer.tsx",
+      "target": "file:frontend/components/ui.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/Footer.tsx",
+      "target": "file:frontend/lib/content.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/Hero.tsx",
+      "target": "file:frontend/components/ui.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/Navbar.tsx",
+      "target": "file:frontend/components/ui.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/Navbar.tsx",
+      "target": "file:frontend/lib/content.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/Specs.tsx",
+      "target": "file:frontend/components/ui.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/Specs.tsx",
+      "target": "file:frontend/lib/content.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/SystemFlow.tsx",
+      "target": "file:frontend/components/ui.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/SystemFlow.tsx",
+      "target": "file:frontend/lib/content.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/Testimonials.tsx",
+      "target": "file:frontend/components/ui.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/Testimonials.tsx",
+      "target": "file:frontend/lib/content.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/app/page.tsx",
+      "target": "function:frontend/app/page.tsx:Home",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/ActionVideo.tsx",
+      "target": "function:frontend/components/ActionVideo.tsx:ActionVideo",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/AnalysisOutputs.tsx",
+      "target": "function:frontend/components/AnalysisOutputs.tsx:AnalysisOutputs",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/CTA.tsx",
+      "target": "function:frontend/components/CTA.tsx:CTA",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/FAQ.tsx",
+      "target": "function:frontend/components/FAQ.tsx:FAQ",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/Features.tsx",
+      "target": "function:frontend/components/Features.tsx:Features",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/Footer.tsx",
+      "target": "function:frontend/components/Footer.tsx:Footer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/Hero.tsx",
+      "target": "function:frontend/components/Hero.tsx:ProductSchematic",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/Hero.tsx",
+      "target": "function:frontend/components/Hero.tsx:Hero",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/Navbar.tsx",
+      "target": "function:frontend/components/Navbar.tsx:Navbar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/Specs.tsx",
+      "target": "function:frontend/components/Specs.tsx:Specs",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/SystemFlow.tsx",
+      "target": "function:frontend/components/SystemFlow.tsx:SystemFlow",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/Testimonials.tsx",
+      "target": "function:frontend/components/Testimonials.tsx:Testimonials",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/ui.tsx",
+      "target": "function:frontend/components/ui.tsx:Section",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/ui.tsx",
+      "target": "function:frontend/components/ui.tsx:Eyebrow",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/ui.tsx",
+      "target": "function:frontend/components/ui.tsx:AnchorButton",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/ui.tsx",
+      "target": "function:frontend/components/ui.tsx:IconButton",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/ui.tsx",
+      "target": "function:frontend/components/ui.tsx:MediaFrame",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/ui.tsx",
+      "target": "function:frontend/components/ui.tsx:Divider",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/app/page.tsx",
+      "target": "function:frontend/app/page.tsx:Home",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/ActionVideo.tsx",
+      "target": "function:frontend/components/ActionVideo.tsx:ActionVideo",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/AnalysisOutputs.tsx",
+      "target": "function:frontend/components/AnalysisOutputs.tsx:AnalysisOutputs",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/CTA.tsx",
+      "target": "function:frontend/components/CTA.tsx:CTA",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/FAQ.tsx",
+      "target": "function:frontend/components/FAQ.tsx:FAQ",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/Features.tsx",
+      "target": "function:frontend/components/Features.tsx:Features",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/Footer.tsx",
+      "target": "function:frontend/components/Footer.tsx:Footer",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/Hero.tsx",
+      "target": "function:frontend/components/Hero.tsx:Hero",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/Navbar.tsx",
+      "target": "function:frontend/components/Navbar.tsx:Navbar",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/Specs.tsx",
+      "target": "function:frontend/components/Specs.tsx:Specs",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/SystemFlow.tsx",
+      "target": "function:frontend/components/SystemFlow.tsx:SystemFlow",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/Testimonials.tsx",
+      "target": "function:frontend/components/Testimonials.tsx:Testimonials",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/ui.tsx",
+      "target": "function:frontend/components/ui.tsx:Section",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/ui.tsx",
+      "target": "function:frontend/components/ui.tsx:Eyebrow",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/ui.tsx",
+      "target": "function:frontend/components/ui.tsx:AnchorButton",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/ui.tsx",
+      "target": "function:frontend/components/ui.tsx:IconButton",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/ui.tsx",
+      "target": "function:frontend/components/ui.tsx:MediaFrame",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/ui.tsx",
+      "target": "function:frontend/components/ui.tsx:Divider",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:frontend/app/page.tsx:Home",
+      "target": "function:frontend/components/Navbar.tsx:Navbar",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:frontend/app/page.tsx:Home",
+      "target": "function:frontend/components/Hero.tsx:Hero",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:frontend/app/page.tsx:Home",
+      "target": "function:frontend/components/SystemFlow.tsx:SystemFlow",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:frontend/app/page.tsx:Home",
+      "target": "function:frontend/components/Features.tsx:Features",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:frontend/app/page.tsx:Home",
+      "target": "function:frontend/components/Specs.tsx:Specs",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:frontend/app/page.tsx:Home",
+      "target": "function:frontend/components/AnalysisOutputs.tsx:AnalysisOutputs",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:frontend/app/page.tsx:Home",
+      "target": "function:frontend/components/Testimonials.tsx:Testimonials",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:frontend/app/page.tsx:Home",
+      "target": "function:frontend/components/ActionVideo.tsx:ActionVideo",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:frontend/app/page.tsx:Home",
+      "target": "function:frontend/components/FAQ.tsx:FAQ",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:frontend/app/page.tsx:Home",
+      "target": "function:frontend/components/CTA.tsx:CTA",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:frontend/app/page.tsx:Home",
+      "target": "function:frontend/components/Footer.tsx:Footer",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

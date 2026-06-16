@@ -1,0 +1,15 @@
+{
+  "projectRoot": "/Users/tuian/Documents/大学/竞赛/大创/游泳/swim",
+  "batchFiles": [
+    {"path": "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/.openspec.yaml", "language": "yaml", "sizeLines": 2, "fileCategory": "config"},
+    {"path": "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/design.md", "language": "markdown", "sizeLines": 79, "fileCategory": "docs"},
+    {"path": "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/proposal.md", "language": "markdown", "sizeLines": 28, "fileCategory": "docs"},
+    {"path": "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/tasks.md", "language": "markdown", "sizeLines": 35, "fileCategory": "docs"}
+  ],
+  "batchImportData": {
+    "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/.openspec.yaml": [],
+    "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/design.md": [],
+    "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/proposal.md": [],
+    "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/tasks.md": []
+  }
+}

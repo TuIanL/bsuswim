@@ -1,0 +1,78 @@
+{
+  "nodes": [
+    {
+      "id": "config:openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/.openspec.yaml",
+      "type": "config",
+      "name": ".openspec.yaml",
+      "filePath": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/.openspec.yaml",
+      "summary": "OpenSpec 变更元数据配置文件，记录变更遵循 spec-driven 模式，创建日期为 2026-06-16。",
+      "tags": ["configuration", "open-spec", "change-metadata"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/design.md",
+      "type": "document",
+      "name": "design.md",
+      "filePath": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/design.md",
+      "summary": "游泳视频分析平台重模型架构技术设计文档，详细描述前端（Vue3 + TypeScript + Vite）、业务后端（FastAPI + SQLAlchemy + MySQL）和独立模型服务三层架构的技术决策、目标与非目标、风险与权衡、迁移计划及未决问题。",
+      "tags": ["architecture-design", "technical-decisions", "system-design", "documentation"],
+      "complexity": "moderate",
+      "languageNotes": "采用三层架构设计（前端、业务后端、模型服务），核心决策包括 BackgroundTasks 起步但任务状态入库、本地 uploads 起步但抽象存储接口、HTML 报告页优先于 PDF 导出。"
+    },
+    {
+      "id": "document:openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/proposal.md",
+      "type": "document",
+      "name": "proposal.md",
+      "filePath": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/proposal.md",
+      "summary": "重模型游泳视频分析平台架构变更提案，阐明从前端原型走向真实后端的技术栈固化动机，列举新增和修改的三项核心能力，并分析对前端、后端、模型服务和数据库的影响范围。",
+      "tags": ["change-proposal", "architecture-planning", "documentation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/tasks.md",
+      "type": "document",
+      "name": "tasks.md",
+      "filePath": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/tasks.md",
+      "summary": "重模型架构变更的 8 项可验收任务分解，覆盖项目技术栈初始化、数据库与后端基础、异步任务调度、模型服务集成、Vue 前端任务流、可视化工作台、HTML 报告页和验证升级边界，所有任务均已标注完成。",
+      "tags": ["task-breakdown", "implementation-plan", "documentation"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "config:openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/.openspec.yaml",
+      "target": "document:openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/design.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/.openspec.yaml",
+      "target": "document:openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/proposal.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/.openspec.yaml",
+      "target": "document:openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/tasks.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/proposal.md",
+      "target": "document:openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/design.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/design.md",
+      "target": "document:openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/tasks.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

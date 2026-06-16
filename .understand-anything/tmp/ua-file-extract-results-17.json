@@ -1,0 +1,1688 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 25,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "frontend/app/layout.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 20,
+      "nonEmptyLines": 18,
+      "functions": [
+        {
+          "name": "RootLayout",
+          "startLine": 10,
+          "endLine": 20,
+          "params": [
+            "{\n  children\n}"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "metadata",
+          "line": 4,
+          "isDefault": false
+        },
+        {
+          "name": "RootLayout",
+          "line": 10,
+          "isDefault": true
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 2,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/next-env.d.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 5,
+      "nonEmptyLines": 4,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/next.config.mjs",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 4,
+      "nonEmptyLines": 3,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/package.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 28,
+      "nonEmptyLines": 28,
+      "sections": [
+        {
+          "heading": "name",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "version",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "private",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "scripts",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "dependencies",
+          "level": 1,
+          "line": 11
+        },
+        {
+          "heading": "devDependencies",
+          "level": 1,
+          "line": 17
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": "frontend/postcss.config.mjs",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 8,
+      "nonEmptyLines": 7,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/tailwind.config.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 42,
+      "nonEmptyLines": 40,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/tsconfig.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 27,
+      "nonEmptyLines": 27,
+      "sections": [
+        {
+          "heading": "compilerOptions",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "include",
+          "level": 1,
+          "line": 25
+        },
+        {
+          "heading": "exclude",
+          "level": 1,
+          "line": 26
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 3
+      }
+    },
+    {
+      "path": "model_service/app/__init__.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 1,
+      "nonEmptyLines": 0,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "model_service/requirements.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 3,
+      "nonEmptyLines": 3,
+      "metrics": {}
+    },
+    {
+      "path": "openspec/changes/add-vue-core-business-workflow/specs/swim-analysis-platform-navigation/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 27,
+      "nonEmptyLines": 20,
+      "sections": [
+        {
+          "heading": "MODIFIED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: App-style analysis navigation",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: Desktop platform navigation",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Scenario: Mobile platform navigation",
+          "level": 4,
+          "line": 10
+        },
+        {
+          "heading": "Scenario: User returns from business workflow to analysis output",
+          "level": 4,
+          "line": 14
+        },
+        {
+          "heading": "Requirement: Stable platform layout",
+          "level": 3,
+          "line": 18
+        },
+        {
+          "heading": "Scenario: User switches platform views",
+          "level": 4,
+          "line": 21
+        },
+        {
+          "heading": "Scenario: User uses dense business tables and forms",
+          "level": 4,
+          "line": 25
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 8
+      }
+    },
+    {
+      "path": "openspec/changes/add-vue-core-business-workflow/specs/swim-video-analysis-job-flow/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 64,
+      "nonEmptyLines": 47,
+      "sections": [
+        {
+          "heading": "MODIFIED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: Swim video upload entry",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: User opens the new swim analysis page",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Scenario: User enters swim metadata",
+          "level": 4,
+          "line": 10
+        },
+        {
+          "heading": "Requirement: Upload form validation",
+          "level": 3,
+          "line": 14
+        },
+        {
+          "heading": "Scenario: User selects a supported video",
+          "level": 4,
+          "line": 17
+        },
+        {
+          "heading": "Scenario: User submits incomplete analysis input",
+          "level": 4,
+          "line": 21
+        },
+        {
+          "heading": "Requirement: Analysis task management",
+          "level": 3,
+          "line": 25
+        },
+        {
+          "heading": "Scenario: User opens task management",
+          "level": 4,
+          "line": 28
+        },
+        {
+          "heading": "Scenario: User opens a completed task",
+          "level": 4,
+          "line": 32
+        },
+        {
+          "heading": "Scenario: User opens a session awaiting upload",
+          "level": 4,
+          "line": 36
+        },
+        {
+          "heading": "Requirement: Backend-ready analysis client",
+          "level": 3,
+          "line": 40
+        },
+        {
+          "heading": "Scenario: Implementation uses local demo data",
+          "level": 4,
+          "line": 43
+        },
+        {
+          "heading": "Scenario: Future backend integration is added",
+          "level": 4,
+          "line": 47
+        },
+        {
+          "heading": "Requirement: Training session preparation flow",
+          "level": 3,
+          "line": 51
+        },
+        {
+          "heading": "Scenario: User prepares backend analysis",
+          "level": 4,
+          "line": 54
+        },
+        {
+          "heading": "Scenario: Session has no bound video",
+          "level": 4,
+          "line": 58
+        },
+        {
+          "heading": "Scenario: Session has multiple camera videos",
+          "level": 4,
+          "line": 62
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 18
+      }
+    },
+    {
+      "path": "openspec/changes/add-vue-core-business-workflow/specs/vue-auth-session-access/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 61,
+      "nonEmptyLines": 45,
+      "sections": [
+        {
+          "heading": "ADDED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: Vue 登录与注册页面",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: User opens login page",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Scenario: User opens register page",
+          "level": 4,
+          "line": 10
+        },
+        {
+          "heading": "Scenario: User submits valid registration",
+          "level": 4,
+          "line": 14
+        },
+        {
+          "heading": "Requirement: Vue 会话保存与恢复",
+          "level": 3,
+          "line": 18
+        },
+        {
+          "heading": "Scenario: Login succeeds",
+          "level": 4,
+          "line": 21
+        },
+        {
+          "heading": "Scenario: User reloads browser",
+          "level": 4,
+          "line": 25
+        },
+        {
+          "heading": "Scenario: Session is invalid",
+          "level": 4,
+          "line": 29
+        },
+        {
+          "heading": "Requirement: Vue 路由权限",
+          "level": 3,
+          "line": 33
+        },
+        {
+          "heading": "Scenario: Anonymous user opens protected page",
+          "level": 4,
+          "line": 36
+        },
+        {
+          "heading": "Scenario: Authenticated user opens auth page",
+          "level": 4,
+          "line": 40
+        },
+        {
+          "heading": "Scenario: Coach opens management pages",
+          "level": 4,
+          "line": 44
+        },
+        {
+          "heading": "Scenario: Athlete role opens management pages",
+          "level": 4,
+          "line": 48
+        },
+        {
+          "heading": "Requirement: Demo authentication mode",
+          "level": 3,
+          "line": 52
+        },
+        {
+          "heading": "Scenario: API base URL is not configured",
+          "level": 4,
+          "line": 55
+        },
+        {
+          "heading": "Scenario: Demo user logs out",
+          "level": 4,
+          "line": 59
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 17
+      }
+    },
+    {
+      "path": "openspec/changes/add-vue-core-business-workflow/specs/vue-core-business-workflow/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 84,
+      "nonEmptyLines": 62,
+      "sections": [
+        {
+          "heading": "ADDED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: Vue 运动员列表",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: Coach opens athlete list",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Scenario: Coach filters athletes",
+          "level": 4,
+          "line": 10
+        },
+        {
+          "heading": "Scenario: Coach creates athlete",
+          "level": 4,
+          "line": 14
+        },
+        {
+          "heading": "Scenario: Coach chooses athlete action",
+          "level": 4,
+          "line": 18
+        },
+        {
+          "heading": "Requirement: Vue 运动员档案",
+          "level": 3,
+          "line": 22
+        },
+        {
+          "heading": "Scenario: User opens athlete profile",
+          "level": 4,
+          "line": 25
+        },
+        {
+          "heading": "Scenario: Athlete has session history",
+          "level": 4,
+          "line": 29
+        },
+        {
+          "heading": "Scenario: Athlete has no session history",
+          "level": 4,
+          "line": 33
+        },
+        {
+          "heading": "Requirement: Vue 测试任务创建",
+          "level": 3,
+          "line": 37
+        },
+        {
+          "heading": "Scenario: Coach opens create session page",
+          "level": 4,
+          "line": 40
+        },
+        {
+          "heading": "Scenario: Coach submits valid session",
+          "level": 4,
+          "line": 44
+        },
+        {
+          "heading": "Scenario: Create session is missing athlete",
+          "level": 4,
+          "line": 48
+        },
+        {
+          "heading": "Requirement: Vue 多机位视频上传",
+          "level": 3,
+          "line": 52
+        },
+        {
+          "heading": "Scenario: User opens session upload page",
+          "level": 4,
+          "line": 55
+        },
+        {
+          "heading": "Scenario: User uploads camera video",
+          "level": 4,
+          "line": 59
+        },
+        {
+          "heading": "Scenario: User edits sync offset",
+          "level": 4,
+          "line": 63
+        },
+        {
+          "heading": "Scenario: User saves draft",
+          "level": 4,
+          "line": 67
+        },
+        {
+          "heading": "Scenario: User submits analysis",
+          "level": 4,
+          "line": 71
+        },
+        {
+          "heading": "Requirement: Vue 业务 demo 数据",
+          "level": 3,
+          "line": 75
+        },
+        {
+          "heading": "Scenario: Demo mode athlete workflow",
+          "level": 4,
+          "line": 78
+        },
+        {
+          "heading": "Scenario: Demo mode session workflow",
+          "level": 4,
+          "line": 82
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 23
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/specs/zhiyong-yunshu-landing-page/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 75,
+      "nonEmptyLines": 54,
+      "sections": [
+        {
+          "heading": "ADDED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: Branded single-page structure",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: Visitor opens the homepage",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Requirement: Sports-tech visual style",
+          "level": 3,
+          "line": 10
+        },
+        {
+          "heading": "Scenario: Page is visually inspected",
+          "level": 4,
+          "line": 13
+        },
+        {
+          "heading": "Requirement: Fixed responsive navigation",
+          "level": 3,
+          "line": 17
+        },
+        {
+          "heading": "Scenario: Desktop navigation",
+          "level": 4,
+          "line": 20
+        },
+        {
+          "heading": "Scenario: Mobile navigation",
+          "level": 4,
+          "line": 24
+        },
+        {
+          "heading": "Requirement: Hero explains the product in the first viewport",
+          "level": 3,
+          "line": 28
+        },
+        {
+          "heading": "Scenario: Visitor reads the hero",
+          "level": 4,
+          "line": 31
+        },
+        {
+          "heading": "Requirement: System workflow section",
+          "level": 3,
+          "line": 35
+        },
+        {
+          "heading": "Scenario: Visitor reviews workflow",
+          "level": 4,
+          "line": 38
+        },
+        {
+          "heading": "Requirement: Feature and specification sections",
+          "level": 3,
+          "line": 42
+        },
+        {
+          "heading": "Scenario: Visitor compares system capabilities",
+          "level": 4,
+          "line": 45
+        },
+        {
+          "heading": "Requirement: Analysis output section",
+          "level": 3,
+          "line": 49
+        },
+        {
+          "heading": "Scenario: Visitor evaluates analysis value",
+          "level": 4,
+          "line": 52
+        },
+        {
+          "heading": "Requirement: FAQ accordion",
+          "level": 3,
+          "line": 56
+        },
+        {
+          "heading": "Scenario: Visitor expands a FAQ item",
+          "level": 4,
+          "line": 59
+        },
+        {
+          "heading": "Requirement: Responsive and accessible interaction basics",
+          "level": 3,
+          "line": 63
+        },
+        {
+          "heading": "Scenario: Layout is checked across viewport sizes",
+          "level": 4,
+          "line": 66
+        },
+        {
+          "heading": "Requirement: Local verification",
+          "level": 3,
+          "line": 70
+        },
+        {
+          "heading": "Scenario: Developer verifies the frontend",
+          "level": 4,
+          "line": 73
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 22
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/specs/swim-analysis-platform-navigation/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 37,
+      "nonEmptyLines": 27,
+      "sections": [
+        {
+          "heading": "ADDED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: Dark platform shell",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: User opens a platform view",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Scenario: User navigates from platform back to home",
+          "level": 4,
+          "line": 10
+        },
+        {
+          "heading": "Requirement: App-style analysis navigation",
+          "level": 3,
+          "line": 14
+        },
+        {
+          "heading": "Scenario: Desktop platform navigation",
+          "level": 4,
+          "line": 17
+        },
+        {
+          "heading": "Scenario: Mobile platform navigation",
+          "level": 4,
+          "line": 21
+        },
+        {
+          "heading": "Requirement: Domain-safe migration boundary",
+          "level": 3,
+          "line": 25
+        },
+        {
+          "heading": "Scenario: User reviews platform navigation and labels",
+          "level": 4,
+          "line": 28
+        },
+        {
+          "heading": "Requirement: Stable platform layout",
+          "level": 3,
+          "line": 32
+        },
+        {
+          "heading": "Scenario: User switches platform views",
+          "level": 4,
+          "line": 35
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 11
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/specs/swim-interactive-performance-report/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 48,
+      "nonEmptyLines": 35,
+      "sections": [
+        {
+          "heading": "ADDED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: Swim performance report",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: User opens a swim report",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Scenario: Report data is limited",
+          "level": 4,
+          "line": 10
+        },
+        {
+          "heading": "Requirement: Swim posture diagnostics",
+          "level": 3,
+          "line": 14
+        },
+        {
+          "heading": "Scenario: User reviews diagnostic findings",
+          "level": 4,
+          "line": 17
+        },
+        {
+          "heading": "Requirement: Stroke rhythm and symmetry metrics",
+          "level": 3,
+          "line": 21
+        },
+        {
+          "heading": "Scenario: User reviews metric cards",
+          "level": 4,
+          "line": 24
+        },
+        {
+          "heading": "Scenario: User reviews trend or progress information",
+          "level": 4,
+          "line": 28
+        },
+        {
+          "heading": "Requirement: Training feedback loop",
+          "level": 3,
+          "line": 32
+        },
+        {
+          "heading": "Scenario: User opens training feedback",
+          "level": 4,
+          "line": 35
+        },
+        {
+          "heading": "Scenario: User follows a recommendation from a report",
+          "level": 4,
+          "line": 39
+        },
+        {
+          "heading": "Requirement: Report visual consistency",
+          "level": 3,
+          "line": 43
+        },
+        {
+          "heading": "Scenario: User compares report views with homepage",
+          "level": 4,
+          "line": 46
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 14
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/specs/swim-video-analysis-job-flow/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 67,
+      "nonEmptyLines": 49,
+      "sections": [
+        {
+          "heading": "ADDED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: Swim video upload entry",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: User opens the new swim analysis page",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Scenario: User enters swim metadata",
+          "level": 4,
+          "line": 10
+        },
+        {
+          "heading": "Requirement: Upload form validation",
+          "level": 3,
+          "line": 14
+        },
+        {
+          "heading": "Scenario: User selects a supported video",
+          "level": 4,
+          "line": 17
+        },
+        {
+          "heading": "Scenario: User submits incomplete analysis input",
+          "level": 4,
+          "line": 21
+        },
+        {
+          "heading": "Requirement: Local demo job creation",
+          "level": 3,
+          "line": 25
+        },
+        {
+          "heading": "Scenario: User starts a demo analysis",
+          "level": 4,
+          "line": 28
+        },
+        {
+          "heading": "Scenario: User returns later in the same browser",
+          "level": 4,
+          "line": 32
+        },
+        {
+          "heading": "Requirement: Analysis task management",
+          "level": 3,
+          "line": 36
+        },
+        {
+          "heading": "Scenario: User opens task management",
+          "level": 4,
+          "line": 39
+        },
+        {
+          "heading": "Scenario: User opens a completed task",
+          "level": 4,
+          "line": 43
+        },
+        {
+          "heading": "Requirement: Swim analysis stage states",
+          "level": 3,
+          "line": 47
+        },
+        {
+          "heading": "Scenario: User opens a processing job",
+          "level": 4,
+          "line": 50
+        },
+        {
+          "heading": "Scenario: User opens a failed or unavailable job",
+          "level": 4,
+          "line": 54
+        },
+        {
+          "heading": "Requirement: Backend-ready analysis client",
+          "level": 3,
+          "line": 58
+        },
+        {
+          "heading": "Scenario: Implementation uses local demo data",
+          "level": 4,
+          "line": 61
+        },
+        {
+          "heading": "Scenario: Future backend integration is added",
+          "level": 4,
+          "line": 65
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 19
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/specs/swim-visual-analysis-workspace/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 56,
+      "nonEmptyLines": 41,
+      "sections": [
+        {
+          "heading": "ADDED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: Video-first swim workspace",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: User opens demo visual analysis",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Scenario: User opens job-specific visual analysis",
+          "level": 4,
+          "line": 10
+        },
+        {
+          "heading": "Requirement: Swim-specific visual overlays",
+          "level": 3,
+          "line": 14
+        },
+        {
+          "heading": "Scenario: User views the demo overlay layer",
+          "level": 4,
+          "line": 17
+        },
+        {
+          "heading": "Scenario: User reads overlay labels",
+          "level": 4,
+          "line": 21
+        },
+        {
+          "heading": "Requirement: Layer availability states",
+          "level": 3,
+          "line": 25
+        },
+        {
+          "heading": "Scenario: Keypoint layer is unavailable",
+          "level": 4,
+          "line": 28
+        },
+        {
+          "heading": "Scenario: Demo overlays are shown",
+          "level": 4,
+          "line": 32
+        },
+        {
+          "heading": "Requirement: Workspace result actions",
+          "level": 3,
+          "line": 36
+        },
+        {
+          "heading": "Scenario: User reviews completed visual analysis",
+          "level": 4,
+          "line": 39
+        },
+        {
+          "heading": "Scenario: User selects a result action",
+          "level": 4,
+          "line": 43
+        },
+        {
+          "heading": "Requirement: Responsive video workspace",
+          "level": 3,
+          "line": 47
+        },
+        {
+          "heading": "Scenario: User views workspace on desktop",
+          "level": 4,
+          "line": 50
+        },
+        {
+          "heading": "Scenario: User views workspace on mobile",
+          "level": 4,
+          "line": 54
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 16
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/specs/zhiyong-yunshu-landing-page/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 19,
+      "nonEmptyLines": 14,
+      "sections": [
+        {
+          "heading": "MODIFIED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: Branded single-page structure",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: Visitor opens the homepage",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Requirement: Fixed responsive navigation",
+          "level": 3,
+          "line": 10
+        },
+        {
+          "heading": "Scenario: Desktop navigation",
+          "level": 4,
+          "line": 13
+        },
+        {
+          "heading": "Scenario: Mobile navigation",
+          "level": 4,
+          "line": 17
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/specs/heavy-model-analysis-architecture/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 71,
+      "nonEmptyLines": 52,
+      "sections": [
+        {
+          "heading": "ADDED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: Platform technology stack",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: Frontend stack is used",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Scenario: Backend stack is used",
+          "level": 4,
+          "line": 10
+        },
+        {
+          "heading": "Requirement: Separate heavy model service",
+          "level": 3,
+          "line": 14
+        },
+        {
+          "heading": "Scenario: Backend dispatches model analysis",
+          "level": 4,
+          "line": 17
+        },
+        {
+          "heading": "Scenario: Model service returns structured result",
+          "level": 4,
+          "line": 21
+        },
+        {
+          "heading": "Requirement: Persistent analysis task state",
+          "level": 3,
+          "line": 25
+        },
+        {
+          "heading": "Scenario: Analysis task is created",
+          "level": 4,
+          "line": 28
+        },
+        {
+          "heading": "Scenario: Task continues after refresh",
+          "level": 4,
+          "line": 32
+        },
+        {
+          "heading": "Scenario: Model analysis fails",
+          "level": 4,
+          "line": 36
+        },
+        {
+          "heading": "Requirement: Local upload storage with future object storage boundary",
+          "level": 3,
+          "line": 40
+        },
+        {
+          "heading": "Scenario: Video file is uploaded",
+          "level": 4,
+          "line": 43
+        },
+        {
+          "heading": "Scenario: Storage backend changes later",
+          "level": 4,
+          "line": 47
+        },
+        {
+          "heading": "Requirement: HTML report generation from analysis result",
+          "level": 3,
+          "line": 51
+        },
+        {
+          "heading": "Scenario: Completed task has result",
+          "level": 4,
+          "line": 54
+        },
+        {
+          "heading": "Scenario: PDF export is unavailable",
+          "level": 4,
+          "line": 58
+        },
+        {
+          "heading": "Requirement: Upgrade path for production async execution",
+          "level": 3,
+          "line": 62
+        },
+        {
+          "heading": "Scenario: MVP background execution runs",
+          "level": 4,
+          "line": 65
+        },
+        {
+          "heading": "Scenario: Queue backend is upgraded",
+          "level": 4,
+          "line": 69
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 20
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/specs/swim-interactive-performance-report/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 34,
+      "nonEmptyLines": 25,
+      "sections": [
+        {
+          "heading": "ADDED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: Backend-generated report data",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: User opens report for completed backend job",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Scenario: Report data is not ready",
+          "level": 4,
+          "line": 10
+        },
+        {
+          "heading": "Requirement: Report provenance clarity",
+          "level": 3,
+          "line": 14
+        },
+        {
+          "heading": "Scenario: Real report is shown",
+          "level": 4,
+          "line": 17
+        },
+        {
+          "heading": "Scenario: Demo report is shown",
+          "level": 4,
+          "line": 21
+        },
+        {
+          "heading": "Requirement: PDF export remains future capability",
+          "level": 3,
+          "line": 25
+        },
+        {
+          "heading": "Scenario: User views first-version report",
+          "level": 4,
+          "line": 28
+        },
+        {
+          "heading": "Scenario: User expects PDF export before implementation",
+          "level": 4,
+          "line": 32
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 10
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/specs/swim-video-analysis-job-flow/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 34,
+      "nonEmptyLines": 25,
+      "sections": [
+        {
+          "heading": "ADDED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: Backend analysis job creation",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: User submits real video analysis",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Scenario: Backend returns created job",
+          "level": 4,
+          "line": 10
+        },
+        {
+          "heading": "Requirement: Backend task polling",
+          "level": 3,
+          "line": 14
+        },
+        {
+          "heading": "Scenario: User opens task management with backend enabled",
+          "level": 4,
+          "line": 17
+        },
+        {
+          "heading": "Scenario: User opens processing task",
+          "level": 4,
+          "line": 21
+        },
+        {
+          "heading": "Requirement: Model-service-backed terminal states",
+          "level": 3,
+          "line": 25
+        },
+        {
+          "heading": "Scenario: Model result is saved",
+          "level": 4,
+          "line": 28
+        },
+        {
+          "heading": "Scenario: Model service fails",
+          "level": 4,
+          "line": 32
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 10
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/specs/swim-visual-analysis-workspace/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 34,
+      "nonEmptyLines": 25,
+      "sections": [
+        {
+          "heading": "ADDED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: Real analysis result rendering",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: User opens completed backend job",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Scenario: Result schema version is unsupported",
+          "level": 4,
+          "line": 10
+        },
+        {
+          "heading": "Requirement: Canvas overlay synchronization",
+          "level": 3,
+          "line": 14
+        },
+        {
+          "heading": "Scenario: User plays analyzed video",
+          "level": 4,
+          "line": 17
+        },
+        {
+          "heading": "Scenario: Overlay data is missing for current time",
+          "level": 4,
+          "line": 21
+        },
+        {
+          "heading": "Requirement: Backend video source handling",
+          "level": 3,
+          "line": 25
+        },
+        {
+          "heading": "Scenario: Backend provides playable video URL",
+          "level": 4,
+          "line": 28
+        },
+        {
+          "heading": "Scenario: Video source cannot be loaded",
+          "level": 4,
+          "line": 32
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 10
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/backend-platform-core/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 113,
+      "nonEmptyLines": 83,
+      "sections": [
+        {
+          "heading": "ADDED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: PostgreSQL backend runtime",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: Backend uses PostgreSQL database URL",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Scenario: Local database services are started",
+          "level": 4,
+          "line": 10
+        },
+        {
+          "heading": "Requirement: Alembic managed schema",
+          "level": 3,
+          "line": 14
+        },
+        {
+          "heading": "Scenario: Database schema is initialized",
+          "level": 4,
+          "line": 17
+        },
+        {
+          "heading": "Scenario: Backend application starts",
+          "level": 4,
+          "line": 21
+        },
+        {
+          "heading": "Requirement: Authenticated user APIs",
+          "level": 3,
+          "line": 25
+        },
+        {
+          "heading": "Scenario: Coach registers an account",
+          "level": 4,
+          "line": 28
+        },
+        {
+          "heading": "Scenario: User logs in",
+          "level": 4,
+          "line": 32
+        },
+        {
+          "heading": "Scenario: User reads current profile",
+          "level": 4,
+          "line": 36
+        },
+        {
+          "heading": "Requirement: Athlete profile APIs",
+          "level": 3,
+          "line": 40
+        },
+        {
+          "heading": "Scenario: Coach creates an athlete",
+          "level": 4,
+          "line": 43
+        },
+        {
+          "heading": "Scenario: Coach lists owned athletes",
+          "level": 4,
+          "line": 47
+        },
+        {
+          "heading": "Scenario: Coach reads athlete detail",
+          "level": 4,
+          "line": 51
+        },
+        {
+          "heading": "Requirement: Training session APIs",
+          "level": 3,
+          "line": 55
+        },
+        {
+          "heading": "Scenario: Coach creates a training session",
+          "level": 4,
+          "line": 58
+        },
+        {
+          "heading": "Scenario: Coach lists training sessions",
+          "level": 4,
+          "line": 62
+        },
+        {
+          "heading": "Scenario: Coach lists sessions for one athlete",
+          "level": 4,
+          "line": 66
+        },
+        {
+          "heading": "Requirement: Session video binding APIs",
+          "level": 3,
+          "line": 70
+        },
+        {
+          "heading": "Scenario: Video file is uploaded",
+          "level": 4,
+          "line": 73
+        },
+        {
+          "heading": "Scenario: Video is bound to a session",
+          "level": 4,
+          "line": 77
+        },
+        {
+          "heading": "Scenario: Session videos are listed",
+          "level": 4,
+          "line": 81
+        },
+        {
+          "heading": "Requirement: Session-level analysis APIs",
+          "level": 3,
+          "line": 85
+        },
+        {
+          "heading": "Scenario: Analysis is submitted for a session",
+          "level": 4,
+          "line": 88
+        },
+        {
+          "heading": "Scenario: Analysis status is queried",
+          "level": 4,
+          "line": 92
+        },
+        {
+          "heading": "Scenario: Analysis result is saved",
+          "level": 4,
+          "line": 96
+        },
+        {
+          "heading": "Scenario: Analysis result is read",
+          "level": 4,
+          "line": 100
+        },
+        {
+          "heading": "Requirement: Session-level report APIs",
+          "level": 3,
+          "line": 104
+        },
+        {
+          "heading": "Scenario: Report is generated for a session",
+          "level": 4,
+          "line": 107
+        },
+        {
+          "heading": "Scenario: Report is read by session",
+          "level": 4,
+          "line": 111
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 31
+      }
+    },
+    {
+      "path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/heavy-model-analysis-architecture/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 44,
+      "nonEmptyLines": 32,
+      "sections": [
+        {
+          "heading": "MODIFIED Requirements",
+          "level": 2,
+          "line": 1
+        },
+        {
+          "heading": "Requirement: Platform technology stack",
+          "level": 3,
+          "line": 3
+        },
+        {
+          "heading": "Scenario: Frontend stack is used",
+          "level": 4,
+          "line": 6
+        },
+        {
+          "heading": "Scenario: Backend stack is used",
+          "level": 4,
+          "line": 10
+        },
+        {
+          "heading": "Scenario: Backend schema changes are introduced",
+          "level": 4,
+          "line": 14
+        },
+        {
+          "heading": "Requirement: Persistent analysis task state",
+          "level": 3,
+          "line": 18
+        },
+        {
+          "heading": "Scenario: Analysis task is created",
+          "level": 4,
+          "line": 21
+        },
+        {
+          "heading": "Scenario: Task continues after refresh",
+          "level": 4,
+          "line": 25
+        },
+        {
+          "heading": "Scenario: Model analysis fails",
+          "level": 4,
+          "line": 29
+        },
+        {
+          "heading": "ADDED Requirements",
+          "level": 2,
+          "line": 33
+        },
+        {
+          "heading": "Requirement: Session-level model dispatch",
+          "level": 3,
+          "line": 35
+        },
+        {
+          "heading": "Scenario: Backend dispatches session analysis",
+          "level": 4,
+          "line": 38
+        },
+        {
+          "heading": "Scenario: Session has multiple videos",
+          "level": 4,
+          "line": 42
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 13
+      }
+    }
+  ]
+}

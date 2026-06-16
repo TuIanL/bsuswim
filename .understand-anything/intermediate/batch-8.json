@@ -1,0 +1,112 @@
+{
+  "nodes": [
+    {
+      "id": "config:.env.example",
+      "type": "config",
+      "name": ".env.example",
+      "filePath": ".env.example",
+      "summary": "项目环境变量模板，包含后端服务名称、API 前缀、PostgreSQL 数据库连接、JWT 密钥与算法、模型服务地址和 CORS 跨域等运行时配置项。",
+      "tags": ["configuration", "environment", "deployment", "authentication"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "项目总览文档，涵盖项目定位（竞技游泳训练 AI 视频分析平台）、技术栈（Vue3 + FastAPI + PostgreSQL）、仓库目录结构、完整启动流程以及本地 AI 实验环境说明，是项目的首要入口文档。",
+      "tags": ["documentation", "entry-point", "overview", "getting-started"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "service:docker-compose.yml",
+      "type": "service",
+      "name": "docker-compose.yml",
+      "filePath": "docker-compose.yml",
+      "summary": "Docker Compose 编排文件，定义 PostgreSQL 16、Redis 7 和 MinIO 三个基础服务，为业务后端提供数据库、缓存和对象存储依赖。",
+      "tags": ["infrastructure", "containerization", "orchestration", "database"],
+      "complexity": "simple",
+      "languageNotes": "使用标准 Docker 镜像构建本地开发基础设施，通过 volumes 持久化数据库和对象存储数据。"
+    },
+    {
+      "id": "service:docker-compose.yml:postgres",
+      "type": "service",
+      "name": "postgres",
+      "filePath": "docker-compose.yml",
+      "summary": "PostgreSQL 16 数据库服务，为业务后端提供主存储，容器名 bsuswim-postgres。",
+      "tags": ["database", "infrastructure", "persistence"],
+      "complexity": "simple"
+    },
+    {
+      "id": "service:docker-compose.yml:redis",
+      "type": "service",
+      "name": "redis",
+      "filePath": "docker-compose.yml",
+      "summary": "Redis 7 缓存服务，用于后端缓存和任务队列，容器名 bsuswim-redis。",
+      "tags": ["cache", "infrastructure", "queue"],
+      "complexity": "simple"
+    },
+    {
+      "id": "service:docker-compose.yml:minio",
+      "type": "service",
+      "name": "minio",
+      "filePath": "docker-compose.yml",
+      "summary": "MinIO 对象存储服务，提供 S3 兼容 API 用于视频文件存储，容器名 bsuswim-minio。",
+      "tags": ["storage", "infrastructure", "s3-compatible"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:requirements-lock.txt",
+      "type": "document",
+      "name": "requirements-lock.txt",
+      "filePath": "requirements-lock.txt",
+      "summary": "Python 依赖锁定文件，列出 MMPose、PyTorch 及 AI 实验环境所需的全部 Python 包及其精确版本号，用于复现本地实验环境。",
+      "tags": ["dependencies", "python", "environment", "lockfile"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "service:docker-compose.yml",
+      "target": "service:docker-compose.yml:postgres",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "service:docker-compose.yml",
+      "target": "service:docker-compose.yml:redis",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "service:docker-compose.yml",
+      "target": "service:docker-compose.yml:minio",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "document:README.md",
+      "target": "config:.env.example",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "service:docker-compose.yml",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:requirements-lock.txt",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

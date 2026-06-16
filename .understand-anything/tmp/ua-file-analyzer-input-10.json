@@ -1,0 +1,13 @@
+{
+  "projectRoot": "/Users/tuian/Documents/大学/竞赛/大创/游泳/swim",
+  "batchFiles": [
+    {"path": "frontend-vue/index.html", "language": "html", "sizeLines": 12, "fileCategory": "markup"},
+    {"path": "frontend-vue/package.json", "language": "json", "sizeLines": 26, "fileCategory": "config"},
+    {"path": "frontend-vue/tsconfig.json", "language": "json", "sizeLines": 18, "fileCategory": "config"}
+  ],
+  "batchImportData": {
+    "frontend-vue/index.html": [],
+    "frontend-vue/package.json": [],
+    "frontend-vue/tsconfig.json": []
+  }
+}

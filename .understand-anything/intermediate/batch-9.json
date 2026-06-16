@@ -1,0 +1,251 @@
+{
+  "nodes": [
+    {
+      "id": "document:docs/ai-api-spec.md",
+      "type": "document",
+      "name": "ai-api-spec.md",
+      "filePath": "docs/ai-api-spec.md",
+      "summary": "定义业务后端与AI模型服务之间的接口规范，涵盖请求/响应结构、字段约定、错误处理和版本演进原则，保证接口在替换模型服务时保持稳定。",
+      "tags": ["api-schema", "specification", "model-service", "contract", "integration"],
+      "complexity": "complex",
+      "languageNotes": "包含完整的JSON请求/响应示例和19个结构化章节，从接口职责到实现状态层层递进。"
+    },
+    {
+      "id": "document:docs/database-design.md",
+      "type": "document",
+      "name": "database-design.md",
+      "filePath": "docs/database-design.md",
+      "summary": "描述以训练记录为中心的PostgreSQL数据库设计，涵盖users、athletes、training_sessions等8张核心表的字段意图、关系结构和Alembic迁移策略。",
+      "tags": ["database", "schema-design", "data-model", "postgresql", "migration"],
+      "complexity": "moderate",
+      "languageNotes": "采用实体关系图和层次缩进展示表之间的层级关系，强调文件层与业务层的分离设计。"
+    },
+    {
+      "id": "document:docs/local-development.md",
+      "type": "document",
+      "name": "local-development.md",
+      "filePath": "docs/local-development.md",
+      "summary": "提供本地开发环境的启动指南，包括四个服务的划分说明、环境变量配置和严格的启动顺序命令。",
+      "tags": ["development", "setup", "getting-started", "guide", "workflow"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/tech-stack.md",
+      "type": "document",
+      "name": "tech-stack.md",
+      "filePath": "docs/tech-stack.md",
+      "summary": "全面说明项目技术栈选择与三层架构设计（Vue3前端、FastAPI业务后端、独立模型服务），详述各服务职责划分、技术选型理由和当前实现状态。",
+      "tags": ["architecture", "technology-stack", "overview", "design", "infrastructure"],
+      "complexity": "moderate",
+      "languageNotes": "以ASCII架构图直观展示前端、业务后端、数据库、模型服务之间的数据流向。"
+    },
+    {
+      "id": "document:docs/upgrade-paths.md",
+      "type": "document",
+      "name": "upgrade-paths.md",
+      "filePath": "docs/upgrade-paths.md",
+      "summary": "记录从MVP到生产环境的三个关键升级路径：本地存储迁移到MinIO、BackgroundTasks升级到Celery+Redis、Stub模型服务替换为YOLO/MMPose，明确各路径的边界接口。",
+      "tags": ["upgrade", "migration", "infrastructure", "planning", "scalability"],
+      "complexity": "simple",
+      "languageNotes": "聚焦于非破坏性迁移策略，每个升级路径都明确了保持不变的契约边界。"
+    }
+  ],
+  "edges": [
+    {
+      "source": "document:docs/ai-api-spec.md",
+      "target": "file:backend/app/services/model_client.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/ai-api-spec.md",
+      "target": "file:model_service/app/schemas.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/ai-api-spec.md",
+      "target": "file:model_service/app/main.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/ai-api-spec.md",
+      "target": "file:model_service/app/runtime.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/database-design.md",
+      "target": "file:backend/app/models/user.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/database-design.md",
+      "target": "file:backend/app/models/athlete.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/database-design.md",
+      "target": "file:backend/app/models/training_session.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/database-design.md",
+      "target": "file:backend/app/models/video.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/database-design.md",
+      "target": "file:backend/app/models/analysis.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/database-design.md",
+      "target": "file:backend/app/models/report.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/database-design.md",
+      "target": "file:backend/app/models/team.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/local-development.md",
+      "target": "file:backend/app/main.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/local-development.md",
+      "target": "file:model_service/app/main.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/local-development.md",
+      "target": "file:frontend-vue/src/main.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/tech-stack.md",
+      "target": "file:frontend-vue/src/main.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/tech-stack.md",
+      "target": "file:backend/app/main.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/tech-stack.md",
+      "target": "file:model_service/app/main.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/tech-stack.md",
+      "target": "file:backend/app/services/model_client.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/upgrade-paths.md",
+      "target": "file:backend/app/services/storage.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/upgrade-paths.md",
+      "target": "file:model_service/app/runtime.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/upgrade-paths.md",
+      "target": "file:backend/app/services/analysis_service.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/ai-api-spec.md",
+      "target": "document:docs/tech-stack.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/database-design.md",
+      "target": "document:docs/tech-stack.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/database-design.md",
+      "target": "document:docs/local-development.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/tech-stack.md",
+      "target": "document:docs/local-development.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/upgrade-paths.md",
+      "target": "document:docs/tech-stack.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/upgrade-paths.md",
+      "target": "document:docs/ai-api-spec.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/upgrade-paths.md",
+      "target": "document:docs/database-design.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

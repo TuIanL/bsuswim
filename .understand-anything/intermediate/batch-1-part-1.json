@@ -1,0 +1,1139 @@
+{
+  "nodes": [
+    {
+      "id": "file:backend/alembic/env.py",
+      "type": "file",
+      "name": "env.py",
+      "filePath": "backend/alembic/env.py",
+      "summary": "Alembic 数据库迁移环境入口，离线与在线两种模式自动执行数据库 Schema 迁移，加载所有 ORM 模型以检测变更。",
+      "tags": ["数据库迁移", "alembic", "schema-management"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/alembic/env.py:run_migrations_offline",
+      "type": "function",
+      "name": "run_migrations_offline",
+      "filePath": "backend/alembic/env.py",
+      "lineRange": [19, 29],
+      "summary": "离线模式生成数据库迁移 SQL 脚本，用于 CI/CD 或人工审查场景。",
+      "tags": ["数据库迁移", "alembic", "offline"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/alembic/env.py:run_migrations_online",
+      "type": "function",
+      "name": "run_migrations_online",
+      "filePath": "backend/alembic/env.py",
+      "lineRange": [32, 43],
+      "summary": "在线模式直接连接 PostgreSQL 数据库执行迁移，使用 NullPool 确保短连接。",
+      "tags": ["数据库迁移", "alembic", "online"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/app/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "backend/app/__init__.py",
+      "summary": "Python 包标识文件，将 `app` 标记为包目录以便导入。",
+      "tags": ["package", "barrel", "python"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/app/api/router.py",
+      "type": "file",
+      "name": "router.py",
+      "filePath": "backend/app/api/router.py",
+      "summary": "FastAPI 主路由聚合器，将认证、用户、运动员、训练、视频、分析和报告等子路由挂载到 `/api/v1` 前缀下。",
+      "tags": ["api-router", "routing", "fastapi"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/app/api/routes/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "backend/app/api/routes/__init__.py",
+      "summary": "Python 包标识文件，标记 `routes` 为包目录。",
+      "tags": ["package", "barrel"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/app/api/routes/analysis.py",
+      "type": "file",
+      "name": "analysis.py",
+      "filePath": "backend/app/api/routes/analysis.py",
+      "summary": "分析任务 API 路由，提供提交分析、查询状态、获取结果以及模型服务回调保存结果等端点。",
+      "tags": ["api-handler", "analysis", "video-processing"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/app/api/routes/analysis.py:submit_analysis",
+      "type": "function",
+      "name": "submit_analysis",
+      "filePath": "backend/app/api/routes/analysis.py",
+      "lineRange": [21, 43],
+      "summary": "接收分析请求，验证训练会话归属权和视频绑定状态，创建分析任务并加入后台任务队列。",
+      "tags": ["api-handler", "analysis", "async"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/app/api/routes/analysis.py:get_analysis_status",
+      "type": "function",
+      "name": "get_analysis_status",
+      "filePath": "backend/app/api/routes/analysis.py",
+      "lineRange": [47, 63],
+      "summary": "查询指定分析任务的当前状态、进度和阶段信息，返回前端轮询所需数据。",
+      "tags": ["api-handler", "analysis", "status"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/app/api/routes/analysis.py:get_result",
+      "type": "function",
+      "name": "get_result",
+      "filePath": "backend/app/api/routes/analysis.py",
+      "lineRange": [67, 76],
+      "summary": "获取已完成分析任务的最终结果，包含检测数据、关键帧和运动指标。",
+      "tags": ["api-handler", "analysis", "result"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/app/api/routes/analysis.py:save_result",
+      "type": "function",
+      "name": "save_result",
+      "filePath": "backend/app/api/routes/analysis.py",
+      "lineRange": [80, 95],
+      "summary": "模型服务回调端点，保存分析结果数据并自动触发报告生成。",
+      "tags": ["api-handler", "analysis", "callback"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:backend/app/api/routes/athletes.py",
+      "type": "file",
+      "name": "athletes.py",
+      "filePath": "backend/app/api/routes/athletes.py",
+      "summary": "运动员管理 API 路由，提供创建、列表查询、详情获取以及查询训练记录等 CRUD 端点。",
+      "tags": ["api-handler", "运动员", "crud"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/app/api/routes/athletes.py:create_athlete",
+      "type": "function",
+      "name": "create_athlete",
+      "filePath": "backend/app/api/routes/athletes.py",
+      "lineRange": [14, 23],
+      "summary": "为当前教练创建新的运动员记录，包含个人信息、泳姿专长和等级。",
+      "tags": ["api-handler", "运动员", "create"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/app/api/routes/athletes.py:list_athletes",
+      "type": "function",
+      "name": "list_athletes",
+      "filePath": "backend/app/api/routes/athletes.py",
+      "lineRange": [27, 32],
+      "summary": "列出当前教练名下的所有运动员，按创建时间倒序排列。",
+      "tags": ["api-handler", "运动员", "list"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/app/api/routes/athletes.py:get_athlete",
+      "type": "function",
+      "name": "get_athlete",
+      "filePath": "backend/app/api/routes/athletes.py",
+      "lineRange": [36, 44],
+      "summary": "根据 ID 获取指定运动员的详细信息，验证归属权后返回。",
+      "tags": ["api-handler", "运动员", "detail"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/app/api/routes/athletes.py:list_athlete_sessions",
+      "type": "function",
+      "name": "list_athlete_sessions",
+      "filePath": "backend/app/api/routes/athletes.py",
+      "lineRange": [48, 62],
+      "summary": "查询指定运动员的所有训练会话记录，验证运动员归属权后按创建时间倒序返回。",
+      "tags": ["api-handler", "运动员", "训练历史"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/app/api/routes/auth.py",
+      "type": "file",
+      "name": "auth.py",
+      "filePath": "backend/app/api/routes/auth.py",
+      "summary": "认证 API 路由，提供用户注册和登录端点，使用 bcrypt 密码哈希和 JWT 令牌签发。",
+      "tags": ["api-handler", "认证", "auth"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/app/api/routes/auth.py:register",
+      "type": "function",
+      "name": "register",
+      "filePath": "backend/app/api/routes/auth.py",
+      "lineRange": [15, 37],
+      "summary": "用户注册接口，校验用户名、邮箱或手机号唯一性，创建用户并存储 bcrypt 密码哈希。",
+      "tags": ["api-handler", "认证", "register"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/app/api/routes/auth.py:login",
+      "type": "function",
+      "name": "login",
+      "filePath": "backend/app/api/routes/auth.py",
+      "lineRange": [41, 49],
+      "summary": "用户登录接口，验证用户名和密码后签发 JWT 访问令牌。",
+      "tags": ["api-handler", "认证", "login"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/app/api/routes/reports.py",
+      "type": "file",
+      "name": "reports.py",
+      "filePath": "backend/app/api/routes/reports.py",
+      "summary": "报告 API 路由，提供训练分析报告的生成和查询功能，聚合分析结果数据。",
+      "tags": ["api-handler", "报告", "report"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/app/api/routes/reports.py:generate_report",
+      "type": "function",
+      "name": "generate_report",
+      "filePath": "backend/app/api/routes/reports.py",
+      "lineRange": [15, 45],
+      "summary": "生成训练分析报告，聚合训练会话的所有分析任务结果并持久化到报告元数据表。",
+      "tags": ["api-handler", "报告", "generate"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/app/api/routes/reports.py:get_report",
+      "type": "function",
+      "name": "get_report",
+      "filePath": "backend/app/api/routes/reports.py",
+      "lineRange": [49, 58],
+      "summary": "获取指定训练会话已生成的分析报告。",
+      "tags": ["api-handler", "报告", "query"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/app/api/routes/reports.py:_read_report",
+      "type": "function",
+      "name": "_read_report",
+      "filePath": "backend/app/api/routes/reports.py",
+      "lineRange": [68, 75],
+      "summary": "将报告 ORM 对象转换为 Pydantic 响应格式的内部助手函数。",
+      "tags": ["utility", "serialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/app/api/routes/sessions.py",
+      "type": "file",
+      "name": "sessions.py",
+      "filePath": "backend/app/api/routes/sessions.py",
+      "summary": "训练会话 API 路由，提供创建、列表、详情查询以及视频绑定和视频列表等端点。",
+      "tags": ["api-handler", "训练", "session"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/app/api/routes/sessions.py:create_session",
+      "type": "function",
+      "name": "create_session",
+      "filePath": "backend/app/api/routes/sessions.py",
+      "lineRange": [16, 29],
+      "summary": "为指定运动员创建新的训练会话记录，包含泳姿、距离和场地信息。",
+      "tags": ["api-handler", "训练", "create"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/app/api/routes/sessions.py:list_sessions",
+      "type": "function",
+      "name": "list_sessions",
+      "filePath": "backend/app/api/routes/sessions.py",
+      "lineRange": [33, 42],
+      "summary": "列出当前教练的所有训练会话，按创建时间倒序排列。",
+      "tags": ["api-handler", "训练", "list"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/app/api/routes/sessions.py:get_session",
+      "type": "function",
+      "name": "get_session",
+      "filePath": "backend/app/api/routes/sessions.py",
+      "lineRange": [46, 52],
+      "summary": "查询指定训练会话的详细信息，验证归属权后返回。",
+      "tags": ["api-handler", "训练", "detail"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/app/api/routes/sessions.py:bind_session_video",
+      "type": "function",
+      "name": "bind_session_video",
+      "filePath": "backend/app/api/routes/sessions.py",
+      "lineRange": [56, 78],
+      "summary": "将视频文件绑定到训练会话，支持多视角关联和同步偏移，处理唯一约束冲突。",
+      "tags": ["api-handler", "训练", "视频绑定"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/app/api/routes/sessions.py:list_session_videos",
+      "type": "function",
+      "name": "list_session_videos",
+      "filePath": "backend/app/api/routes/sessions.py",
+      "lineRange": [82, 94],
+      "summary": "列出与训练会话关联的所有视频文件及其元信息，按创建时间升序排列。",
+      "tags": ["api-handler", "训练", "视频列表"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/app/api/routes/sessions.py:_read_session_video",
+      "type": "function",
+      "name": "_read_session_video",
+      "filePath": "backend/app/api/routes/sessions.py",
+      "lineRange": [104, 110],
+      "summary": "将会话视频关联对象转换为 Pydantic 响应格式，附带视频文件的完整信息。",
+      "tags": ["utility", "serialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/app/api/routes/users.py",
+      "type": "file",
+      "name": "users.py",
+      "filePath": "backend/app/api/routes/users.py",
+      "summary": "用户个人信息 API 路由，提供当前用户信息查询端点。",
+      "tags": ["api-handler", "用户", "profile"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/app/api/routes/videos.py",
+      "type": "file",
+      "name": "videos.py",
+      "filePath": "backend/app/api/routes/videos.py",
+      "summary": "视频文件 API 路由，提供视频上传和详情查询功能，验证文件类型并保存到存储系统。",
+      "tags": ["api-handler", "视频", "upload"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/app/api/routes/videos.py:upload_video",
+      "type": "function",
+      "name": "upload_video",
+      "filePath": "backend/app/api/routes/videos.py",
+      "lineRange": [13, 22],
+      "summary": "异步处理视频文件上传，验证 MIME 类型，使用 StorageService 保存文件并创建视频记录。",
+      "tags": ["api-handler", "视频", "upload"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/app/api/routes/videos.py:get_video",
+      "type": "function",
+      "name": "get_video",
+      "filePath": "backend/app/api/routes/videos.py",
+      "lineRange": [26, 30],
+      "summary": "根据 ID 获取视频文件的元信息。",
+      "tags": ["api-handler", "视频", "query"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/app/api/routes/videos.py:_read_video",
+      "type": "function",
+      "name": "_read_video",
+      "filePath": "backend/app/api/routes/videos.py",
+      "lineRange": [33, 39],
+      "summary": "将视频 ORM 对象转换为 Pydantic 响应格式，附加播放 URL。",
+      "tags": ["utility", "serialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:backend/app/core/config.py",
+      "type": "file",
+      "name": "config.py",
+      "filePath": "backend/app/core/config.py",
+      "summary": "应用核心配置模块，使用 Pydantic BaseSettings 管理数据库连接、JWT 密钥、模型服务地址和 CORS 等参数。",
+      "tags": ["configuration", "settings", "pydantic"],
+      "complexity": "simple",
+      "languageNotes": "使用 Pydantic BaseSettings，支持 .env 文件加载和环境变量覆盖。"
+    },
+    {
+      "id": "class:backend/app/core/config.py:Settings",
+      "type": "class",
+      "name": "Settings",
+      "filePath": "backend/app/core/config.py",
+      "lineRange": [7, 24],
+      "summary": "应用配置类，定义数据库连接串、JWT 密钥与算法、模型服务端点、上传目录和 CORS 来源等核心参数。",
+      "tags": ["configuration", "settings", "pydantic"],
+      "complexity": "simple",
+      "languageNotes": "继承 Pydantic BaseSettings，通过 .env 文件和环境变量注入配置值。"
+    },
+    {
+      "id": "file:backend/app/core/deps.py",
+      "type": "file",
+      "name": "deps.py",
+      "filePath": "backend/app/core/deps.py",
+      "summary": "FastAPI 依赖注入模块，提供 JWT 令牌验证和当前用户身份解析功能。",
+      "tags": ["middleware", "依赖注入", "auth"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:backend/app/core/deps.py:get_current_user",
+      "type": "function",
+      "name": "get_current_user",
+      "filePath": "backend/app/core/deps.py",
+      "lineRange": [14, 37],
+      "summary": "FastAPI 依赖函数，从 Bearer 令牌中解析 JWT 并验证用户身份，返回当前活跃用户。",
+      "tags": ["middleware", "jwt", "依赖注入"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:backend/app/core/security.py",
+      "type": "file",
+      "name": "security.py",
+      "filePath": "backend/app/core/security.py",
+      "summary": "安全工具模块，提供 bcrypt 密码哈希验证和 JWT 访问令牌签发功能。",
+      "tags": ["security", "jwt", "密码"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:backend/app/core/security.py:create_access_token",
+      "type": "function",
+      "name": "create_access_token",
+      "filePath": "backend/app/core/security.py",
+      "lineRange": [21, 27],
+      "summary": "基于配置的密钥和 HS256 算法签发 JWT 访问令牌，支持自定义过期时间。",
+      "tags": ["security", "jwt", "token"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:backend/alembic/env.py",
+      "target": "function:backend/alembic/env.py:run_migrations_offline",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/alembic/env.py",
+      "target": "function:backend/alembic/env.py:run_migrations_online",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/alembic/env.py",
+      "target": "function:backend/alembic/env.py:run_migrations_offline",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/alembic/env.py",
+      "target": "function:backend/alembic/env.py:run_migrations_online",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/analysis.py",
+      "target": "function:backend/app/api/routes/analysis.py:submit_analysis",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/analysis.py",
+      "target": "function:backend/app/api/routes/analysis.py:get_analysis_status",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/analysis.py",
+      "target": "function:backend/app/api/routes/analysis.py:get_result",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/analysis.py",
+      "target": "function:backend/app/api/routes/analysis.py:save_result",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/analysis.py",
+      "target": "function:backend/app/api/routes/analysis.py:submit_analysis",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/analysis.py",
+      "target": "function:backend/app/api/routes/analysis.py:get_analysis_status",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/analysis.py",
+      "target": "function:backend/app/api/routes/analysis.py:get_result",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/analysis.py",
+      "target": "function:backend/app/api/routes/analysis.py:save_result",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/athletes.py",
+      "target": "function:backend/app/api/routes/athletes.py:create_athlete",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/athletes.py",
+      "target": "function:backend/app/api/routes/athletes.py:list_athletes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/athletes.py",
+      "target": "function:backend/app/api/routes/athletes.py:get_athlete",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/athletes.py",
+      "target": "function:backend/app/api/routes/athletes.py:list_athlete_sessions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/athletes.py",
+      "target": "function:backend/app/api/routes/athletes.py:create_athlete",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/athletes.py",
+      "target": "function:backend/app/api/routes/athletes.py:list_athletes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/athletes.py",
+      "target": "function:backend/app/api/routes/athletes.py:get_athlete",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/athletes.py",
+      "target": "function:backend/app/api/routes/athletes.py:list_athlete_sessions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/auth.py",
+      "target": "function:backend/app/api/routes/auth.py:register",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/auth.py",
+      "target": "function:backend/app/api/routes/auth.py:login",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/auth.py",
+      "target": "function:backend/app/api/routes/auth.py:register",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/auth.py",
+      "target": "function:backend/app/api/routes/auth.py:login",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/reports.py",
+      "target": "function:backend/app/api/routes/reports.py:generate_report",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/reports.py",
+      "target": "function:backend/app/api/routes/reports.py:get_report",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/reports.py",
+      "target": "function:backend/app/api/routes/reports.py:_read_report",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/reports.py",
+      "target": "function:backend/app/api/routes/reports.py:generate_report",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/reports.py",
+      "target": "function:backend/app/api/routes/reports.py:get_report",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/reports.py",
+      "target": "function:backend/app/api/routes/reports.py:_read_report",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "function:backend/app/api/routes/sessions.py:create_session",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "function:backend/app/api/routes/sessions.py:list_sessions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "function:backend/app/api/routes/sessions.py:get_session",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "function:backend/app/api/routes/sessions.py:bind_session_video",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "function:backend/app/api/routes/sessions.py:list_session_videos",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "function:backend/app/api/routes/sessions.py:_read_session_video",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "function:backend/app/api/routes/sessions.py:create_session",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "function:backend/app/api/routes/sessions.py:list_sessions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "function:backend/app/api/routes/sessions.py:get_session",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "function:backend/app/api/routes/sessions.py:bind_session_video",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "function:backend/app/api/routes/sessions.py:list_session_videos",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "function:backend/app/api/routes/sessions.py:_read_session_video",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/videos.py",
+      "target": "function:backend/app/api/routes/videos.py:upload_video",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/videos.py",
+      "target": "function:backend/app/api/routes/videos.py:get_video",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/videos.py",
+      "target": "function:backend/app/api/routes/videos.py:_read_video",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/api/routes/videos.py",
+      "target": "function:backend/app/api/routes/videos.py:upload_video",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/videos.py",
+      "target": "function:backend/app/api/routes/videos.py:get_video",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/api/routes/videos.py",
+      "target": "function:backend/app/api/routes/videos.py:_read_video",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/core/config.py",
+      "target": "class:backend/app/core/config.py:Settings",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/core/config.py",
+      "target": "class:backend/app/core/config.py:Settings",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/core/deps.py",
+      "target": "function:backend/app/core/deps.py:get_current_user",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/core/deps.py",
+      "target": "function:backend/app/core/deps.py:get_current_user",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/app/core/security.py",
+      "target": "function:backend/app/core/security.py:create_access_token",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:backend/app/core/security.py",
+      "target": "function:backend/app/core/security.py:create_access_token",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:backend/alembic/env.py",
+      "target": "file:backend/app/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/alembic/env.py",
+      "target": "file:backend/app/core/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/alembic/env.py",
+      "target": "file:backend/app/db/session.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/alembic/env.py",
+      "target": "file:backend/app/models/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/router.py",
+      "target": "file:backend/app/api/routes/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/router.py",
+      "target": "file:backend/app/api/routes/analysis.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/router.py",
+      "target": "file:backend/app/api/routes/athletes.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/router.py",
+      "target": "file:backend/app/api/routes/auth.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/router.py",
+      "target": "file:backend/app/api/routes/reports.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/router.py",
+      "target": "file:backend/app/api/routes/sessions.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/router.py",
+      "target": "file:backend/app/api/routes/users.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/router.py",
+      "target": "file:backend/app/api/routes/videos.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/analysis.py",
+      "target": "file:backend/app/core/deps.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/analysis.py",
+      "target": "file:backend/app/db/session.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/analysis.py",
+      "target": "file:backend/app/models/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/analysis.py",
+      "target": "file:backend/app/schemas/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/analysis.py",
+      "target": "file:backend/app/services/analysis_service.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/athletes.py",
+      "target": "file:backend/app/core/deps.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/athletes.py",
+      "target": "file:backend/app/db/session.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/athletes.py",
+      "target": "file:backend/app/models/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/athletes.py",
+      "target": "file:backend/app/schemas/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/auth.py",
+      "target": "file:backend/app/core/security.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/auth.py",
+      "target": "file:backend/app/db/session.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/auth.py",
+      "target": "file:backend/app/models/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/auth.py",
+      "target": "file:backend/app/schemas/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/reports.py",
+      "target": "file:backend/app/core/deps.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/reports.py",
+      "target": "file:backend/app/db/session.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/reports.py",
+      "target": "file:backend/app/models/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/reports.py",
+      "target": "file:backend/app/schemas/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/reports.py",
+      "target": "file:backend/app/services/report_builder.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "file:backend/app/api/routes/videos.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "file:backend/app/core/deps.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "file:backend/app/db/session.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "file:backend/app/models/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/sessions.py",
+      "target": "file:backend/app/schemas/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/users.py",
+      "target": "file:backend/app/core/deps.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/users.py",
+      "target": "file:backend/app/models/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/users.py",
+      "target": "file:backend/app/schemas/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/videos.py",
+      "target": "file:backend/app/db/session.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/videos.py",
+      "target": "file:backend/app/models/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/videos.py",
+      "target": "file:backend/app/schemas/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/api/routes/videos.py",
+      "target": "file:backend/app/services/storage.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/core/deps.py",
+      "target": "file:backend/app/core/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/core/deps.py",
+      "target": "file:backend/app/db/session.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/core/deps.py",
+      "target": "file:backend/app/models/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:backend/app/core/security.py",
+      "target": "file:backend/app/core/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:backend/app/api/routes/analysis.py:submit_analysis",
+      "target": "function:backend/app/services/analysis_service.py:create_analysis_task",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:backend/app/api/routes/analysis.py:save_result",
+      "target": "function:backend/app/services/analysis_service.py:save_analysis_result",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:backend/app/api/routes/auth.py:login",
+      "target": "function:backend/app/core/security.py:create_access_token",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:backend/app/api/routes/reports.py:generate_report",
+      "target": "function:backend/app/services/report_builder.py:build_report_data",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:backend/app/api/routes/sessions.py:_read_session_video",
+      "target": "function:backend/app/api/routes/videos.py:_read_video",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

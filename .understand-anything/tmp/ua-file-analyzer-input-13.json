@@ -1,0 +1,15 @@
+{
+  "projectRoot": "/Users/tuian/Documents/大学/竞赛/大创/游泳/swim",
+  "batchFiles": [
+    {"path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/.openspec.yaml", "language": "yaml", "sizeLines": 2, "fileCategory": "config"},
+    {"path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/design.md", "language": "markdown", "sizeLines": 85, "fileCategory": "docs"},
+    {"path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/proposal.md", "language": "markdown", "sizeLines": 34, "fileCategory": "docs"},
+    {"path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/tasks.md", "language": "markdown", "sizeLines": 52, "fileCategory": "docs"}
+  ],
+  "batchImportData": {
+    "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/.openspec.yaml": [],
+    "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/design.md": [],
+    "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/proposal.md": [],
+    "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/tasks.md": []
+  }
+}

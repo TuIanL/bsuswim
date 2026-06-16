@@ -1,0 +1,726 @@
+{
+  "nodes": [
+    {
+      "id": "file:frontend/app/platform/page.tsx",
+      "type": "file",
+      "name": "page.tsx",
+      "filePath": "frontend/app/platform/page.tsx",
+      "summary": "Next.js 平台路由页面，渲染 SwimPlatformApp 作为智泳云枢分析平台的入口组件。",
+      "tags": ["entry-point", "page", "route"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:frontend/components/platform/PlatformShell.tsx",
+      "type": "file",
+      "name": "PlatformShell.tsx",
+      "filePath": "frontend/components/platform/PlatformShell.tsx",
+      "summary": "提供智泳云枢分析平台的导航外壳组件，包含品牌标识、平台视图导航（上传/任务/工作台/报告/训练）、移动端菜单及通用页面模板组件。",
+      "tags": ["navigation", "layout", "shell", "ui-component"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "type": "file",
+      "name": "SwimPlatformApp.tsx",
+      "filePath": "frontend/components/platform/SwimPlatformApp.tsx",
+      "summary": "智泳云枢分析平台的主应用组件，管理视图状态与 URL 参数驱动的路由，协调上传、任务、工作台、报告、训练反馈五个子视图的切换，对接本地存储 API 客户端。",
+      "tags": ["application", "router", "view-manager", "platform"],
+      "complexity": "complex",
+      "languageNotes": "单文件内部包含 11 个视图子组件，通过条件渲染切换视图，使用 useState/useEffect/useMemo 管理状态生命周期。"
+    },
+    {
+      "id": "file:frontend/components/platform/SwimVisualWorkspace.tsx",
+      "type": "file",
+      "name": "SwimVisualWorkspace.tsx",
+      "filePath": "frontend/components/platform/SwimVisualWorkspace.tsx",
+      "summary": "视觉分析工作台组件，展示泳姿视频关键点 SVG 轨迹、节奏时间线、叠加提示标签和图层状态面板，模拟侧面视频分析工作流界面。",
+      "tags": ["visualization", "workspace", "video-analysis", "ui-component"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend/lib/swim-analysis-client.ts",
+      "type": "file",
+      "name": "swim-analysis-client.ts",
+      "filePath": "frontend/lib/swim-analysis-client.ts",
+      "summary": "基于 localStorage 的游泳分析 API 客户端，提供任务与报告的 CRUD 操作、文件大小格式化、演示任务注入功能，在前端无后端运行时独立运行。",
+      "tags": ["api-client", "storage", "service", "utility"],
+      "complexity": "moderate",
+      "languageNotes": "使用泛型读取/写入 JSON 到 localStorage 实现持久化，通过 CustomEvent 实现跨标签页状态同步。"
+    },
+    {
+      "id": "file:frontend/lib/swim-demo-data.ts",
+      "type": "file",
+      "name": "swim-demo-data.ts",
+      "filePath": "frontend/lib/swim-demo-data.ts",
+      "summary": "演示数据层，包含泳姿标签映射、采集模式映射、分析流程蓝图、完整的示例分析报告及会话克隆函数，用于无后端模式下的演示体验。",
+      "tags": ["demo-data", "mock", "sample-data", "constants"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:frontend/lib/swim-types.ts",
+      "type": "file",
+      "name": "swim-types.ts",
+      "filePath": "frontend/lib/swim-types.ts",
+      "summary": "TypeScript 类型定义文件，定义游泳分析领域的核心类型体系：泳姿、采集模式、分析状态、任务、报告、诊断和训练建议等接口。",
+      "tags": ["type-definition", "typescript", "schema", "interface"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/app/platform/page.tsx:PlatformPage",
+      "type": "function",
+      "name": "PlatformPage",
+      "filePath": "frontend/app/platform/page.tsx",
+      "lineRange": [7, 9],
+      "summary": "智泳云枢分析平台的 Next.js 默认导出页面入口，渲染 SwimPlatformApp 根组件。",
+      "tags": ["entry-point", "page", "wrapper"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/platform/PlatformShell.tsx:PlatformShell",
+      "type": "function",
+      "name": "PlatformShell",
+      "filePath": "frontend/components/platform/PlatformShell.tsx",
+      "lineRange": [28, 143],
+      "summary": "平台导航外壳组件，含品牌标头、桌面端与移动端导航菜单、视图切换回调处理，包装子视图内容区域。",
+      "tags": ["navigation", "layout", "shell", "ui-component"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/components/platform/PlatformShell.tsx:PlatformPageHeader",
+      "type": "function",
+      "name": "PlatformPageHeader",
+      "filePath": "frontend/components/platform/PlatformShell.tsx",
+      "lineRange": [145, 168],
+      "summary": "平台通用页面标题组件，展示眉标（eyebrow）、大标题、描述文本和可选的操作按钮区域。",
+      "tags": ["ui-component", "header", "title"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/platform/PlatformShell.tsx:PlatformPanel",
+      "type": "function",
+      "name": "PlatformPanel",
+      "filePath": "frontend/components/platform/PlatformShell.tsx",
+      "lineRange": [170, 172],
+      "summary": "简单的面板容器组件，提供带有统一样式的半透明边框面板布局，接收可选 className。",
+      "tags": ["ui-component", "container", "panel"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/platform/SwimPlatformApp.tsx:SwimPlatformApp",
+      "type": "function",
+      "name": "SwimPlatformApp",
+      "filePath": "frontend/components/platform/SwimPlatformApp.tsx",
+      "lineRange": [57, 143],
+      "summary": "主应用逻辑组件，管理 URL 参数驱动的视图状态、任务列表刷新、当前任务获取以及五个子视图的条件渲染与路由导航。",
+      "tags": ["application", "controller", "view-manager", "router"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/components/platform/SwimPlatformApp.tsx:UploadView",
+      "type": "function",
+      "name": "UploadView",
+      "filePath": "frontend/components/platform/SwimPlatformApp.tsx",
+      "lineRange": [145, 241],
+      "summary": "上传训练视频的表单视图，包含文件选择器、泳姿/采集模式等会话元数据表单字段、校验逻辑和提交处理。",
+      "tags": ["form", "upload", "view", "ui-component"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/components/platform/SwimPlatformApp.tsx:Field",
+      "type": "function",
+      "name": "Field",
+      "filePath": "frontend/components/platform/SwimPlatformApp.tsx",
+      "lineRange": [243, 265],
+      "summary": "通用文本/日期输入字段组件，带标签和受控 onChange 值绑定。",
+      "tags": ["form", "input", "ui-component"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/platform/SwimPlatformApp.tsx:SelectField",
+      "type": "function",
+      "name": "SelectField",
+      "filePath": "frontend/components/platform/SwimPlatformApp.tsx",
+      "lineRange": [267, 294],
+      "summary": "通用泛型选择下拉框组件，支持枚举键值映射为中文标签显示。",
+      "tags": ["form", "select", "ui-component"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/platform/SwimPlatformApp.tsx:TasksView",
+      "type": "function",
+      "name": "TasksView",
+      "filePath": "frontend/components/platform/SwimPlatformApp.tsx",
+      "lineRange": [296, 359],
+      "summary": "任务管理视图，展示所有游泳分析任务的卡片列表，提供刷新和导航到各子视图的操作入口。",
+      "tags": ["list", "view", "tasks", "ui-component"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/components/platform/SwimPlatformApp.tsx:JobView",
+      "type": "function",
+      "name": "JobView",
+      "filePath": "frontend/components/platform/SwimPlatformApp.tsx",
+      "lineRange": [361, 427],
+      "summary": "任务详情视图，展示单个分析任务的进度百分比、各阶段状态列表以及导航到工作台/报告/训练反馈的入口。",
+      "tags": ["detail", "view", "progress", "ui-component"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/components/platform/SwimPlatformApp.tsx:WorkspaceView",
+      "type": "function",
+      "name": "WorkspaceView",
+      "filePath": "frontend/components/platform/SwimPlatformApp.tsx",
+      "lineRange": [429, 479],
+      "summary": "工作台视图容器，协调 SwimVisualWorkspace 子组件与平台导航逻辑，支持无任务时载入演示数据。",
+      "tags": ["view", "workspace", "container", "ui-component"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/components/platform/SwimPlatformApp.tsx:ReportView",
+      "type": "function",
+      "name": "ReportView",
+      "filePath": "frontend/components/platform/SwimPlatformApp.tsx",
+      "lineRange": [481, 556],
+      "summary": "分析报告视图，展示技术评分指标卡片、技术诊断列表、关键发现摘要和导航到训练反馈的入口。",
+      "tags": ["report", "view", "metrics", "diagnostics"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/components/platform/SwimPlatformApp.tsx:TrainingView",
+      "type": "function",
+      "name": "TrainingView",
+      "filePath": "frontend/components/platform/SwimPlatformApp.tsx",
+      "lineRange": [558, 605],
+      "summary": "训练反馈闭环视图，展示每个诊断问题的练习建议、学习内容、当前进度条和目标跟踪。",
+      "tags": ["training", "view", "feedback", "progress"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/components/platform/SwimPlatformApp.tsx:MetricCard",
+      "type": "function",
+      "name": "MetricCard",
+      "filePath": "frontend/components/platform/SwimPlatformApp.tsx",
+      "lineRange": [607, 616],
+      "summary": "指标卡片组件，展示单个技术指标的值、趋势方向和详情描述。",
+      "tags": ["metric", "card", "ui-component"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/platform/SwimPlatformApp.tsx:EmptyState",
+      "type": "function",
+      "name": "EmptyState",
+      "filePath": "frontend/components/platform/SwimPlatformApp.tsx",
+      "lineRange": [618, 640],
+      "summary": "空状态占位组件，在无数据时展示标题、说明文字和操作按钮引导用户创建内容。",
+      "tags": ["empty-state", "placeholder", "ui-component"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/components/platform/SwimVisualWorkspace.tsx:SwimVisualWorkspace",
+      "type": "function",
+      "name": "SwimVisualWorkspace",
+      "filePath": "frontend/components/platform/SwimVisualWorkspace.tsx",
+      "lineRange": [14, 162],
+      "summary": "视觉工作台核心组件，渲染泳姿视频示意区域、关键点 SVG 轨迹折线、叠加提示标签、节奏时间线、会话上下文和图层状态面板。",
+      "tags": ["visualization", "workspace", "video-analysis", "ui-component"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:frontend/components/platform/SwimVisualWorkspace.tsx:StatusBadge",
+      "type": "function",
+      "name": "StatusBadge",
+      "filePath": "frontend/components/platform/SwimVisualWorkspace.tsx",
+      "lineRange": [164, 179],
+      "summary": "状态徽章组件，将分析状态（排队中/分析中/已完成/失败/已取消）映射为带 Activity 图标的中文标签。",
+      "tags": ["badge", "status", "ui-component"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/lib/swim-analysis-client.ts:readJson",
+      "type": "function",
+      "name": "readJson",
+      "filePath": "frontend/lib/swim-analysis-client.ts",
+      "lineRange": [23, 34],
+      "summary": "从 localStorage 读取并解析 JSON 数据的内部工具函数，包含存储不可用检查和异常回退默认值。",
+      "tags": ["storage", "utility", "json"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/lib/swim-analysis-client.ts:formatFileSize",
+      "type": "function",
+      "name": "formatFileSize",
+      "filePath": "frontend/lib/swim-analysis-client.ts",
+      "lineRange": [44, 54],
+      "summary": "将字节数格式化为可读的文件大小字符串（KB/MB），空值时返回「演示视频」。",
+      "tags": ["utility", "format", "file-size"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/lib/swim-analysis-client.ts:listSwimAnalysisJobs",
+      "type": "function",
+      "name": "listSwimAnalysisJobs",
+      "filePath": "frontend/lib/swim-analysis-client.ts",
+      "lineRange": [56, 60],
+      "summary": "从 localStorage 读取所有分析任务并按更新时间降序排列返回。",
+      "tags": ["storage", "query", "list"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/lib/swim-analysis-client.ts:getRecentSwimAnalysisJob",
+      "type": "function",
+      "name": "getRecentSwimAnalysisJob",
+      "filePath": "frontend/lib/swim-analysis-client.ts",
+      "lineRange": [62, 64],
+      "summary": "从 localStorage 读取最近一次访问的分析任务。",
+      "tags": ["storage", "query", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/lib/swim-analysis-client.ts:rememberSwimAnalysisJob",
+      "type": "function",
+      "name": "rememberSwimAnalysisJob",
+      "filePath": "frontend/lib/swim-analysis-client.ts",
+      "lineRange": [66, 71],
+      "summary": "将分析任务持久化为最近任务记录并触发 CustomEvent 通知其他标签页同步状态。",
+      "tags": ["storage", "event", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/lib/swim-analysis-client.ts:getSwimAnalysisJob",
+      "type": "function",
+      "name": "getSwimAnalysisJob",
+      "filePath": "frontend/lib/swim-analysis-client.ts",
+      "lineRange": [82, 84],
+      "summary": "按 ID 从任务列表中查找并返回分析任务，未找到时返回 null。",
+      "tags": ["storage", "query", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/lib/swim-analysis-client.ts:getSwimAnalysisReport",
+      "type": "function",
+      "name": "getSwimAnalysisReport",
+      "filePath": "frontend/lib/swim-analysis-client.ts",
+      "lineRange": [86, 93],
+      "summary": "按任务 ID 从 localStorage 读取分析报告，未找到或无任务时返回演示默认报告。",
+      "tags": ["storage", "query", "report"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/lib/swim-analysis-client.ts:createSwimAnalysisJob",
+      "type": "function",
+      "name": "createSwimAnalysisJob",
+      "filePath": "frontend/lib/swim-analysis-client.ts",
+      "lineRange": [95, 121],
+      "summary": "创建游泳分析任务，生成唯一 ID 和报告 ID，组装任务结构与流程阶段蓝图，保存到 localStorage 并返回新任务。",
+      "tags": ["factory", "storage", "job", "service"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:frontend/lib/swim-analysis-client.ts:seedDemoSwimJob",
+      "type": "function",
+      "name": "seedDemoSwimJob",
+      "filePath": "frontend/lib/swim-analysis-client.ts",
+      "lineRange": [123, 141],
+      "summary": "确保存在一个演示任务，复用现有最近任务或用演示报告数据创建全新的演示任务。",
+      "tags": ["demo", "seed", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:frontend/lib/swim-demo-data.ts:cloneReportForSession",
+      "type": "function",
+      "name": "cloneReportForSession",
+      "filePath": "frontend/lib/swim-demo-data.ts",
+      "lineRange": [273, 281],
+      "summary": "基于演示报告模板为新会话创建本地分析报告的副本，替换报告 ID、数据源标记和会话信息。",
+      "tags": ["utility", "factory", "report", "clone"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:frontend/app/platform/page.tsx",
+      "target": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/platform/PlatformShell.tsx",
+      "target": "file:frontend/lib/swim-types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "file:frontend/components/platform/PlatformShell.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "file:frontend/components/platform/SwimVisualWorkspace.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "file:frontend/lib/swim-analysis-client.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "file:frontend/lib/swim-demo-data.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "file:frontend/lib/swim-types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/platform/SwimVisualWorkspace.tsx",
+      "target": "file:frontend/lib/swim-demo-data.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/components/platform/SwimVisualWorkspace.tsx",
+      "target": "file:frontend/lib/swim-types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "file:frontend/lib/swim-demo-data.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "file:frontend/lib/swim-types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/lib/swim-demo-data.ts",
+      "target": "file:frontend/lib/swim-types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:frontend/app/platform/page.tsx",
+      "target": "function:frontend/app/platform/page.tsx:PlatformPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/app/platform/page.tsx",
+      "target": "function:frontend/app/platform/page.tsx:PlatformPage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/platform/PlatformShell.tsx",
+      "target": "function:frontend/components/platform/PlatformShell.tsx:PlatformShell",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/PlatformShell.tsx",
+      "target": "function:frontend/components/platform/PlatformShell.tsx:PlatformPageHeader",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/PlatformShell.tsx",
+      "target": "function:frontend/components/platform/PlatformShell.tsx:PlatformPanel",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/PlatformShell.tsx",
+      "target": "function:frontend/components/platform/PlatformShell.tsx:PlatformShell",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/platform/PlatformShell.tsx",
+      "target": "function:frontend/components/platform/PlatformShell.tsx:PlatformPageHeader",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/platform/PlatformShell.tsx",
+      "target": "function:frontend/components/platform/PlatformShell.tsx:PlatformPanel",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "function:frontend/components/platform/SwimPlatformApp.tsx:SwimPlatformApp",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "function:frontend/components/platform/SwimPlatformApp.tsx:UploadView",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "function:frontend/components/platform/SwimPlatformApp.tsx:Field",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "function:frontend/components/platform/SwimPlatformApp.tsx:SelectField",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "function:frontend/components/platform/SwimPlatformApp.tsx:TasksView",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "function:frontend/components/platform/SwimPlatformApp.tsx:JobView",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "function:frontend/components/platform/SwimPlatformApp.tsx:WorkspaceView",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "function:frontend/components/platform/SwimPlatformApp.tsx:ReportView",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "function:frontend/components/platform/SwimPlatformApp.tsx:TrainingView",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "function:frontend/components/platform/SwimPlatformApp.tsx:MetricCard",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "function:frontend/components/platform/SwimPlatformApp.tsx:EmptyState",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/SwimPlatformApp.tsx",
+      "target": "function:frontend/components/platform/SwimPlatformApp.tsx:SwimPlatformApp",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/platform/SwimVisualWorkspace.tsx",
+      "target": "function:frontend/components/platform/SwimVisualWorkspace.tsx:SwimVisualWorkspace",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/SwimVisualWorkspace.tsx",
+      "target": "function:frontend/components/platform/SwimVisualWorkspace.tsx:StatusBadge",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/components/platform/SwimVisualWorkspace.tsx",
+      "target": "function:frontend/components/platform/SwimVisualWorkspace.tsx:SwimVisualWorkspace",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/components/platform/SwimVisualWorkspace.tsx",
+      "target": "function:frontend/components/platform/SwimVisualWorkspace.tsx:StatusBadge",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:readJson",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:formatFileSize",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:listSwimAnalysisJobs",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:getRecentSwimAnalysisJob",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:rememberSwimAnalysisJob",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:getSwimAnalysisJob",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:getSwimAnalysisReport",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:createSwimAnalysisJob",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:seedDemoSwimJob",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:formatFileSize",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:listSwimAnalysisJobs",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:getRecentSwimAnalysisJob",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:rememberSwimAnalysisJob",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:getSwimAnalysisJob",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:getSwimAnalysisReport",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:createSwimAnalysisJob",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/lib/swim-analysis-client.ts",
+      "target": "function:frontend/lib/swim-analysis-client.ts:seedDemoSwimJob",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:frontend/lib/swim-demo-data.ts",
+      "target": "function:frontend/lib/swim-demo-data.ts:cloneReportForSession",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:frontend/lib/swim-demo-data.ts",
+      "target": "function:frontend/lib/swim-demo-data.ts:cloneReportForSession",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

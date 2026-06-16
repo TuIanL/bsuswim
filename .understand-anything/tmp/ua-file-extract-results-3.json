@@ -1,0 +1,645 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 14,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "frontend/app/page.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 29,
+      "nonEmptyLines": 28,
+      "functions": [
+        {
+          "name": "Home",
+          "startLine": 13,
+          "endLine": 29,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Home",
+          "line": 13,
+          "isDefault": true
+        }
+      ],
+      "metrics": {
+        "importCount": 11,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/components/ActionVideo.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 35,
+      "nonEmptyLines": 34,
+      "functions": [
+        {
+          "name": "ActionVideo",
+          "startLine": 5,
+          "endLine": 35,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "ActionVideo",
+          "line": 5,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ActionVideo",
+          "callee": "videoHighlights.map",
+          "lineNumber": 26
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/components/AnalysisOutputs.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 29,
+      "nonEmptyLines": 28,
+      "functions": [
+        {
+          "name": "AnalysisOutputs",
+          "startLine": 4,
+          "endLine": 29,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "AnalysisOutputs",
+          "line": 4,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "AnalysisOutputs",
+          "callee": "analysisOutputs.map",
+          "lineNumber": 13
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/components/CTA.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 25,
+      "nonEmptyLines": 24,
+      "functions": [
+        {
+          "name": "CTA",
+          "startLine": 3,
+          "endLine": 25,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "CTA",
+          "line": 3,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/components/FAQ.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 43,
+      "nonEmptyLines": 39,
+      "functions": [
+        {
+          "name": "FAQ",
+          "startLine": 8,
+          "endLine": 43,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "FAQ",
+          "line": 8,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "FAQ",
+          "callee": "useState",
+          "lineNumber": 9
+        },
+        {
+          "caller": "FAQ",
+          "callee": "faqItems.map",
+          "lineNumber": 14
+        },
+        {
+          "caller": "FAQ",
+          "callee": "setOpenIndex",
+          "lineNumber": 21
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/components/Features.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 27,
+      "nonEmptyLines": 26,
+      "functions": [
+        {
+          "name": "Features",
+          "startLine": 4,
+          "endLine": 27,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Features",
+          "line": 4,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Features",
+          "callee": "features.map",
+          "lineNumber": 13
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/components/Footer.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 68,
+      "nonEmptyLines": 65,
+      "functions": [
+        {
+          "name": "Footer",
+          "startLine": 5,
+          "endLine": 68,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Footer",
+          "line": 5,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Footer",
+          "callee": "footerGroups.map",
+          "lineNumber": 27
+        },
+        {
+          "caller": "Footer",
+          "callee": "group.links.map",
+          "lineNumber": 31
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/components/Hero.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 70,
+      "nonEmptyLines": 68,
+      "functions": [
+        {
+          "name": "ProductSchematic",
+          "startLine": 3,
+          "endLine": 33,
+          "params": []
+        },
+        {
+          "name": "Hero",
+          "startLine": 35,
+          "endLine": 70,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Hero",
+          "line": 35,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/components/Navbar.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 86,
+      "nonEmptyLines": 78,
+      "functions": [
+        {
+          "name": "Navbar",
+          "startLine": 8,
+          "endLine": 86,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Navbar",
+          "line": 8,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Navbar",
+          "callee": "useState",
+          "lineNumber": 9
+        },
+        {
+          "caller": "Navbar",
+          "callee": "useState",
+          "lineNumber": 10
+        },
+        {
+          "caller": "Navbar",
+          "callee": "useEffect",
+          "lineNumber": 12
+        },
+        {
+          "caller": "onScroll",
+          "callee": "setScrolled",
+          "lineNumber": 13
+        },
+        {
+          "caller": "Navbar",
+          "callee": "onScroll",
+          "lineNumber": 14
+        },
+        {
+          "caller": "Navbar",
+          "callee": "window.addEventListener",
+          "lineNumber": 15
+        },
+        {
+          "caller": "Navbar",
+          "callee": "window.removeEventListener",
+          "lineNumber": 16
+        },
+        {
+          "caller": "Navbar",
+          "callee": "navLinks.map",
+          "lineNumber": 41
+        },
+        {
+          "caller": "Navbar",
+          "callee": "setOpen",
+          "lineNumber": 59
+        },
+        {
+          "caller": "Navbar",
+          "callee": "navLinks.map",
+          "lineNumber": 68
+        },
+        {
+          "caller": "Navbar",
+          "callee": "setOpen",
+          "lineNumber": 72
+        },
+        {
+          "caller": "Navbar",
+          "callee": "setOpen",
+          "lineNumber": 78
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/components/Specs.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 46,
+      "nonEmptyLines": 45,
+      "functions": [
+        {
+          "name": "Specs",
+          "startLine": 4,
+          "endLine": 46,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Specs",
+          "line": 4,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Specs",
+          "callee": "specs.map",
+          "lineNumber": 36
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/components/SystemFlow.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 24,
+      "nonEmptyLines": 23,
+      "functions": [
+        {
+          "name": "SystemFlow",
+          "startLine": 4,
+          "endLine": 24,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "SystemFlow",
+          "line": 4,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "SystemFlow",
+          "callee": "workflowSteps.map",
+          "lineNumber": 13
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/components/Testimonials.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 29,
+      "nonEmptyLines": 28,
+      "functions": [
+        {
+          "name": "Testimonials",
+          "startLine": 4,
+          "endLine": 29,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Testimonials",
+          "line": 4,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Testimonials",
+          "callee": "testimonials.map",
+          "lineNumber": 12
+        },
+        {
+          "caller": "Testimonials",
+          "callee": "String(index + 1).padStart",
+          "lineNumber": 17
+        },
+        {
+          "caller": "Testimonials",
+          "callee": "String",
+          "lineNumber": 17
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/components/ui.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 111,
+      "nonEmptyLines": 100,
+      "functions": [
+        {
+          "name": "Section",
+          "startLine": 12,
+          "endLine": 42,
+          "params": [
+            "{\n  id,\n  eyebrow,\n  title,\n  description,\n  children,\n  className = \"\"\n}"
+          ]
+        },
+        {
+          "name": "Eyebrow",
+          "startLine": 44,
+          "endLine": 50,
+          "params": [
+            "{ children }"
+          ]
+        },
+        {
+          "name": "AnchorButton",
+          "startLine": 61,
+          "endLine": 80,
+          "params": [
+            "{\n  children,\n  variant = \"solid\",\n  className = \"\",\n  ...props\n}"
+          ]
+        },
+        {
+          "name": "IconButton",
+          "startLine": 87,
+          "endLine": 98,
+          "params": [
+            "{ label, children, className = \"\", ...props }"
+          ]
+        },
+        {
+          "name": "MediaFrame",
+          "startLine": 100,
+          "endLine": 107,
+          "params": [
+            "{ children, className = \"\" }"
+          ]
+        },
+        {
+          "name": "Divider",
+          "startLine": 109,
+          "endLine": 111,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Section",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "Eyebrow",
+          "line": 44,
+          "isDefault": false
+        },
+        {
+          "name": "AnchorButton",
+          "line": 61,
+          "isDefault": false
+        },
+        {
+          "name": "IconButton",
+          "line": 87,
+          "isDefault": false
+        },
+        {
+          "name": "MediaFrame",
+          "line": 100,
+          "isDefault": false
+        },
+        {
+          "name": "Divider",
+          "line": 109,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 6,
+        "functionCount": 6,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "frontend/lib/content.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 181,
+      "nonEmptyLines": 172,
+      "exports": [
+        {
+          "name": "navLinks",
+          "line": 19,
+          "isDefault": false
+        },
+        {
+          "name": "workflowSteps",
+          "line": 26,
+          "isDefault": false
+        },
+        {
+          "name": "features",
+          "line": 53,
+          "isDefault": false
+        },
+        {
+          "name": "specs",
+          "line": 71,
+          "isDefault": false
+        },
+        {
+          "name": "analysisOutputs",
+          "line": 81,
+          "isDefault": false
+        },
+        {
+          "name": "testimonials",
+          "line": 120,
+          "isDefault": false
+        },
+        {
+          "name": "videoHighlights",
+          "line": 138,
+          "isDefault": false
+        },
+        {
+          "name": "faqItems",
+          "line": 144,
+          "isDefault": false
+        },
+        {
+          "name": "footerGroups",
+          "line": 172,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 9,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    }
+  ]
+}

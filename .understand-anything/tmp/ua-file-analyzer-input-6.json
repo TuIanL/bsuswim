@@ -1,0 +1,13 @@
+{
+  "projectRoot": "/Users/tuian/Documents/大学/竞赛/大创/游泳/swim",
+  "batchFiles": [
+    {"path": "model_service/app/main.py", "language": "python", "sizeLines": 17, "fileCategory": "code"},
+    {"path": "model_service/app/runtime.py", "language": "python", "sizeLines": 67, "fileCategory": "code"},
+    {"path": "model_service/app/schemas.py", "language": "python", "sizeLines": 21, "fileCategory": "code"}
+  ],
+  "batchImportData": {
+    "model_service/app/main.py": ["model_service/app/runtime.py", "model_service/app/schemas.py"],
+    "model_service/app/runtime.py": ["model_service/app/schemas.py"],
+    "model_service/app/schemas.py": []
+  }
+}

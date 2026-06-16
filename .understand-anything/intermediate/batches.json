@@ -1,0 +1,2249 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "louvain",
+  "totalFiles": 179,
+  "totalBatches": 18,
+  "exportsByPath": {
+    ".understand-anything/.understandignore": [],
+    "backend/alembic/env.py": [
+      "run_migrations_offline",
+      "run_migrations_online"
+    ],
+    "backend/alembic/script.py.mako": [],
+    "backend/alembic/versions/20260616_0001_create_platform_core_tables.py": [
+      "upgrade",
+      "downgrade"
+    ],
+    "backend/app/__init__.py": [],
+    "backend/app/api/__init__.py": [],
+    "backend/app/api/router.py": [],
+    "backend/app/api/routes/__init__.py": [],
+    "backend/app/api/routes/analysis.py": [
+      "submit_analysis",
+      "get_analysis_status",
+      "get_result",
+      "save_result",
+      "_get_owned_task",
+      "_read_task"
+    ],
+    "backend/app/api/routes/athletes.py": [
+      "create_athlete",
+      "list_athletes",
+      "get_athlete",
+      "list_athlete_sessions"
+    ],
+    "backend/app/api/routes/auth.py": [
+      "register",
+      "login"
+    ],
+    "backend/app/api/routes/reports.py": [
+      "generate_report",
+      "get_report",
+      "_get_owned_session",
+      "_read_report"
+    ],
+    "backend/app/api/routes/sessions.py": [
+      "create_session",
+      "list_sessions",
+      "get_session",
+      "bind_session_video",
+      "list_session_videos",
+      "_get_owned_session",
+      "_read_session_video"
+    ],
+    "backend/app/api/routes/users.py": [
+      "get_me"
+    ],
+    "backend/app/api/routes/videos.py": [
+      "upload_video",
+      "get_video",
+      "_read_video"
+    ],
+    "backend/app/core/__init__.py": [],
+    "backend/app/core/config.py": [
+      "Settings",
+      "get_settings"
+    ],
+    "backend/app/core/deps.py": [
+      "get_current_user"
+    ],
+    "backend/app/core/security.py": [
+      "verify_password",
+      "get_password_hash",
+      "create_access_token"
+    ],
+    "backend/app/db/__init__.py": [],
+    "backend/app/db/session.py": [
+      "Base",
+      "get_db"
+    ],
+    "backend/app/main.py": [
+      "create_app"
+    ],
+    "backend/app/models/__init__.py": [],
+    "backend/app/models/analysis.py": [
+      "AnalysisTaskStatus",
+      "AnalysisTask",
+      "AnalysisResult"
+    ],
+    "backend/app/models/athlete.py": [
+      "Athlete"
+    ],
+    "backend/app/models/report.py": [
+      "ReportMetadata"
+    ],
+    "backend/app/models/team.py": [
+      "Team"
+    ],
+    "backend/app/models/training_session.py": [
+      "StrokeType",
+      "TrainingSessionStatus",
+      "TrainingSession"
+    ],
+    "backend/app/models/user.py": [
+      "UserRole",
+      "User"
+    ],
+    "backend/app/models/video.py": [
+      "ViewType",
+      "VideoFile",
+      "SessionVideo"
+    ],
+    "backend/app/schemas/__init__.py": [],
+    "backend/app/schemas/analysis.py": [
+      "AnalysisSubmit",
+      "AnalysisTaskRead",
+      "AnalysisStatusRead",
+      "ModelVideoInput",
+      "ModelAthleteInput",
+      "ModelSessionInput",
+      "ModelAnalysisRequest",
+      "ModelAnalysisResult",
+      "AnalysisResultRead",
+      "WorkspaceData"
+    ],
+    "backend/app/schemas/athlete.py": [
+      "AthleteCreate",
+      "AthleteRead"
+    ],
+    "backend/app/schemas/auth.py": [
+      "UserRegister",
+      "Token"
+    ],
+    "backend/app/schemas/report.py": [
+      "ReportGenerate",
+      "ReportData"
+    ],
+    "backend/app/schemas/training_session.py": [
+      "TrainingSessionCreate",
+      "TrainingSessionRead"
+    ],
+    "backend/app/schemas/user.py": [
+      "UserRead"
+    ],
+    "backend/app/schemas/video.py": [
+      "VideoFileRead",
+      "VideoUploadResponse",
+      "SessionVideoCreate",
+      "SessionVideoRead"
+    ],
+    "backend/app/services/__init__.py": [],
+    "backend/app/services/analysis_service.py": [
+      "task_actions",
+      "create_analysis_task",
+      "build_model_request_payload",
+      "run_analysis_task",
+      "save_analysis_result",
+      "_set_task_state",
+      "_mark_failed"
+    ],
+    "backend/app/services/model_client.py": [
+      "ModelServiceError",
+      "ModelServiceClient"
+    ],
+    "backend/app/services/report_builder.py": [
+      "build_report_data"
+    ],
+    "backend/app/services/storage.py": [
+      "StorageService",
+      "playback_url"
+    ],
+    "configs/.gitkeep": [],
+    "data/swim_coco/annotations/.gitkeep": [],
+    "frontend-vue/src/App.vue": [],
+    "frontend-vue/src/components/OverlayCanvas.vue": [],
+    "frontend-vue/src/main.ts": [],
+    "frontend-vue/src/router.ts": [
+      "router"
+    ],
+    "frontend-vue/src/services/api.ts": [
+      "demoMode",
+      "setAuthToken",
+      "login",
+      "register",
+      "getCurrentUser",
+      "listAthletes",
+      "createAthlete",
+      "getAthlete",
+      "listAthleteSessions",
+      "getAthleteTrend",
+      "createSession",
+      "listSessions",
+      "getSession",
+      "uploadVideo",
+      "bindSessionVideo",
+      "bindUploadedSessionVideo",
+      "listSessionVideos",
+      "createAnalysisTask",
+      "listTasks",
+      "getTask",
+      "getWorkspace",
+      "getReport",
+      "resolveMediaUrl"
+    ],
+    "frontend-vue/src/services/demoData.ts": [
+      "demoUser",
+      "demoAthletes",
+      "demoSessions",
+      "demoSessionVideos",
+      "demoAthleteTrends",
+      "demoTask",
+      "demoWorkspace",
+      "demoReport",
+      "resetDemoBusinessData",
+      "getDemoAthletes",
+      "createDemoAthlete",
+      "getDemoAthlete",
+      "getDemoAthleteSessions",
+      "getDemoAthleteTrend",
+      "getDemoSessions",
+      "getDemoSession",
+      "createDemoSession",
+      "createDemoVideo",
+      "bindDemoSessionVideo",
+      "getDemoSessionVideos"
+    ],
+    "frontend-vue/src/stores/auth.ts": [
+      "useAuthStore"
+    ],
+    "frontend-vue/src/stores/tasks.ts": [
+      "useTasksStore"
+    ],
+    "frontend-vue/src/types.ts": [],
+    "frontend-vue/src/views/AthleteProfileView.vue": [],
+    "frontend-vue/src/views/AthletesView.vue": [],
+    "frontend-vue/src/views/CreateSessionView.vue": [],
+    "frontend-vue/src/views/LoginView.vue": [],
+    "frontend-vue/src/views/RegisterView.vue": [],
+    "frontend-vue/src/views/ReportView.vue": [],
+    "frontend-vue/src/views/SessionUploadView.vue": [],
+    "frontend-vue/src/views/TasksView.vue": [],
+    "frontend-vue/src/views/UploadView.vue": [],
+    "frontend-vue/src/views/WorkspaceView.vue": [],
+    "frontend-vue/vite.config.ts": [],
+    "frontend/app/layout.tsx": [
+      "metadata",
+      "RootLayout"
+    ],
+    "frontend/app/page.tsx": [
+      "Home"
+    ],
+    "frontend/app/platform/page.tsx": [
+      "metadata",
+      "PlatformPage"
+    ],
+    "frontend/components/ActionVideo.tsx": [
+      "ActionVideo"
+    ],
+    "frontend/components/AnalysisOutputs.tsx": [
+      "AnalysisOutputs"
+    ],
+    "frontend/components/CTA.tsx": [
+      "CTA"
+    ],
+    "frontend/components/FAQ.tsx": [
+      "FAQ"
+    ],
+    "frontend/components/Features.tsx": [
+      "Features"
+    ],
+    "frontend/components/Footer.tsx": [
+      "Footer"
+    ],
+    "frontend/components/Hero.tsx": [
+      "Hero"
+    ],
+    "frontend/components/Navbar.tsx": [
+      "Navbar"
+    ],
+    "frontend/components/platform/PlatformShell.tsx": [
+      "platformNavigation",
+      "PlatformShell",
+      "PlatformPageHeader",
+      "PlatformPanel"
+    ],
+    "frontend/components/platform/SwimPlatformApp.tsx": [
+      "SwimPlatformApp"
+    ],
+    "frontend/components/platform/SwimVisualWorkspace.tsx": [
+      "SwimVisualWorkspace",
+      "StatusBadge"
+    ],
+    "frontend/components/Specs.tsx": [
+      "Specs"
+    ],
+    "frontend/components/SystemFlow.tsx": [
+      "SystemFlow"
+    ],
+    "frontend/components/Testimonials.tsx": [
+      "Testimonials"
+    ],
+    "frontend/components/ui.tsx": [
+      "Section",
+      "Eyebrow",
+      "AnchorButton",
+      "IconButton",
+      "MediaFrame",
+      "Divider"
+    ],
+    "frontend/lib/content.ts": [
+      "navLinks",
+      "workflowSteps",
+      "features",
+      "specs",
+      "analysisOutputs",
+      "testimonials",
+      "videoHighlights",
+      "faqItems",
+      "footerGroups"
+    ],
+    "frontend/lib/swim-analysis-client.ts": [
+      "RECENT_SWIM_ANALYSIS_JOB_EVENT",
+      "formatFileSize",
+      "listSwimAnalysisJobs",
+      "getRecentSwimAnalysisJob",
+      "rememberSwimAnalysisJob",
+      "getSwimAnalysisJob",
+      "getSwimAnalysisReport",
+      "createSwimAnalysisJob",
+      "seedDemoSwimJob"
+    ],
+    "frontend/lib/swim-demo-data.ts": [
+      "strokeLabels",
+      "captureModeLabels",
+      "swimStageBlueprint",
+      "demoSwimReport",
+      "cloneReportForSession"
+    ],
+    "frontend/lib/swim-types.ts": [],
+    "frontend/next-env.d.ts": [],
+    "frontend/next.config.mjs": [],
+    "frontend/postcss.config.mjs": [],
+    "frontend/tailwind.config.ts": [],
+    "model_service/app/__init__.py": [],
+    "model_service/app/main.py": [
+      "health",
+      "analyze"
+    ],
+    "model_service/app/runtime.py": [
+      "SwimModelRuntime"
+    ],
+    "model_service/app/schemas.py": [
+      "AnalysisRequest",
+      "AnalysisResponse"
+    ],
+    "start-web.command": [],
+    "stop-web.command": [],
+    "tools/.gitkeep": [],
+    "uploads/.gitkeep": [],
+    "weights/.gitkeep": []
+  },
+  "batches": [
+    {
+      "batchIndex": 1,
+      "files": [
+        {
+          "path": "backend/alembic/env.py",
+          "language": "python",
+          "sizeLines": 49,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/__init__.py",
+          "language": "python",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/api/router.py",
+          "language": "python",
+          "sizeLines": 12,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/api/routes/__init__.py",
+          "language": "python",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/api/routes/analysis.py",
+          "language": "python",
+          "sizeLines": 106,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/api/routes/athletes.py",
+          "language": "python",
+          "sizeLines": 62,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/api/routes/auth.py",
+          "language": "python",
+          "sizeLines": 49,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/api/routes/reports.py",
+          "language": "python",
+          "sizeLines": 75,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/api/routes/sessions.py",
+          "language": "python",
+          "sizeLines": 110,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/api/routes/users.py",
+          "language": "python",
+          "sizeLines": 12,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/api/routes/videos.py",
+          "language": "python",
+          "sizeLines": 39,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/core/config.py",
+          "language": "python",
+          "sizeLines": 29,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/core/deps.py",
+          "language": "python",
+          "sizeLines": 37,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/core/security.py",
+          "language": "python",
+          "sizeLines": 27,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/db/session.py",
+          "language": "python",
+          "sizeLines": 23,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/main.py",
+          "language": "python",
+          "sizeLines": 33,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/models/__init__.py",
+          "language": "python",
+          "sizeLines": 24,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/models/analysis.py",
+          "language": "python",
+          "sizeLines": 56,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/models/athlete.py",
+          "language": "python",
+          "sizeLines": 30,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/models/report.py",
+          "language": "python",
+          "sizeLines": 20,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/models/team.py",
+          "language": "python",
+          "sizeLines": 18,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/models/training_session.py",
+          "language": "python",
+          "sizeLines": 53,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/models/user.py",
+          "language": "python",
+          "sizeLines": 33,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/models/video.py",
+          "language": "python",
+          "sizeLines": 47,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/services/analysis_service.py",
+          "language": "python",
+          "sizeLines": 218,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/services/model_client.py",
+          "language": "python",
+          "sizeLines": 32,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/services/report_builder.py",
+          "language": "python",
+          "sizeLines": 62,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/services/storage.py",
+          "language": "python",
+          "sizeLines": 40,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "backend/alembic/env.py": [
+          "backend/app/__init__.py",
+          "backend/app/core/config.py",
+          "backend/app/db/session.py",
+          "backend/app/models/__init__.py"
+        ],
+        "backend/app/__init__.py": [],
+        "backend/app/api/router.py": [
+          "backend/app/api/routes/__init__.py",
+          "backend/app/api/routes/analysis.py",
+          "backend/app/api/routes/athletes.py",
+          "backend/app/api/routes/auth.py",
+          "backend/app/api/routes/reports.py",
+          "backend/app/api/routes/sessions.py",
+          "backend/app/api/routes/users.py",
+          "backend/app/api/routes/videos.py"
+        ],
+        "backend/app/api/routes/__init__.py": [],
+        "backend/app/api/routes/analysis.py": [
+          "backend/app/core/deps.py",
+          "backend/app/db/session.py",
+          "backend/app/models/__init__.py",
+          "backend/app/schemas/__init__.py",
+          "backend/app/services/analysis_service.py"
+        ],
+        "backend/app/api/routes/athletes.py": [
+          "backend/app/core/deps.py",
+          "backend/app/db/session.py",
+          "backend/app/models/__init__.py",
+          "backend/app/schemas/__init__.py"
+        ],
+        "backend/app/api/routes/auth.py": [
+          "backend/app/core/security.py",
+          "backend/app/db/session.py",
+          "backend/app/models/__init__.py",
+          "backend/app/schemas/__init__.py"
+        ],
+        "backend/app/api/routes/reports.py": [
+          "backend/app/core/deps.py",
+          "backend/app/db/session.py",
+          "backend/app/models/__init__.py",
+          "backend/app/schemas/__init__.py",
+          "backend/app/services/report_builder.py"
+        ],
+        "backend/app/api/routes/sessions.py": [
+          "backend/app/api/routes/videos.py",
+          "backend/app/core/deps.py",
+          "backend/app/db/session.py",
+          "backend/app/models/__init__.py",
+          "backend/app/schemas/__init__.py"
+        ],
+        "backend/app/api/routes/users.py": [
+          "backend/app/core/deps.py",
+          "backend/app/models/__init__.py",
+          "backend/app/schemas/__init__.py"
+        ],
+        "backend/app/api/routes/videos.py": [
+          "backend/app/db/session.py",
+          "backend/app/models/__init__.py",
+          "backend/app/schemas/__init__.py",
+          "backend/app/services/storage.py"
+        ],
+        "backend/app/core/config.py": [],
+        "backend/app/core/deps.py": [
+          "backend/app/core/config.py",
+          "backend/app/db/session.py",
+          "backend/app/models/__init__.py"
+        ],
+        "backend/app/core/security.py": [
+          "backend/app/core/config.py"
+        ],
+        "backend/app/db/session.py": [
+          "backend/app/core/config.py"
+        ],
+        "backend/app/main.py": [
+          "backend/app/api/router.py",
+          "backend/app/core/config.py"
+        ],
+        "backend/app/models/__init__.py": [
+          "backend/app/models/analysis.py",
+          "backend/app/models/athlete.py",
+          "backend/app/models/report.py",
+          "backend/app/models/team.py",
+          "backend/app/models/training_session.py",
+          "backend/app/models/user.py",
+          "backend/app/models/video.py"
+        ],
+        "backend/app/models/analysis.py": [
+          "backend/app/db/session.py"
+        ],
+        "backend/app/models/athlete.py": [
+          "backend/app/db/session.py"
+        ],
+        "backend/app/models/report.py": [
+          "backend/app/db/session.py"
+        ],
+        "backend/app/models/team.py": [
+          "backend/app/db/session.py"
+        ],
+        "backend/app/models/training_session.py": [
+          "backend/app/db/session.py"
+        ],
+        "backend/app/models/user.py": [
+          "backend/app/db/session.py"
+        ],
+        "backend/app/models/video.py": [
+          "backend/app/db/session.py"
+        ],
+        "backend/app/services/analysis_service.py": [
+          "backend/app/db/session.py",
+          "backend/app/models/__init__.py",
+          "backend/app/schemas/__init__.py",
+          "backend/app/services/model_client.py",
+          "backend/app/services/report_builder.py",
+          "backend/app/services/storage.py"
+        ],
+        "backend/app/services/model_client.py": [
+          "backend/app/core/config.py",
+          "backend/app/schemas/__init__.py"
+        ],
+        "backend/app/services/report_builder.py": [
+          "backend/app/models/__init__.py"
+        ],
+        "backend/app/services/storage.py": [
+          "backend/app/core/config.py"
+        ]
+      },
+      "neighborMap": {
+        "backend/app/api/routes/analysis.py": [
+          {
+            "path": "backend/app/schemas/__init__.py",
+            "batchIndex": 4,
+            "symbols": []
+          }
+        ],
+        "backend/app/api/routes/athletes.py": [
+          {
+            "path": "backend/app/schemas/__init__.py",
+            "batchIndex": 4,
+            "symbols": []
+          }
+        ],
+        "backend/app/api/routes/auth.py": [
+          {
+            "path": "backend/app/schemas/__init__.py",
+            "batchIndex": 4,
+            "symbols": []
+          }
+        ],
+        "backend/app/api/routes/reports.py": [
+          {
+            "path": "backend/app/schemas/__init__.py",
+            "batchIndex": 4,
+            "symbols": []
+          }
+        ],
+        "backend/app/api/routes/sessions.py": [
+          {
+            "path": "backend/app/schemas/__init__.py",
+            "batchIndex": 4,
+            "symbols": []
+          }
+        ],
+        "backend/app/api/routes/users.py": [
+          {
+            "path": "backend/app/schemas/__init__.py",
+            "batchIndex": 4,
+            "symbols": []
+          }
+        ],
+        "backend/app/api/routes/videos.py": [
+          {
+            "path": "backend/app/schemas/__init__.py",
+            "batchIndex": 4,
+            "symbols": []
+          }
+        ],
+        "backend/app/models/__init__.py": [
+          {
+            "path": "backend/app/schemas/analysis.py",
+            "batchIndex": 4,
+            "symbols": [
+              "AnalysisSubmit",
+              "AnalysisTaskRead",
+              "AnalysisStatusRead",
+              "ModelVideoInput",
+              "ModelAthleteInput",
+              "ModelSessionInput",
+              "ModelAnalysisRequest",
+              "ModelAnalysisResult",
+              "AnalysisResultRead",
+              "WorkspaceData"
+            ]
+          },
+          {
+            "path": "backend/app/schemas/auth.py",
+            "batchIndex": 4,
+            "symbols": [
+              "UserRegister",
+              "Token"
+            ]
+          },
+          {
+            "path": "backend/app/schemas/training_session.py",
+            "batchIndex": 4,
+            "symbols": [
+              "TrainingSessionCreate",
+              "TrainingSessionRead"
+            ]
+          },
+          {
+            "path": "backend/app/schemas/user.py",
+            "batchIndex": 4,
+            "symbols": [
+              "UserRead"
+            ]
+          },
+          {
+            "path": "backend/app/schemas/video.py",
+            "batchIndex": 4,
+            "symbols": [
+              "VideoFileRead",
+              "VideoUploadResponse",
+              "SessionVideoCreate",
+              "SessionVideoRead"
+            ]
+          }
+        ],
+        "backend/app/services/analysis_service.py": [
+          {
+            "path": "backend/app/schemas/__init__.py",
+            "batchIndex": 4,
+            "symbols": []
+          }
+        ],
+        "backend/app/services/model_client.py": [
+          {
+            "path": "backend/app/schemas/__init__.py",
+            "batchIndex": 4,
+            "symbols": []
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 2,
+      "files": [
+        {
+          "path": "frontend-vue/src/App.vue",
+          "language": "vue",
+          "sizeLines": 55,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/main.ts",
+          "language": "typescript",
+          "sizeLines": 9,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/router.ts",
+          "language": "typescript",
+          "sizeLines": 46,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/services/api.ts",
+          "language": "typescript",
+          "sizeLines": 235,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/services/demoData.ts",
+          "language": "typescript",
+          "sizeLines": 405,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/stores/auth.ts",
+          "language": "typescript",
+          "sizeLines": 91,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/stores/tasks.ts",
+          "language": "typescript",
+          "sizeLines": 20,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/types.ts",
+          "language": "typescript",
+          "sizeLines": 197,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/views/AthleteProfileView.vue",
+          "language": "vue",
+          "sizeLines": 172,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/views/AthletesView.vue",
+          "language": "vue",
+          "sizeLines": 207,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/views/CreateSessionView.vue",
+          "language": "vue",
+          "sizeLines": 134,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/views/LoginView.vue",
+          "language": "vue",
+          "sizeLines": 59,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/views/RegisterView.vue",
+          "language": "vue",
+          "sizeLines": 80,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/views/ReportView.vue",
+          "language": "vue",
+          "sizeLines": 83,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/views/SessionUploadView.vue",
+          "language": "vue",
+          "sizeLines": 216,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/views/TasksView.vue",
+          "language": "vue",
+          "sizeLines": 78,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/views/WorkspaceView.vue",
+          "language": "vue",
+          "sizeLines": 88,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "frontend-vue/src/App.vue": [],
+        "frontend-vue/src/main.ts": [
+          "frontend-vue/src/App.vue",
+          "frontend-vue/src/router.ts",
+          "frontend-vue/src/styles.css"
+        ],
+        "frontend-vue/src/router.ts": [
+          "frontend-vue/src/services/api.ts",
+          "frontend-vue/src/stores/auth.ts",
+          "frontend-vue/src/views/AthleteProfileView.vue",
+          "frontend-vue/src/views/AthletesView.vue",
+          "frontend-vue/src/views/CreateSessionView.vue",
+          "frontend-vue/src/views/LoginView.vue",
+          "frontend-vue/src/views/RegisterView.vue",
+          "frontend-vue/src/views/ReportView.vue",
+          "frontend-vue/src/views/SessionUploadView.vue",
+          "frontend-vue/src/views/TasksView.vue",
+          "frontend-vue/src/views/WorkspaceView.vue"
+        ],
+        "frontend-vue/src/services/api.ts": [
+          "frontend-vue/src/services/demoData.ts",
+          "frontend-vue/src/types.ts"
+        ],
+        "frontend-vue/src/services/demoData.ts": [
+          "frontend-vue/src/types.ts"
+        ],
+        "frontend-vue/src/stores/auth.ts": [
+          "frontend-vue/src/services/api.ts",
+          "frontend-vue/src/types.ts"
+        ],
+        "frontend-vue/src/stores/tasks.ts": [
+          "frontend-vue/src/services/api.ts",
+          "frontend-vue/src/types.ts"
+        ],
+        "frontend-vue/src/types.ts": [],
+        "frontend-vue/src/views/AthleteProfileView.vue": [],
+        "frontend-vue/src/views/AthletesView.vue": [],
+        "frontend-vue/src/views/CreateSessionView.vue": [],
+        "frontend-vue/src/views/LoginView.vue": [],
+        "frontend-vue/src/views/RegisterView.vue": [],
+        "frontend-vue/src/views/ReportView.vue": [],
+        "frontend-vue/src/views/SessionUploadView.vue": [],
+        "frontend-vue/src/views/TasksView.vue": [],
+        "frontend-vue/src/views/WorkspaceView.vue": []
+      },
+      "neighborMap": {
+        "frontend-vue/src/main.ts": [
+          {
+            "path": "frontend-vue/src/styles.css",
+            "batchIndex": 16,
+            "symbols": []
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 3,
+      "files": [
+        {
+          "path": "frontend/app/page.tsx",
+          "language": "typescript",
+          "sizeLines": 29,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/components/ActionVideo.tsx",
+          "language": "typescript",
+          "sizeLines": 35,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/components/AnalysisOutputs.tsx",
+          "language": "typescript",
+          "sizeLines": 29,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/components/CTA.tsx",
+          "language": "typescript",
+          "sizeLines": 25,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/components/FAQ.tsx",
+          "language": "typescript",
+          "sizeLines": 43,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/components/Features.tsx",
+          "language": "typescript",
+          "sizeLines": 27,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/components/Footer.tsx",
+          "language": "typescript",
+          "sizeLines": 68,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/components/Hero.tsx",
+          "language": "typescript",
+          "sizeLines": 70,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/components/Navbar.tsx",
+          "language": "typescript",
+          "sizeLines": 86,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/components/Specs.tsx",
+          "language": "typescript",
+          "sizeLines": 46,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/components/SystemFlow.tsx",
+          "language": "typescript",
+          "sizeLines": 24,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/components/Testimonials.tsx",
+          "language": "typescript",
+          "sizeLines": 29,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/components/ui.tsx",
+          "language": "typescript",
+          "sizeLines": 111,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/lib/content.ts",
+          "language": "typescript",
+          "sizeLines": 181,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "frontend/app/page.tsx": [
+          "frontend/components/ActionVideo.tsx",
+          "frontend/components/AnalysisOutputs.tsx",
+          "frontend/components/CTA.tsx",
+          "frontend/components/FAQ.tsx",
+          "frontend/components/Features.tsx",
+          "frontend/components/Footer.tsx",
+          "frontend/components/Hero.tsx",
+          "frontend/components/Navbar.tsx",
+          "frontend/components/Specs.tsx",
+          "frontend/components/SystemFlow.tsx",
+          "frontend/components/Testimonials.tsx"
+        ],
+        "frontend/components/ActionVideo.tsx": [
+          "frontend/components/ui.tsx",
+          "frontend/lib/content.ts"
+        ],
+        "frontend/components/AnalysisOutputs.tsx": [
+          "frontend/components/ui.tsx",
+          "frontend/lib/content.ts"
+        ],
+        "frontend/components/CTA.tsx": [
+          "frontend/components/ui.tsx"
+        ],
+        "frontend/components/FAQ.tsx": [
+          "frontend/components/ui.tsx",
+          "frontend/lib/content.ts"
+        ],
+        "frontend/components/Features.tsx": [
+          "frontend/components/ui.tsx",
+          "frontend/lib/content.ts"
+        ],
+        "frontend/components/Footer.tsx": [
+          "frontend/components/ui.tsx",
+          "frontend/lib/content.ts"
+        ],
+        "frontend/components/Hero.tsx": [
+          "frontend/components/ui.tsx"
+        ],
+        "frontend/components/Navbar.tsx": [
+          "frontend/components/ui.tsx",
+          "frontend/lib/content.ts"
+        ],
+        "frontend/components/Specs.tsx": [
+          "frontend/components/ui.tsx",
+          "frontend/lib/content.ts"
+        ],
+        "frontend/components/SystemFlow.tsx": [
+          "frontend/components/ui.tsx",
+          "frontend/lib/content.ts"
+        ],
+        "frontend/components/Testimonials.tsx": [
+          "frontend/components/ui.tsx",
+          "frontend/lib/content.ts"
+        ],
+        "frontend/components/ui.tsx": [],
+        "frontend/lib/content.ts": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 4,
+      "files": [
+        {
+          "path": "backend/app/schemas/__init__.py",
+          "language": "python",
+          "sizeLines": 38,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/schemas/analysis.py",
+          "language": "python",
+          "sizeLines": 106,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/schemas/athlete.py",
+          "language": "python",
+          "sizeLines": 33,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/schemas/auth.py",
+          "language": "python",
+          "sizeLines": 17,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/schemas/report.py",
+          "language": "python",
+          "sizeLines": 16,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/schemas/training_session.py",
+          "language": "python",
+          "sizeLines": 34,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/schemas/user.py",
+          "language": "python",
+          "sizeLines": 19,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/schemas/video.py",
+          "language": "python",
+          "sizeLines": 45,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "backend/app/schemas/__init__.py": [
+          "backend/app/schemas/analysis.py",
+          "backend/app/schemas/athlete.py",
+          "backend/app/schemas/auth.py",
+          "backend/app/schemas/report.py",
+          "backend/app/schemas/training_session.py",
+          "backend/app/schemas/user.py",
+          "backend/app/schemas/video.py"
+        ],
+        "backend/app/schemas/analysis.py": [
+          "backend/app/models/__init__.py",
+          "backend/app/schemas/video.py"
+        ],
+        "backend/app/schemas/athlete.py": [],
+        "backend/app/schemas/auth.py": [
+          "backend/app/models/__init__.py"
+        ],
+        "backend/app/schemas/report.py": [],
+        "backend/app/schemas/training_session.py": [
+          "backend/app/models/__init__.py"
+        ],
+        "backend/app/schemas/user.py": [
+          "backend/app/models/__init__.py"
+        ],
+        "backend/app/schemas/video.py": [
+          "backend/app/models/__init__.py"
+        ]
+      },
+      "neighborMap": {
+        "backend/app/schemas/__init__.py": [
+          {
+            "path": "backend/app/api/routes/analysis.py",
+            "batchIndex": 1,
+            "symbols": [
+              "submit_analysis",
+              "get_analysis_status",
+              "get_result",
+              "save_result",
+              "_get_owned_task",
+              "_read_task"
+            ]
+          },
+          {
+            "path": "backend/app/api/routes/athletes.py",
+            "batchIndex": 1,
+            "symbols": [
+              "create_athlete",
+              "list_athletes",
+              "get_athlete",
+              "list_athlete_sessions"
+            ]
+          },
+          {
+            "path": "backend/app/api/routes/auth.py",
+            "batchIndex": 1,
+            "symbols": [
+              "register",
+              "login"
+            ]
+          },
+          {
+            "path": "backend/app/api/routes/reports.py",
+            "batchIndex": 1,
+            "symbols": [
+              "generate_report",
+              "get_report",
+              "_get_owned_session",
+              "_read_report"
+            ]
+          },
+          {
+            "path": "backend/app/api/routes/sessions.py",
+            "batchIndex": 1,
+            "symbols": [
+              "create_session",
+              "list_sessions",
+              "get_session",
+              "bind_session_video",
+              "list_session_videos",
+              "_get_owned_session",
+              "_read_session_video"
+            ]
+          },
+          {
+            "path": "backend/app/api/routes/users.py",
+            "batchIndex": 1,
+            "symbols": [
+              "get_me"
+            ]
+          },
+          {
+            "path": "backend/app/api/routes/videos.py",
+            "batchIndex": 1,
+            "symbols": [
+              "upload_video",
+              "get_video",
+              "_read_video"
+            ]
+          },
+          {
+            "path": "backend/app/services/analysis_service.py",
+            "batchIndex": 1,
+            "symbols": [
+              "task_actions",
+              "create_analysis_task",
+              "build_model_request_payload",
+              "run_analysis_task",
+              "save_analysis_result",
+              "_set_task_state",
+              "_mark_failed"
+            ]
+          },
+          {
+            "path": "backend/app/services/model_client.py",
+            "batchIndex": 1,
+            "symbols": [
+              "ModelServiceError",
+              "ModelServiceClient"
+            ]
+          }
+        ],
+        "backend/app/schemas/analysis.py": [
+          {
+            "path": "backend/app/models/__init__.py",
+            "batchIndex": 1,
+            "symbols": []
+          }
+        ],
+        "backend/app/schemas/auth.py": [
+          {
+            "path": "backend/app/models/__init__.py",
+            "batchIndex": 1,
+            "symbols": []
+          }
+        ],
+        "backend/app/schemas/training_session.py": [
+          {
+            "path": "backend/app/models/__init__.py",
+            "batchIndex": 1,
+            "symbols": []
+          }
+        ],
+        "backend/app/schemas/user.py": [
+          {
+            "path": "backend/app/models/__init__.py",
+            "batchIndex": 1,
+            "symbols": []
+          }
+        ],
+        "backend/app/schemas/video.py": [
+          {
+            "path": "backend/app/models/__init__.py",
+            "batchIndex": 1,
+            "symbols": []
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 5,
+      "files": [
+        {
+          "path": "frontend/app/platform/page.tsx",
+          "language": "typescript",
+          "sizeLines": 9,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/components/platform/PlatformShell.tsx",
+          "language": "typescript",
+          "sizeLines": 172,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/components/platform/SwimPlatformApp.tsx",
+          "language": "typescript",
+          "sizeLines": 640,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/components/platform/SwimVisualWorkspace.tsx",
+          "language": "typescript",
+          "sizeLines": 179,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/lib/swim-analysis-client.ts",
+          "language": "typescript",
+          "sizeLines": 141,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/lib/swim-demo-data.ts",
+          "language": "typescript",
+          "sizeLines": 281,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/lib/swim-types.ts",
+          "language": "typescript",
+          "sizeLines": 126,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "frontend/app/platform/page.tsx": [
+          "frontend/components/platform/SwimPlatformApp.tsx"
+        ],
+        "frontend/components/platform/PlatformShell.tsx": [
+          "frontend/lib/swim-types.ts"
+        ],
+        "frontend/components/platform/SwimPlatformApp.tsx": [
+          "frontend/components/platform/PlatformShell.tsx",
+          "frontend/components/platform/SwimVisualWorkspace.tsx",
+          "frontend/lib/swim-analysis-client.ts",
+          "frontend/lib/swim-demo-data.ts",
+          "frontend/lib/swim-types.ts"
+        ],
+        "frontend/components/platform/SwimVisualWorkspace.tsx": [
+          "frontend/lib/swim-demo-data.ts",
+          "frontend/lib/swim-types.ts"
+        ],
+        "frontend/lib/swim-analysis-client.ts": [
+          "frontend/lib/swim-demo-data.ts",
+          "frontend/lib/swim-types.ts"
+        ],
+        "frontend/lib/swim-demo-data.ts": [
+          "frontend/lib/swim-types.ts"
+        ],
+        "frontend/lib/swim-types.ts": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 6,
+      "files": [
+        {
+          "path": "model_service/app/main.py",
+          "language": "python",
+          "sizeLines": 17,
+          "fileCategory": "code"
+        },
+        {
+          "path": "model_service/app/runtime.py",
+          "language": "python",
+          "sizeLines": 67,
+          "fileCategory": "code"
+        },
+        {
+          "path": "model_service/app/schemas.py",
+          "language": "python",
+          "sizeLines": 21,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "model_service/app/main.py": [
+          "model_service/app/runtime.py",
+          "model_service/app/schemas.py"
+        ],
+        "model_service/app/runtime.py": [
+          "model_service/app/schemas.py"
+        ],
+        "model_service/app/schemas.py": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 7,
+      "files": [
+        {
+          "path": ".claude/commands/opsx/apply.md",
+          "language": "markdown",
+          "sizeLines": 152,
+          "fileCategory": "docs"
+        },
+        {
+          "path": ".claude/commands/opsx/archive.md",
+          "language": "markdown",
+          "sizeLines": 157,
+          "fileCategory": "docs"
+        },
+        {
+          "path": ".claude/commands/opsx/explore.md",
+          "language": "markdown",
+          "sizeLines": 173,
+          "fileCategory": "docs"
+        },
+        {
+          "path": ".claude/commands/opsx/propose.md",
+          "language": "markdown",
+          "sizeLines": 106,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        ".claude/commands/opsx/apply.md": [],
+        ".claude/commands/opsx/archive.md": [],
+        ".claude/commands/opsx/explore.md": [],
+        ".claude/commands/opsx/propose.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 8,
+      "files": [
+        {
+          "path": ".env.example",
+          "language": "config",
+          "sizeLines": 15,
+          "fileCategory": "config"
+        },
+        {
+          "path": "README.md",
+          "language": "markdown",
+          "sizeLines": 162,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docker-compose.yml",
+          "language": "yaml",
+          "sizeLines": 38,
+          "fileCategory": "infra"
+        },
+        {
+          "path": "requirements-lock.txt",
+          "language": "txt",
+          "sizeLines": 19,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        ".env.example": [],
+        "README.md": [],
+        "docker-compose.yml": [],
+        "requirements-lock.txt": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 9,
+      "files": [
+        {
+          "path": "docs/ai-api-spec.md",
+          "language": "markdown",
+          "sizeLines": 256,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/database-design.md",
+          "language": "markdown",
+          "sizeLines": 168,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/local-development.md",
+          "language": "markdown",
+          "sizeLines": 54,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/tech-stack.md",
+          "language": "markdown",
+          "sizeLines": 123,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/upgrade-paths.md",
+          "language": "markdown",
+          "sizeLines": 41,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "docs/ai-api-spec.md": [],
+        "docs/database-design.md": [],
+        "docs/local-development.md": [],
+        "docs/tech-stack.md": [],
+        "docs/upgrade-paths.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 10,
+      "files": [
+        {
+          "path": "frontend-vue/index.html",
+          "language": "html",
+          "sizeLines": 12,
+          "fileCategory": "markup"
+        },
+        {
+          "path": "frontend-vue/package.json",
+          "language": "json",
+          "sizeLines": 26,
+          "fileCategory": "config"
+        },
+        {
+          "path": "frontend-vue/tsconfig.json",
+          "language": "json",
+          "sizeLines": 18,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "frontend-vue/index.html": [],
+        "frontend-vue/package.json": [],
+        "frontend-vue/tsconfig.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 11,
+      "files": [
+        {
+          "path": "openspec/changes/add-vue-core-business-workflow/.openspec.yaml",
+          "language": "yaml",
+          "sizeLines": 2,
+          "fileCategory": "config"
+        },
+        {
+          "path": "openspec/changes/add-vue-core-business-workflow/design.md",
+          "language": "markdown",
+          "sizeLines": 95,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/add-vue-core-business-workflow/proposal.md",
+          "language": "markdown",
+          "sizeLines": 34,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/add-vue-core-business-workflow/tasks.md",
+          "language": "markdown",
+          "sizeLines": 74,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "openspec/changes/add-vue-core-business-workflow/.openspec.yaml": [],
+        "openspec/changes/add-vue-core-business-workflow/design.md": [],
+        "openspec/changes/add-vue-core-business-workflow/proposal.md": [],
+        "openspec/changes/add-vue-core-business-workflow/tasks.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 12,
+      "files": [
+        {
+          "path": "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/.openspec.yaml",
+          "language": "yaml",
+          "sizeLines": 2,
+          "fileCategory": "config"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/design.md",
+          "language": "markdown",
+          "sizeLines": 79,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/proposal.md",
+          "language": "markdown",
+          "sizeLines": 28,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/tasks.md",
+          "language": "markdown",
+          "sizeLines": 35,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/.openspec.yaml": [],
+        "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/design.md": [],
+        "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/proposal.md": [],
+        "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/tasks.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 13,
+      "files": [
+        {
+          "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/.openspec.yaml",
+          "language": "yaml",
+          "sizeLines": 2,
+          "fileCategory": "config"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/design.md",
+          "language": "markdown",
+          "sizeLines": 85,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/proposal.md",
+          "language": "markdown",
+          "sizeLines": 34,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/tasks.md",
+          "language": "markdown",
+          "sizeLines": 52,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/.openspec.yaml": [],
+        "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/design.md": [],
+        "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/proposal.md": [],
+        "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/tasks.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 14,
+      "files": [
+        {
+          "path": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/.openspec.yaml",
+          "language": "yaml",
+          "sizeLines": 2,
+          "fileCategory": "config"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/design.md",
+          "language": "markdown",
+          "sizeLines": 134,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/proposal.md",
+          "language": "markdown",
+          "sizeLines": 32,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/tasks.md",
+          "language": "markdown",
+          "sizeLines": 62,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/.openspec.yaml": [],
+        "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/design.md": [],
+        "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/proposal.md": [],
+        "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/tasks.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 15,
+      "files": [
+        {
+          "path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/.openspec.yaml",
+          "language": "yaml",
+          "sizeLines": 2,
+          "fileCategory": "config"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/design.md",
+          "language": "markdown",
+          "sizeLines": 88,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/proposal.md",
+          "language": "markdown",
+          "sizeLines": 36,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/tasks.md",
+          "language": "markdown",
+          "sizeLines": 63,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/.openspec.yaml": [],
+        "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/design.md": [],
+        "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/proposal.md": [],
+        "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/tasks.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 16,
+      "files": [
+        {
+          "path": ".claude/skills/openspec-apply-change/SKILL.md",
+          "language": "markdown",
+          "sizeLines": 156,
+          "fileCategory": "docs"
+        },
+        {
+          "path": ".claude/skills/openspec-archive-change/SKILL.md",
+          "language": "markdown",
+          "sizeLines": 114,
+          "fileCategory": "docs"
+        },
+        {
+          "path": ".claude/skills/openspec-explore/SKILL.md",
+          "language": "markdown",
+          "sizeLines": 288,
+          "fileCategory": "docs"
+        },
+        {
+          "path": ".claude/skills/openspec-propose/SKILL.md",
+          "language": "markdown",
+          "sizeLines": 110,
+          "fileCategory": "docs"
+        },
+        {
+          "path": ".codex/skills/openspec-apply-change/SKILL.md",
+          "language": "markdown",
+          "sizeLines": 156,
+          "fileCategory": "docs"
+        },
+        {
+          "path": ".codex/skills/openspec-archive-change/SKILL.md",
+          "language": "markdown",
+          "sizeLines": 114,
+          "fileCategory": "docs"
+        },
+        {
+          "path": ".codex/skills/openspec-explore/SKILL.md",
+          "language": "markdown",
+          "sizeLines": 288,
+          "fileCategory": "docs"
+        },
+        {
+          "path": ".codex/skills/openspec-propose/SKILL.md",
+          "language": "markdown",
+          "sizeLines": 110,
+          "fileCategory": "docs"
+        },
+        {
+          "path": ".understand-anything/.understandignore",
+          "language": "unknown",
+          "sizeLines": 40,
+          "fileCategory": "code"
+        },
+        {
+          "path": ".understand-anything/config.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "backend/alembic.ini",
+          "language": "config",
+          "sizeLines": 38,
+          "fileCategory": "config"
+        },
+        {
+          "path": "backend/alembic/script.py.mako",
+          "language": "mako",
+          "sizeLines": 24,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/alembic/versions/20260616_0001_create_platform_core_tables.py",
+          "language": "python",
+          "sizeLines": 265,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/api/__init__.py",
+          "language": "python",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/core/__init__.py",
+          "language": "python",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/db/__init__.py",
+          "language": "python",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/app/services/__init__.py",
+          "language": "python",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "backend/requirements.txt",
+          "language": "txt",
+          "sizeLines": 12,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "configs/.gitkeep",
+          "language": "unknown",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "data/swim_coco/annotations/.gitkeep",
+          "language": "unknown",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/components/OverlayCanvas.vue",
+          "language": "vue",
+          "sizeLines": 93,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/src/styles.css",
+          "language": "css",
+          "sizeLines": 354,
+          "fileCategory": "markup"
+        },
+        {
+          "path": "frontend-vue/src/views/UploadView.vue",
+          "language": "vue",
+          "sizeLines": 104,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend-vue/vite.config.ts",
+          "language": "typescript",
+          "sizeLines": 9,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/app/globals.css",
+          "language": "css",
+          "sizeLines": 108,
+          "fileCategory": "markup"
+        }
+      ],
+      "batchImportData": {
+        ".claude/skills/openspec-apply-change/SKILL.md": [],
+        ".claude/skills/openspec-archive-change/SKILL.md": [],
+        ".claude/skills/openspec-explore/SKILL.md": [],
+        ".claude/skills/openspec-propose/SKILL.md": [],
+        ".codex/skills/openspec-apply-change/SKILL.md": [],
+        ".codex/skills/openspec-archive-change/SKILL.md": [],
+        ".codex/skills/openspec-explore/SKILL.md": [],
+        ".codex/skills/openspec-propose/SKILL.md": [],
+        ".understand-anything/.understandignore": [],
+        ".understand-anything/config.json": [],
+        "backend/alembic.ini": [],
+        "backend/alembic/script.py.mako": [],
+        "backend/alembic/versions/20260616_0001_create_platform_core_tables.py": [],
+        "backend/app/api/__init__.py": [],
+        "backend/app/core/__init__.py": [],
+        "backend/app/db/__init__.py": [],
+        "backend/app/services/__init__.py": [],
+        "backend/requirements.txt": [],
+        "configs/.gitkeep": [],
+        "data/swim_coco/annotations/.gitkeep": [],
+        "frontend-vue/src/components/OverlayCanvas.vue": [],
+        "frontend-vue/src/styles.css": [],
+        "frontend-vue/src/views/UploadView.vue": [],
+        "frontend-vue/vite.config.ts": [],
+        "frontend/app/globals.css": []
+      },
+      "neighborMap": {
+        "frontend-vue/src/styles.css": [
+          {
+            "path": "frontend-vue/src/main.ts",
+            "batchIndex": 2,
+            "symbols": []
+          }
+        ],
+        "frontend/app/globals.css": [
+          {
+            "path": "frontend/app/layout.tsx",
+            "batchIndex": 17,
+            "symbols": [
+              "metadata",
+              "RootLayout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 17,
+      "files": [
+        {
+          "path": "frontend/app/layout.tsx",
+          "language": "typescript",
+          "sizeLines": 20,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/next-env.d.ts",
+          "language": "typescript",
+          "sizeLines": 5,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/next.config.mjs",
+          "language": "javascript",
+          "sizeLines": 4,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/package.json",
+          "language": "json",
+          "sizeLines": 28,
+          "fileCategory": "config"
+        },
+        {
+          "path": "frontend/postcss.config.mjs",
+          "language": "javascript",
+          "sizeLines": 8,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/tailwind.config.ts",
+          "language": "typescript",
+          "sizeLines": 42,
+          "fileCategory": "code"
+        },
+        {
+          "path": "frontend/tsconfig.json",
+          "language": "json",
+          "sizeLines": 27,
+          "fileCategory": "config"
+        },
+        {
+          "path": "model_service/app/__init__.py",
+          "language": "python",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "model_service/requirements.txt",
+          "language": "txt",
+          "sizeLines": 3,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/add-vue-core-business-workflow/specs/swim-analysis-platform-navigation/spec.md",
+          "language": "markdown",
+          "sizeLines": 27,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/add-vue-core-business-workflow/specs/swim-video-analysis-job-flow/spec.md",
+          "language": "markdown",
+          "sizeLines": 64,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/add-vue-core-business-workflow/specs/vue-auth-session-access/spec.md",
+          "language": "markdown",
+          "sizeLines": 61,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/add-vue-core-business-workflow/specs/vue-core-business-workflow/spec.md",
+          "language": "markdown",
+          "sizeLines": 84,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/specs/zhiyong-yunshu-landing-page/spec.md",
+          "language": "markdown",
+          "sizeLines": 75,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/specs/swim-analysis-platform-navigation/spec.md",
+          "language": "markdown",
+          "sizeLines": 37,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/specs/swim-interactive-performance-report/spec.md",
+          "language": "markdown",
+          "sizeLines": 48,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/specs/swim-video-analysis-job-flow/spec.md",
+          "language": "markdown",
+          "sizeLines": 67,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/specs/swim-visual-analysis-workspace/spec.md",
+          "language": "markdown",
+          "sizeLines": 56,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/specs/zhiyong-yunshu-landing-page/spec.md",
+          "language": "markdown",
+          "sizeLines": 19,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/specs/heavy-model-analysis-architecture/spec.md",
+          "language": "markdown",
+          "sizeLines": 71,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/specs/swim-interactive-performance-report/spec.md",
+          "language": "markdown",
+          "sizeLines": 34,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/specs/swim-video-analysis-job-flow/spec.md",
+          "language": "markdown",
+          "sizeLines": 34,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/specs/swim-visual-analysis-workspace/spec.md",
+          "language": "markdown",
+          "sizeLines": 34,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/backend-platform-core/spec.md",
+          "language": "markdown",
+          "sizeLines": 113,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/heavy-model-analysis-architecture/spec.md",
+          "language": "markdown",
+          "sizeLines": 44,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "frontend/app/layout.tsx": [
+          "frontend/app/globals.css"
+        ],
+        "frontend/next-env.d.ts": [],
+        "frontend/next.config.mjs": [],
+        "frontend/package.json": [],
+        "frontend/postcss.config.mjs": [],
+        "frontend/tailwind.config.ts": [],
+        "frontend/tsconfig.json": [],
+        "model_service/app/__init__.py": [],
+        "model_service/requirements.txt": [],
+        "openspec/changes/add-vue-core-business-workflow/specs/swim-analysis-platform-navigation/spec.md": [],
+        "openspec/changes/add-vue-core-business-workflow/specs/swim-video-analysis-job-flow/spec.md": [],
+        "openspec/changes/add-vue-core-business-workflow/specs/vue-auth-session-access/spec.md": [],
+        "openspec/changes/add-vue-core-business-workflow/specs/vue-core-business-workflow/spec.md": [],
+        "openspec/changes/archive/2026-06-14-add-zhiyong-yunshu-frontend/specs/zhiyong-yunshu-landing-page/spec.md": [],
+        "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/specs/swim-analysis-platform-navigation/spec.md": [],
+        "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/specs/swim-interactive-performance-report/spec.md": [],
+        "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/specs/swim-video-analysis-job-flow/spec.md": [],
+        "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/specs/swim-visual-analysis-workspace/spec.md": [],
+        "openspec/changes/archive/2026-06-15-port-pickleball-platform-to-swim-analysis/specs/zhiyong-yunshu-landing-page/spec.md": [],
+        "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/specs/heavy-model-analysis-architecture/spec.md": [],
+        "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/specs/swim-interactive-performance-report/spec.md": [],
+        "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/specs/swim-video-analysis-job-flow/spec.md": [],
+        "openspec/changes/archive/2026-06-16-define-heavy-model-analysis-architecture/specs/swim-visual-analysis-workspace/spec.md": [],
+        "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/backend-platform-core/spec.md": [],
+        "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/heavy-model-analysis-architecture/spec.md": []
+      },
+      "neighborMap": {
+        "frontend/app/layout.tsx": [
+          {
+            "path": "frontend/app/globals.css",
+            "batchIndex": 16,
+            "symbols": []
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 18,
+      "files": [
+        {
+          "path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/swim-interactive-performance-report/spec.md",
+          "language": "markdown",
+          "sizeLines": 36,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/swim-video-analysis-job-flow/spec.md",
+          "language": "markdown",
+          "sizeLines": 47,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/swim-visual-analysis-workspace/spec.md",
+          "language": "markdown",
+          "sizeLines": 36,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/config.yaml",
+          "language": "yaml",
+          "sizeLines": 25,
+          "fileCategory": "config"
+        },
+        {
+          "path": "openspec/specs/backend-platform-core/spec.md",
+          "language": "markdown",
+          "sizeLines": 117,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/specs/heavy-model-analysis-architecture/spec.md",
+          "language": "markdown",
+          "sizeLines": 91,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/specs/swim-analysis-platform-navigation/spec.md",
+          "language": "markdown",
+          "sizeLines": 41,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/specs/swim-interactive-performance-report/spec.md",
+          "language": "markdown",
+          "sizeLines": 96,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/specs/swim-video-analysis-job-flow/spec.md",
+          "language": "markdown",
+          "sizeLines": 115,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/specs/swim-visual-analysis-workspace/spec.md",
+          "language": "markdown",
+          "sizeLines": 104,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "openspec/specs/zhiyong-yunshu-landing-page/spec.md",
+          "language": "markdown",
+          "sizeLines": 79,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "start-web.command",
+          "language": "command",
+          "sizeLines": 87,
+          "fileCategory": "code"
+        },
+        {
+          "path": "stop-web.command",
+          "language": "command",
+          "sizeLines": 56,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/.gitkeep",
+          "language": "unknown",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "uploads/.gitkeep",
+          "language": "unknown",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "weights/.gitkeep",
+          "language": "unknown",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/swim-interactive-performance-report/spec.md": [],
+        "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/swim-video-analysis-job-flow/spec.md": [],
+        "openspec/changes/archive/2026-06-16-refactor-backend-platform-core-postgres/specs/swim-visual-analysis-workspace/spec.md": [],
+        "openspec/config.yaml": [],
+        "openspec/specs/backend-platform-core/spec.md": [],
+        "openspec/specs/heavy-model-analysis-architecture/spec.md": [],
+        "openspec/specs/swim-analysis-platform-navigation/spec.md": [],
+        "openspec/specs/swim-interactive-performance-report/spec.md": [],
+        "openspec/specs/swim-video-analysis-job-flow/spec.md": [],
+        "openspec/specs/swim-visual-analysis-workspace/spec.md": [],
+        "openspec/specs/zhiyong-yunshu-landing-page/spec.md": [],
+        "start-web.command": [],
+        "stop-web.command": [],
+        "tools/.gitkeep": [],
+        "uploads/.gitkeep": [],
+        "weights/.gitkeep": []
+      },
+      "neighborMap": {}
+    }
+  ]
+}

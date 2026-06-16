@@ -1,0 +1,17 @@
+{
+  "projectRoot": "/Users/tuian/Documents/大学/竞赛/大创/游泳/swim",
+  "batchFiles": [
+    {"path": "docs/ai-api-spec.md", "language": "markdown", "sizeLines": 256, "fileCategory": "docs"},
+    {"path": "docs/database-design.md", "language": "markdown", "sizeLines": 168, "fileCategory": "docs"},
+    {"path": "docs/local-development.md", "language": "markdown", "sizeLines": 54, "fileCategory": "docs"},
+    {"path": "docs/tech-stack.md", "language": "markdown", "sizeLines": 123, "fileCategory": "docs"},
+    {"path": "docs/upgrade-paths.md", "language": "markdown", "sizeLines": 41, "fileCategory": "docs"}
+  ],
+  "batchImportData": {
+    "docs/ai-api-spec.md": [],
+    "docs/database-design.md": [],
+    "docs/local-development.md": [],
+    "docs/tech-stack.md": [],
+    "docs/upgrade-paths.md": []
+  }
+}
