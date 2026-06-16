@@ -14,8 +14,9 @@ API 调用方不应依赖本地绝对路径，只使用后端返回的 `playback
 
 当前业务代码通过 `BackgroundTasks` 调用 `run_analysis_task(task_id)`。迁移到 Celery + Redis 时，保持以下契约不变：
 
-- `POST /api/v1/tasks` 仍返回任务 ID 和初始状态
-- `GET /api/v1/tasks` 与 `GET /api/v1/tasks/{id}` 仍读取数据库任务状态
+- `POST /api/v1/analysis/submit` 仍基于 `session_id` 返回任务 ID 和初始状态
+- `GET /api/v1/analysis/{task_id}/status` 仍读取数据库任务状态
+- `GET /api/v1/analysis/{task_id}/result` 仍读取已保存分析结果
 - 状态字段仍覆盖 `uploaded`、`queued`、`processing`、`result_saving`、`completed`、`failed`
 - 前端轮询和报告读取方式不变
 

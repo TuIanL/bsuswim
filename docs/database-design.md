@@ -2,161 +2,167 @@
 
 ## 1. 设计目标
 
-当前数据库设计服务于 MVP 阶段的四个核心能力：
+当前数据库设计已经从“单视频分析 Demo”升级为“训练记录为中心的平台后端骨架”，核心目标是：
 
-- 记录上传视频
-- 记录分析任务状态
-- 保存模型返回的结构化结果
-- 保存报告生成结果
+- 管理教练用户和登录认证
+- 管理运动员档案
+- 管理一次训练或测试记录
+- 将多个视频文件按机位绑定到同一次训练记录
+- 持久化 session 级 AI 分析任务、模型结果和报告数据
 
-当前实现位于 [models.py](/Users/tuian/Documents/大学/竞赛/大创/游泳/swim/backend/app/models.py)。
+当前模型位于 [models/](/Users/tuian/Documents/大学/竞赛/大创/游泳/swim/backend/app/models)。
 
 ## 2. 表结构总览
 
 ```text
-video_files
-    └── 1:N analysis_tasks
-              └── 1:1 analysis_results
-              └── 1:1 report_metadata
+users
+  └── athletes
+        └── training_sessions
+              ├── session_videos
+              │     └── video_files
+              ├── analysis_tasks
+              │     └── analysis_results
+              └── report_metadata
+
+teams
+  └── athletes
 ```
 
-## 3. 表说明
+## 3. 核心表说明
 
-### 3.1 `video_files`
+### 3.1 `users`
 
-上传视频主表。
+保存平台登录用户。第一版主要服务教练账号。
 
-主要字段：
+关键字段：
 
-- `id`: 主键
-- `original_filename`: 用户原始文件名
-- `stored_filename`: 本地落盘文件名
-- `storage_path`: 存储路径，后期可演进为 object key
-- `mime_type`: 文件 MIME type
-- `size_bytes`: 文件大小
-- `checksum_sha256`: 文件校验值
-- `created_at`: 上传时间
+- `username`
+- `email`
+- `phone`
+- `password_hash`
+- `role`
+- `is_active`
 
-设计意图：
+### 3.2 `athletes`
 
-- 将文件元数据和任务分离，允许一个视频被多次分析
-- 为后期从本地文件迁移到对象存储保留字段语义空间
+保存运动员档案，并通过 `coach_id` 关联当前教练。
 
-### 3.2 `analysis_tasks`
+关键字段：
 
-分析任务主表。
+- `name`
+- `gender`
+- `birth_date`
+- `height_cm`
+- `weight_kg`
+- `stroke_specialty`
+- `level`
+- `coach_id`
+- `team_id`
 
-主要字段：
+### 3.3 `training_sessions`
 
-- `id`: 主键
-- `video_id`: 关联 `video_files.id`
-- `status`: 任务状态枚举
-- `progress`: 0-100 进度值
-- `stage`: 当前阶段标签
-- `session_metadata`: 训练元数据 JSON
-- `error_message`: 错误原因
-- `created_at`: 创建时间
-- `updated_at`: 更新时间
-- `completed_at`: 完成时间
+一次训练或测试记录，是平台分析链路的业务中心。
 
-当前状态枚举：
+关键字段：
 
-- `uploaded`
-- `queued`
-- `processing`
-- `result_saving`
-- `completed`
-- `failed`
+- `athlete_id`
+- `coach_id`
+- `title`
+- `session_date`
+- `venue`
+- `stroke_type`
+- `distance_m`
+- `pool_length_m`
+- `status`
 
-设计意图：
+### 3.4 `video_files`
 
-- 任务状态必须入库，不能只存在内存里
-- 支持前端刷新后恢复状态
-- 为后期切换 Celery + Redis 保持状态契约稳定
+只记录文件存储事实，不直接承载训练业务含义。
 
-### 3.3 `analysis_results`
+关键字段：
 
-模型结果表。
+- `original_filename`
+- `stored_filename`
+- `storage_path`
+- `mime_type`
+- `size_bytes`
+- `checksum_sha256`
 
-主要字段：
+### 3.5 `session_videos`
 
-- `id`: 主键
-- `task_id`: 关联 `analysis_tasks.id`
-- `schema_version`: 结果版本
-- `detections`: 检测框 JSON
-- `keypoint_frames`: 关键点帧序列 JSON
-- `phases`: 动作阶段 JSON
-- `metrics`: 指标 JSON
-- `diagnostics`: 诊断结果 JSON
-- `raw_result`: 原始完整结果 JSON
-- `created_at`: 创建时间
+记录视频文件在某次训练记录中的业务角色。
 
-设计意图：
+关键字段：
 
-- 一次任务对应一份主结果，故 `task_id` 唯一
-- 先用 JSON 承接高维度模型输出，降低前期频繁改表成本
-- 用 `schema_version` 约束前后端兼容
+- `session_id`
+- `video_file_id`
+- `view_type`
+- `fps`
+- `resolution`
+- `sync_offset_ms`
 
-### 3.4 `report_metadata`
+这个表让一个训练记录可以绑定侧面、正面、水下等多机位视频。
 
-报告数据表。
+### 3.6 `analysis_tasks`
 
-主要字段：
+保存 session 级分析任务状态。
 
-- `id`: 主键
-- `task_id`: 关联 `analysis_tasks.id`
-- `source`: 报告来源，当前默认 `model_service`
-- `report_data`: 报告 JSON
-- `generated_at`: 生成时间
+关键字段：
 
-设计意图：
+- `session_id`
+- `status`
+- `progress`
+- `stage`
+- `request_payload`
+- `error_message`
+- `completed_at`
 
-- 将报告作为分析结果的下游派生物独立存储
-- 为后期报告重生成、版本演化、PDF 导出留空间
+### 3.7 `analysis_results`
 
-## 4. 当前关系设计
+保存模型服务返回的结构化结果。
 
-- 一个视频可以创建多个分析任务
-- 一个任务最多对应一份分析结果
-- 一个任务最多对应一份报告数据
+关键字段：
 
-这是当前 MVP 最稳的结构。如果后面需要支持“同一任务多版本推理结果”或“多次报告生成”，可以把 1:1 调整为 1:N。
+- `task_id`
+- `schema_version`
+- `detections`
+- `keypoint_frames`
+- `phases`
+- `metrics`
+- `diagnostics`
+- `raw_result`
 
-## 5. 当前不足与后续演进
+### 3.8 `report_metadata`
 
-### 5.1 缺少用户体系
+保存训练记录报告 JSON。
 
-当前没有：
+关键字段：
 
-- 用户表
-- 教练/运动员表
-- 项目或训练分组表
+- `session_id`
+- `task_id`
+- `source`
+- `report_data`
+- `generated_at`
 
-后续如接入登录与权限，需要新增业务主体表并把视频、任务挂到用户或项目下。
+## 4. Migration
 
-### 5.2 缺少数据库迁移工具
+业务数据库使用 PostgreSQL，schema 由 Alembic 管理：
 
-当前后端启动时直接 `create_all`。开发期方便，但正式环境建议引入：
+```bash
+cd backend
+alembic upgrade head
+```
 
-- `Alembic`
+后续修改模型后，应生成新的 migration 并检查差异：
 
-### 5.3 JSON 字段较多
+```bash
+alembic revision --autogenerate -m "describe change"
+alembic upgrade head
+```
 
-这是当前有意为之。原因是：
+## 5. 设计边界
 
-- 模型输出迭代快
-- 指标字段还不稳定
-- 先保证链路跑通
-
-当某些指标和查询维度稳定后，可以把高频查询字段从 JSON 中抽出为结构化列。
-
-## 6. 推荐索引方向
-
-当前模型中已经包含主键和部分索引，后期建议补充：
-
-- `analysis_tasks(status, updated_at)`
-- `analysis_tasks(video_id)`
-- `analysis_results(task_id)`
-- `report_metadata(task_id)`
-
-如果未来按用户或项目查询，再增加对应组合索引。
+- `video_files` 是文件层，`session_videos` 是业务关系层。
+- `analysis_tasks` 绑定 `session_id`，而不是单个 `video_id`。
+- 模型输出先用 JSON 字段承接，等指标稳定后再抽结构化列。
+- 文件存储第一版使用本地 `uploads/`，后续可迁移到 MinIO。

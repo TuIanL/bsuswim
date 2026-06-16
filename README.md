@@ -34,7 +34,8 @@
 - FastAPI
 - Pydantic
 - SQLAlchemy
-- MySQL
+- PostgreSQL
+- Alembic
 - FastAPI `BackgroundTasks`
 
 ### 模型服务
@@ -86,19 +87,27 @@ uvicorn app.main:app --reload --port 8100
 
 ### 3. 启动业务后端
 
-默认环境变量：
+先启动本地依赖：
 
 ```bash
-export DATABASE_URL='mysql+pymysql://swim:swim@127.0.0.1:3306/swim_analysis?charset=utf8mb4'
-export MODEL_SERVICE_URL='http://127.0.0.1:8100'
-export UPLOAD_DIR='uploads'
+docker compose up -d postgres redis minio
 ```
 
-启动：
+默认环境变量可参考 `.env.example`：
+
+```bash
+export DATABASE_URL='postgresql+psycopg://swim:swim@localhost:5432/swim_analysis'
+export MODEL_SERVICE_URL='http://127.0.0.1:8100'
+export UPLOAD_DIR='uploads'
+export JWT_SECRET_KEY='please-change-this-secret'
+```
+
+启动并迁移数据库：
 
 ```bash
 cd backend
 pip install -r requirements.txt
+alembic upgrade head
 uvicorn app.main:app --reload --port 8000
 ```
 

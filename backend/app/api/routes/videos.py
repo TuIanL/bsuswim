@@ -9,7 +9,7 @@ from app.services.storage import StorageService, playback_url
 router = APIRouter()
 
 
-@router.post("", response_model=VideoUploadResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/upload", response_model=VideoUploadResponse, status_code=status.HTTP_201_CREATED)
 async def upload_video(file: UploadFile = File(...), db: Session = Depends(get_db)) -> VideoUploadResponse:
     if not (file.content_type or "").startswith("video/"):
         raise HTTPException(status_code=400, detail="请上传视频文件")
@@ -20,6 +20,14 @@ async def upload_video(file: UploadFile = File(...), db: Session = Depends(get_d
     db.commit()
     db.refresh(video)
     return VideoUploadResponse(video=_read_video(video))
+
+
+@router.get("/{video_id}", response_model=VideoFileRead)
+def get_video(video_id: int, db: Session = Depends(get_db)) -> VideoFileRead:
+    video = db.get(VideoFile, video_id)
+    if not video:
+        raise HTTPException(status_code=404, detail="视频不存在")
+    return _read_video(video)
 
 
 def _read_video(video: VideoFile) -> VideoFileRead:

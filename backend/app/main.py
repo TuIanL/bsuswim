@@ -4,7 +4,6 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api.router import api_router
 from app.core.config import get_settings
-from app.db.session import Base, engine
 
 
 settings = get_settings()
@@ -23,10 +22,6 @@ def create_app() -> FastAPI:
     settings.upload_dir.mkdir(parents=True, exist_ok=True)
     app.mount("/uploads", StaticFiles(directory=settings.upload_dir), name="uploads")
     app.include_router(api_router, prefix=settings.api_prefix)
-
-    @app.on_event("startup")
-    def create_tables() -> None:
-        Base.metadata.create_all(bind=engine)
 
     @app.get("/health")
     def health() -> dict[str, str]:

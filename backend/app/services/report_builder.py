@@ -7,11 +7,26 @@ def build_report_data(task: AnalysisTask, result: AnalysisResult | None = None) 
     result = result or task.result
     metrics = result.metrics if result else {}
     diagnostics = result.diagnostics if result else []
+    session = task.session
+    athlete = session.athlete if session else None
 
     return {
+        "session": {
+            "id": session.id if session else task.session_id,
+            "title": session.title if session else "游泳训练分析",
+            "session_date": session.session_date.isoformat() if session and session.session_date else None,
+            "stroke_type": session.stroke_type.value if session else None,
+            "distance_m": session.distance_m if session else None,
+            "pool_length_m": float(session.pool_length_m) if session and session.pool_length_m is not None else None,
+        },
+        "athlete": {
+            "id": athlete.id if athlete else None,
+            "name": athlete.name if athlete else None,
+            "level": athlete.level if athlete else None,
+        },
         "summary": {
-            "title": task.session_metadata.get("session_title", "游泳训练分析"),
-            "stroke_type": task.session_metadata.get("stroke_type", "freestyle"),
+            "title": session.title if session else "游泳训练分析",
+            "stroke_type": session.stroke_type.value if session else "freestyle",
             "overall_score": metrics.get("overall_score", 0),
             "headline": "基于模型服务输出生成的第一版 HTML 报告",
         },
@@ -39,6 +54,7 @@ def build_report_data(task: AnalysisTask, result: AnalysisResult | None = None) 
         },
         "provenance": {
             "task_id": task.id,
+            "session_id": task.session_id,
             "source": "model_service",
             "generated_at": datetime.utcnow().isoformat(),
             "schema_version": result.schema_version if result else None,

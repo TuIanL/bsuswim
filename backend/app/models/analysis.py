@@ -16,32 +16,17 @@ class AnalysisTaskStatus(str, PyEnum):
     FAILED = "failed"
 
 
-class VideoFile(Base):
-    __tablename__ = "video_files"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    original_filename: Mapped[str] = mapped_column(String(255), nullable=False)
-    stored_filename: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
-    storage_path: Mapped[str] = mapped_column(String(500), nullable=False)
-    mime_type: Mapped[str | None] = mapped_column(String(120))
-    size_bytes: Mapped[int] = mapped_column(Integer, nullable=False)
-    checksum_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-
-    tasks: Mapped[list["AnalysisTask"]] = relationship(back_populates="video")
-
-
 class AnalysisTask(Base):
     __tablename__ = "analysis_tasks"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    video_id: Mapped[int] = mapped_column(ForeignKey("video_files.id"), nullable=False, index=True)
+    session_id: Mapped[int] = mapped_column(ForeignKey("training_sessions.id"), nullable=False, index=True)
     status: Mapped[AnalysisTaskStatus] = mapped_column(
         SQLEnum(AnalysisTaskStatus), default=AnalysisTaskStatus.QUEUED, nullable=False, index=True
     )
     progress: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     stage: Mapped[str] = mapped_column(String(80), default="queued", nullable=False)
-    session_metadata: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    request_payload: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     error_message: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
@@ -49,9 +34,9 @@ class AnalysisTask(Base):
     )
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
-    video: Mapped[VideoFile] = relationship(back_populates="tasks")
-    result: Mapped["AnalysisResult | None"] = relationship(back_populates="task", uselist=False)
-    report: Mapped["ReportMetadata | None"] = relationship(back_populates="task", uselist=False)
+    session = relationship("TrainingSession", back_populates="analysis_tasks")
+    result = relationship("AnalysisResult", back_populates="task", uselist=False)
+    report = relationship("ReportMetadata", back_populates="task", uselist=False)
 
 
 class AnalysisResult(Base):
@@ -68,16 +53,4 @@ class AnalysisResult(Base):
     raw_result: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    task: Mapped[AnalysisTask] = relationship(back_populates="result")
-
-
-class ReportMetadata(Base):
-    __tablename__ = "report_metadata"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    task_id: Mapped[int] = mapped_column(ForeignKey("analysis_tasks.id"), unique=True, nullable=False)
-    source: Mapped[str] = mapped_column(String(80), default="model_service", nullable=False)
-    report_data: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
-    generated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-
-    task: Mapped[AnalysisTask] = relationship(back_populates="report")
+    task = relationship("AnalysisTask", back_populates="result")
