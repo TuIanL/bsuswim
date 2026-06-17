@@ -26,7 +26,7 @@ export const router = createRouter({
     { path: '/upload', redirect: '/sessions/new' },
     { path: '/tasks', component: TasksView },
     { path: '/workspace/:taskId', component: WorkspaceView, props: true },
-    { path: '/reports/:taskId', component: ReportView, props: true }
+    { path: '/reports/:sessionId', component: ReportView, props: true }
   ]
 })
 

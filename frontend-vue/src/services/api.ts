@@ -1,6 +1,7 @@
 import axios from 'axios'
 import type {
   AnalysisTask,
+  AnalysisStatus,
   Athlete,
   AthleteCreateInput,
   AthleteTrendPoint,
@@ -11,7 +12,6 @@ import type {
   ReportData,
   SessionVideo,
   SessionVideoCreateInput,
-  TrainingMetadata,
   TrainingSession,
   User,
   VideoFile,
@@ -22,17 +22,19 @@ import {
   createDemoAthlete,
   createDemoSession,
   createDemoVideo,
-  demoReport,
-  demoTask,
   demoUser,
-  demoWorkspace,
   getDemoAthlete,
   getDemoAthleteSessions,
   getDemoAthleteTrend,
   getDemoAthletes,
   getDemoSession,
   getDemoSessions,
-  getDemoSessionVideos
+  getDemoSessionVideos,
+  getDemoTask,
+  getDemoTasks,
+  getDemoWorkspace,
+  getDemoReport,
+  submitDemoAnalysis
 } from './demoData'
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || ''
@@ -196,35 +198,73 @@ export async function listSessionVideos(sessionId: number): Promise<SessionVideo
   return response.data
 }
 
-export async function createAnalysisTask(videoId: number, metadata: TrainingMetadata): Promise<AnalysisTask> {
-  if (demoMode) {
-    return { ...demoTask, video_id: videoId, session_metadata: metadata }
-  }
-  const response = await client.post<AnalysisTask>('/tasks', { video_id: videoId, metadata })
+export async function submitAnalysis(sessionId: number): Promise<AnalysisTask> {
+  if (demoMode) return submitDemoAnalysis(sessionId)
+  const response = await client.post<AnalysisTask>('/analysis/submit', { session_id: sessionId })
   return response.data
 }
 
+export async function createAnalysisTask(_videoId?: number, _metadata?: unknown): Promise<AnalysisTask> {
+  if (demoMode) return submitDemoAnalysis(201)
+  throw new Error('真实后端模式请先创建训练记录、绑定视频，再调用 submitAnalysis(sessionId)')
+}
+
 export async function listTasks(): Promise<AnalysisTask[]> {
-  if (demoMode) return [demoTask]
-  const response = await client.get<AnalysisTask[]>('/tasks')
+  if (demoMode) return getDemoTasks()
+  const response = await client.get<AnalysisTask[]>('/analysis')
   return response.data
 }
 
 export async function getTask(taskId: number): Promise<AnalysisTask> {
-  if (demoMode) return demoTask
-  const response = await client.get<AnalysisTask>(`/tasks/${taskId}`)
+  if (demoMode) return getDemoTask(taskId)
+  const response = await client.get<AnalysisTask>(`/analysis/${taskId}`)
+  return response.data
+}
+
+export async function getAnalysisStatus(taskId: number): Promise<AnalysisStatus> {
+  if (demoMode) {
+    const task = getDemoTask(taskId)
+    return {
+      task_id: task.id,
+      session_id: task.session_id,
+      status: task.status,
+      progress: task.progress,
+      stage: task.stage,
+      error_message: task.error_message,
+      created_at: task.created_at,
+      updated_at: task.updated_at,
+      completed_at: task.completed_at
+    }
+  }
+  const response = await client.get<AnalysisStatus>(`/analysis/${taskId}/status`)
+  return response.data
+}
+
+export async function getAnalysisResult(taskId: number) {
+  if (demoMode) return getDemoWorkspace(taskId).result || null
+  const response = await client.get(`/analysis/${taskId}/result`)
+  return response.data
+}
+
+export async function getAnalysisWorkspace(taskId: number): Promise<WorkspaceData> {
+  if (demoMode) return getDemoWorkspace(taskId)
+  const response = await client.get<WorkspaceData>(`/analysis/${taskId}/workspace`)
   return response.data
 }
 
 export async function getWorkspace(taskId: number): Promise<WorkspaceData> {
-  if (demoMode) return demoWorkspace
-  const response = await client.get<WorkspaceData>(`/tasks/${taskId}/workspace`)
+  return getAnalysisWorkspace(taskId)
+}
+
+export async function generateReport(sessionId: number): Promise<ReportData> {
+  if (demoMode) return getDemoReport(sessionId)
+  const response = await client.post<ReportData>('/reports/generate', { session_id: sessionId })
   return response.data
 }
 
-export async function getReport(taskId: number): Promise<ReportData> {
-  if (demoMode) return demoReport
-  const response = await client.get<ReportData>(`/reports/${taskId}`)
+export async function getReport(sessionId: number): Promise<ReportData> {
+  if (demoMode) return getDemoReport(sessionId)
+  const response = await client.get<ReportData>(`/reports/${sessionId}`)
   return response.data
 }
 

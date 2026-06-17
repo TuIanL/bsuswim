@@ -159,17 +159,31 @@ export interface VideoFile {
 
 export interface AnalysisTask {
   id: number
-  video_id: number
+  session_id: number
   status: TaskStatus
   progress: number
   stage: string
-  session_metadata: TrainingMetadata
-  error_message?: string
+  request_payload?: Record<string, any>
+  error_message?: string | null
   created_at: string
   updated_at: string
-  completed_at?: string
-  video?: VideoFile
+  completed_at?: string | null
   actions: string[]
+  video_id?: number
+  session_metadata?: TrainingMetadata
+  video?: VideoFile
+}
+
+export interface AnalysisStatus {
+  task_id: number
+  session_id: number
+  status: TaskStatus
+  progress: number
+  stage: string
+  error_message?: string | null
+  created_at: string
+  updated_at: string
+  completed_at?: string | null
 }
 
 export interface AnalysisResult {
@@ -186,10 +200,13 @@ export interface AnalysisResult {
 
 export interface WorkspaceData {
   task: AnalysisTask
-  result?: AnalysisResult
+  result?: AnalysisResult | null
+  videos?: VideoFile[]
+  session_videos?: SessionVideo[]
 }
 
 export interface ReportData {
+  session_id: number
   task_id: number
   source: string
   generated_at: string

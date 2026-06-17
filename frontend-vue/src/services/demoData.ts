@@ -185,6 +185,7 @@ export const demoAthleteTrends: Record<number, AthleteTrendPoint[]> = {
 
 export const demoTask: AnalysisTask = {
   id: 1001,
+  session_id: 201,
   video_id: 9001,
   status: 'completed',
   progress: 100,
@@ -248,6 +249,7 @@ export const demoWorkspace: WorkspaceData = {
 }
 
 export const demoReport: ReportData = {
+  session_id: demoTask.session_id,
   task_id: demoTask.id,
   source: 'demo',
   generated_at: new Date().toISOString(),
@@ -281,15 +283,18 @@ export const demoReport: ReportData = {
 let athletes = [...demoAthletes]
 let sessions = [...demoSessions]
 let sessionVideos = [...demoSessionVideos]
+let tasks = [demoTask]
 let videoSequence = 9100
 let athleteSequence = 200
 let sessionSequence = 300
 let sessionVideoSequence = 400
+let taskSequence = 1001
 
 export function resetDemoBusinessData() {
   athletes = [...demoAthletes]
   sessions = [...demoSessions]
   sessionVideos = [...demoSessionVideos]
+  tasks = [demoTask]
 }
 
 export function getDemoAthletes() {
@@ -402,4 +407,65 @@ export function bindDemoSessionVideo(
 
 export function getDemoSessionVideos(sessionId: number) {
   return sessionVideos.filter((item) => item.session_id === sessionId)
+}
+
+export function submitDemoAnalysis(sessionId: number) {
+  const session = getDemoSession(sessionId)
+  const createdAt = new Date().toISOString()
+  const task: AnalysisTask = {
+    ...demoTask,
+    id: ++taskSequence,
+    session_id: sessionId,
+    status: 'completed',
+    progress: 100,
+    stage: 'completed',
+    created_at: createdAt,
+    updated_at: createdAt,
+    completed_at: createdAt,
+    request_payload: {
+      schema_version: 'analysis.request.v1',
+      session_id: sessionId,
+      session: session ? { id: session.id, title: session.title, stroke_type: session.stroke_type } : null,
+      videos: getDemoSessionVideos(sessionId)
+    },
+    session_metadata: {
+      session_title: session?.title || demoTask.session_metadata?.session_title || 'Demo 游泳分析',
+      venue: session?.venue || '',
+      session_date: session?.session_date || '',
+      stroke_type: session?.stroke_type || 'freestyle',
+      capture_mode: 'multi_camera'
+    }
+  }
+  tasks = [task, ...tasks.filter((item) => item.session_id !== sessionId)]
+  sessions = sessions.map((item) =>
+    item.id === sessionId ? { ...item, status: 'completed', score: 81, updated_at: createdAt } : item
+  )
+  return task
+}
+
+export function getDemoTasks() {
+  return [...tasks].sort((a, b) => Date.parse(b.updated_at) - Date.parse(a.updated_at))
+}
+
+export function getDemoTask(taskId: number) {
+  return tasks.find((task) => task.id === taskId) || demoTask
+}
+
+export function getDemoWorkspace(taskId: number): WorkspaceData {
+  const task = getDemoTask(taskId)
+  return {
+    ...demoWorkspace,
+    task,
+    videos: getDemoSessionVideos(task.session_id).map((item) => item.video),
+    session_videos: getDemoSessionVideos(task.session_id)
+  }
+}
+
+export function getDemoReport(sessionId: number): ReportData {
+  const task = tasks.find((item) => item.session_id === sessionId) || demoTask
+  return {
+    ...demoReport,
+    session_id: sessionId,
+    task_id: task.id
+  }
 }

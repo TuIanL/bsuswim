@@ -9,10 +9,14 @@
     </div>
 
     <div v-if="loading" class="section">加载中...</div>
+    <el-empty v-else-if="errorMessage" class="section" :description="errorMessage">
+      <el-button @click="$router.push('/tasks')">返回任务管理</el-button>
+      <el-button type="primary" @click="load">刷新报告</el-button>
+    </el-empty>
     <div v-else-if="report" class="grid-two">
       <div class="section">
         <h2>{{ report.report.summary?.title }}</h2>
-        <el-tag>{{ report.source === 'demo' ? 'Demo 数据' : '真实模型输出' }}</el-tag>
+        <el-tag>{{ sourceLabel(report.source) }}</el-tag>
         <div class="metric-grid">
           <div class="metric">
             <span>综合评分</span>
@@ -38,6 +42,7 @@
         <h2>报告来源</h2>
         <el-descriptions :column="1" border>
           <el-descriptions-item label="任务 ID">{{ report.task_id }}</el-descriptions-item>
+          <el-descriptions-item label="训练记录 ID">{{ report.session_id }}</el-descriptions-item>
           <el-descriptions-item label="生成时间">{{ report.generated_at }}</el-descriptions-item>
           <el-descriptions-item label="来源">{{ report.source }}</el-descriptions-item>
         </el-descriptions>
@@ -49,17 +54,20 @@
 <script setup lang="ts">
 import * as echarts from 'echarts'
 import { nextTick, onMounted, ref } from 'vue'
-import { getReport } from '../services/api'
+import { generateReport, getReport } from '../services/api'
 import type { ReportData } from '../types'
 
-const props = defineProps<{ taskId: string }>()
+const props = defineProps<{ sessionId: string }>()
 const report = ref<ReportData | null>(null)
 const loading = ref(true)
+const errorMessage = ref('')
 const chartRef = ref<HTMLDivElement | null>(null)
+let chart: echarts.ECharts | null = null
 
 function renderChart() {
   if (!chartRef.value || !report.value) return
-  const chart = echarts.init(chartRef.value)
+  chart?.dispose()
+  chart = echarts.init(chartRef.value)
   const radar = report.value.report.charts?.radar || []
   chart.setOption({
     radar: {
@@ -74,10 +82,34 @@ function renderChart() {
   })
 }
 
-onMounted(async () => {
-  report.value = await getReport(Number(props.taskId))
-  loading.value = false
+function sourceLabel(source: string) {
+  if (source === 'demo') return 'Demo 数据'
+  if (source.includes('mock')) return '模型服务 Mock 输出'
+  return '模型服务输出'
+}
+
+async function load() {
+  loading.value = true
+  errorMessage.value = ''
+  report.value = null
+  try {
+    report.value = await getReport(Number(props.sessionId))
+  } catch (error: any) {
+    try {
+      report.value = await generateReport(Number(props.sessionId))
+    } catch (generateError: any) {
+      errorMessage.value =
+        generateError?.response?.data?.detail ||
+        error?.response?.data?.detail ||
+        generateError?.message ||
+        '报告尚未生成'
+    }
+  } finally {
+    loading.value = false
+  }
   await nextTick()
   renderChart()
-})
+}
+
+onMounted(load)
 </script>

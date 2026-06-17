@@ -13,8 +13,6 @@
         <el-menu-item index="/athletes">运动员</el-menu-item>
         <el-menu-item index="/sessions/new" :disabled="!auth.isCoach">创建测试</el-menu-item>
         <el-menu-item index="/tasks">测试任务</el-menu-item>
-        <el-menu-item index="/workspace/1001">视觉工作台</el-menu-item>
-        <el-menu-item index="/reports/1001">分析报告</el-menu-item>
       </el-menu>
       <div class="side-footer">
         <div class="mode-badge">{{ demoMode ? 'Demo 数据模式' : '后端 API 模式' }}</div>

@@ -1,7 +1,7 @@
 # vue-auth-session-access Specification
 
 ## Purpose
-定义 `frontend-vue` 的登录注册、会话恢复、角色感知导航和路由访问控制要求。
+定义 `frontend-vue` 的登录注册、会话恢复、角色感知导航、demo 模式认证体验和路由访问控制要求，确保真实后端模式与本地演示模式都有稳定入口。
 
 ## Requirements
 ### Requirement: Vue 登录与注册页面

@@ -16,7 +16,7 @@ class ModelServiceClient:
         url = f"{self.settings.model_service_url.rstrip('/')}/api/v1/analyze"
         try:
             async with httpx.AsyncClient(timeout=self.settings.model_service_timeout_seconds) as client:
-                response = await client.post(url, json=request.model_dump())
+                response = await client.post(url, json=request.model_dump(mode="json"))
                 response.raise_for_status()
         except httpx.HTTPError as exc:
             raise ModelServiceError(f"模型服务调用失败: {exc}") from exc

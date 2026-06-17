@@ -2,6 +2,8 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
+from app.api.routes.sessions import _read_session_video
+from app.api.routes.videos import _read_video
 from app.core.deps import get_current_user
 from app.db.session import get_db
 from app.models import AnalysisResult, AnalysisTask, SessionVideo, TrainingSession, User
@@ -11,6 +13,7 @@ from app.schemas import (
     AnalysisSubmit,
     AnalysisTaskRead,
     ModelAnalysisResult,
+    WorkspaceData,
 )
 from app.services.analysis_service import create_analysis_task, run_analysis_task, save_analysis_result, task_actions
 
@@ -40,6 +43,30 @@ async def submit_analysis(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     background_tasks.add_task(run_analysis_task, task.id)
+    return _read_task(task)
+
+
+@router.get("", response_model=list[AnalysisTaskRead])
+def list_analysis_tasks(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> list[AnalysisTaskRead]:
+    tasks = db.scalars(
+        select(AnalysisTask)
+        .join(AnalysisTask.session)
+        .where(TrainingSession.coach_id == current_user.id)
+        .order_by(AnalysisTask.updated_at.desc())
+    ).all()
+    return [_read_task(task) for task in tasks]
+
+
+@router.get("/{task_id}", response_model=AnalysisTaskRead)
+def get_analysis_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> AnalysisTaskRead:
+    task = _get_owned_task(db, task_id, current_user)
     return _read_task(task)
 
 
@@ -76,6 +103,32 @@ def get_result(
     return AnalysisResultRead.model_validate(result)
 
 
+@router.get("/{task_id}/workspace", response_model=WorkspaceData)
+def get_workspace(
+    task_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> WorkspaceData:
+    task = _get_owned_task(
+        db,
+        task_id,
+        current_user,
+        options=[
+            joinedload(AnalysisTask.result),
+            joinedload(AnalysisTask.session)
+            .joinedload(TrainingSession.videos)
+            .joinedload(SessionVideo.video_file),
+        ],
+    )
+    session_videos = sorted(task.session.videos if task.session else [], key=lambda item: item.created_at)
+    return WorkspaceData(
+        task=_read_task(task),
+        result=AnalysisResultRead.model_validate(task.result) if task.result else None,
+        videos=[_read_video(link.video_file) for link in session_videos if link.video_file],
+        session_videos=[_read_session_video(link) for link in session_videos if link.video_file],
+    )
+
+
 @router.post("/{task_id}/result", response_model=AnalysisResultRead)
 def save_result(
     task_id: int,
@@ -95,8 +148,14 @@ def save_result(
     return AnalysisResultRead.model_validate(result)
 
 
-def _get_owned_task(db: Session, task_id: int, current_user: User) -> AnalysisTask:
-    task = db.get(AnalysisTask, task_id, options=[joinedload(AnalysisTask.session)])
+def _get_owned_task(
+    db: Session,
+    task_id: int,
+    current_user: User,
+    options: list | None = None,
+) -> AnalysisTask:
+    load_options = options or [joinedload(AnalysisTask.session)]
+    task = db.get(AnalysisTask, task_id, options=load_options)
     if not task or not task.session or task.session.coach_id != current_user.id:
         raise HTTPException(status_code=404, detail="任务不存在")
     return task

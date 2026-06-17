@@ -34,10 +34,10 @@ def generate_report(
     report = db.scalar(select(ReportMetadata).where(ReportMetadata.session_id == session.id))
     if report:
         report.task_id = task.id
-        report.source = "model_service"
+        report.source = "model_service_mock"
         report.report_data = report_data
     else:
-        report = ReportMetadata(session_id=session.id, task_id=task.id, source="model_service", report_data=report_data)
+        report = ReportMetadata(session_id=session.id, task_id=task.id, source="model_service_mock", report_data=report_data)
 
     db.add(report)
     db.commit()

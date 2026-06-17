@@ -164,13 +164,13 @@ def save_analysis_result(db: Session, task: AnalysisTask, result: ModelAnalysisR
     report_data = build_report_data(task, analysis_result)
     if report:
         report.task_id = task.id
-        report.source = "model_service"
+        report.source = "model_service_mock"
         report.report_data = report_data
     else:
         report = ReportMetadata(
             session_id=task.session_id,
             task_id=task.id,
-            source="model_service",
+            source="model_service_mock",
             report_data=report_data,
         )
     db.add(report)

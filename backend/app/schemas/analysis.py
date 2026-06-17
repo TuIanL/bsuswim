@@ -4,7 +4,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict
 
 from app.models import AnalysisTaskStatus, StrokeType
-from app.schemas.video import VideoFileRead
+from app.schemas.video import SessionVideoRead, VideoFileRead
 
 
 class AnalysisSubmit(BaseModel):
@@ -104,3 +104,4 @@ class WorkspaceData(BaseModel):
     task: AnalysisTaskRead
     result: AnalysisResultRead | None
     videos: list[VideoFileRead] = []
+    session_videos: list[SessionVideoRead] = []

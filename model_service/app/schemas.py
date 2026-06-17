@@ -3,11 +3,40 @@ from typing import Any, Literal
 from pydantic import BaseModel
 
 
+class VideoInput(BaseModel):
+    video_file_id: int
+    view_type: str
+    video_url: str
+    video_path: str
+    fps: float | None = None
+    resolution: str | None = None
+    sync_offset_ms: int = 0
+
+
+class AthleteInput(BaseModel):
+    id: int
+    name: str
+    gender: str | None = None
+    level: str | None = None
+
+
+class SessionInput(BaseModel):
+    id: int
+    title: str
+    stroke_type: str
+    distance_m: int | None = None
+    pool_length_m: float | None = None
+    session_date: str | None = None
+
+
 class AnalysisRequest(BaseModel):
     task_id: int
-    video_path: str
-    video_url: str
-    metadata: dict[str, Any]
+    session_id: int
+    athlete: AthleteInput
+    session: SessionInput
+    videos: list[VideoInput]
+    callback_url: str | None = None
+    schema_version: str = "analysis.request.v1"
 
 
 class AnalysisResponse(BaseModel):

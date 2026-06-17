@@ -7,7 +7,7 @@
       </div>
       <div class="action-row">
         <el-button @click="$router.push('/tasks')">任务管理</el-button>
-        <el-button type="primary" :disabled="!hasSuccessVideo" @click="submitAnalysis">提交分析</el-button>
+        <el-button type="primary" :loading="submitting" :disabled="!hasSuccessVideo" @click="submitAnalysis">提交分析</el-button>
       </div>
     </div>
 
@@ -75,7 +75,7 @@
       <div class="section">
         <div class="action-row">
           <el-button @click="saveDraft">保存草稿</el-button>
-          <el-button type="primary" :disabled="!hasSuccessVideo" @click="submitAnalysis">提交分析</el-button>
+          <el-button type="primary" :loading="submitting" :disabled="!hasSuccessVideo" @click="submitAnalysis">提交分析</el-button>
           <span class="muted-text">至少成功绑定一个机位视频后可提交分析。</span>
         </div>
       </div>
@@ -85,9 +85,10 @@
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import type { UploadFile } from 'element-plus'
 import { ElMessage } from 'element-plus'
-import { bindUploadedSessionVideo, getAthlete, getSession, listSessionVideos, uploadVideo } from '../services/api'
+import { bindUploadedSessionVideo, getAthlete, getSession, listSessionVideos, submitAnalysis as submitBackendAnalysis, uploadVideo } from '../services/api'
 import type { Athlete, BackendSessionVideoView, SessionVideoView, TrainingSession, UploadStatus } from '../types'
 
 type CameraState = {
@@ -105,7 +106,9 @@ type CameraState = {
 }
 
 const props = defineProps<{ sessionId: string }>()
+const router = useRouter()
 const loading = ref(true)
+const submitting = ref(false)
 const session = ref<TrainingSession | null>(null)
 const athlete = ref<Athlete | null>(null)
 const cameras = reactive<CameraState[]>([
@@ -182,12 +185,22 @@ function saveDraft() {
   ElMessage.success('草稿已保存')
 }
 
-function submitAnalysis() {
+async function submitAnalysis() {
   if (!hasSuccessVideo.value) {
     ElMessage.warning('请至少绑定一个机位视频')
     return
   }
-  ElMessage.info('视频已准备好，后端分析提交入口将在下一阶段接入')
+  if (!session.value) return
+  submitting.value = true
+  try {
+    const task = await submitBackendAnalysis(session.value.id)
+    ElMessage.success('分析任务已提交')
+    router.push(`/workspace/${task.id}`)
+  } catch (error: any) {
+    ElMessage.error(error?.response?.data?.detail || error?.message || '提交分析失败')
+  } finally {
+    submitting.value = false
+  }
 }
 
 function formatSize(bytes: number) {

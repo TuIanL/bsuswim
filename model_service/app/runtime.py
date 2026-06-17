@@ -5,15 +5,36 @@ class SwimModelRuntime:
     """Runtime boundary for future YOLO/MMPose inference."""
 
     def analyze(self, request: AnalysisRequest) -> AnalysisResponse:
+        primary_video = request.videos[0] if request.videos else None
+        view_type = primary_video.view_type if primary_video else "unknown"
         return AnalysisResponse(
             detections=[
-                {"time": 0.0, "bbox": [0.18, 0.36, 0.34, 0.18], "label": "swimmer", "confidence": 0.93},
-                {"time": 1.5, "bbox": [0.28, 0.34, 0.35, 0.2], "label": "swimmer", "confidence": 0.91},
-                {"time": 3.0, "bbox": [0.42, 0.35, 0.33, 0.19], "label": "swimmer", "confidence": 0.9},
+                {
+                    "time": 0.0,
+                    "bbox": [0.18, 0.36, 0.34, 0.18],
+                    "label": "swimmer",
+                    "confidence": 0.93,
+                    "view_type": view_type,
+                },
+                {
+                    "time": 1.5,
+                    "bbox": [0.28, 0.34, 0.35, 0.2],
+                    "label": "swimmer",
+                    "confidence": 0.91,
+                    "view_type": view_type,
+                },
+                {
+                    "time": 3.0,
+                    "bbox": [0.42, 0.35, 0.33, 0.19],
+                    "label": "swimmer",
+                    "confidence": 0.9,
+                    "view_type": view_type,
+                },
             ],
             keypoint_frames=[
                 {
                     "time": 0.0,
+                    "video_file_id": primary_video.video_file_id if primary_video else None,
                     "points": [
                         {"name": "head", "x": 0.28, "y": 0.39, "score": 0.92},
                         {"name": "shoulder", "x": 0.36, "y": 0.43, "score": 0.9},
@@ -23,6 +44,7 @@ class SwimModelRuntime:
                 },
                 {
                     "time": 1.5,
+                    "video_file_id": primary_video.video_file_id if primary_video else None,
                     "points": [
                         {"name": "head", "x": 0.38, "y": 0.38, "score": 0.91},
                         {"name": "shoulder", "x": 0.45, "y": 0.43, "score": 0.9},
@@ -45,6 +67,7 @@ class SwimModelRuntime:
                 "stroke_rate": 34,
                 "body_angle_stability": 82,
                 "breathing_timing": 79,
+                "video_count": len(request.videos),
             },
             diagnostics=[
                 {
@@ -64,4 +87,5 @@ class SwimModelRuntime:
                     "priority": 2,
                 },
             ],
+            error_message=None,
         )
