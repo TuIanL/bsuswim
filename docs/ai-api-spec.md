@@ -254,3 +254,35 @@ Content-Type: application/json
 - HTML 报告渲染
 
 接入真实 YOLO / MMPose 时，优先保持这份接口规范不变，只替换 runtime 内部实现。
+
+## 10. NormalizedAnnotation — 标准化标注输入层
+
+### 概述
+
+`NormalizedAnnotation`（`swim-annotation.v1`）是业务后端与模型服务之间的**稳定观测输入格式**。它统一了 Kinovea 人工标注、Dartfish、AI 姿态识别和人工 JSON 补录等多种来源的标注数据，作为下游 metrics engine 和 diagnostics engine 的唯一输入。
+
+### 在整体架构中的位置
+
+```text
+annotation_files (原始文件)
+  → parse / create
+    → NormalizedAnnotation (标准化观测输入)  ← 本文档定义
+      → Metrics Engine (未来)
+        → Diagnostics Engine (未来)
+          → analysis_results (计算结果)
+            → report_metadata
+```
+
+### 关键原则
+
+- NormalizedAnnotation **只描述观测事实**（在哪个帧、哪个关节、什么位置），不包含计算结论
+- `analysis_results` **只存储计算结果**（角度、划频、SWOLF、诊断），不重复存储观测数据
+- 不同来源（Kinovea / AI / manual）的输出只要转换为 `swim-annotation.v1` schema，即可复用后续整条分析链路
+
+### 当前实现状态
+
+- 表：`normalized_annotations`（关联 `session_videos`）
+- API：`POST /api/v1/session-videos/{id}/normalized-annotations`（JSON 创建）
+- API：`POST /api/v1/annotations/{id}/parse`（从 annotation_file 解析，MVP 仅支持 JSON 文件）
+- 示例文件：`backend/samples/side-view-freestyle-v1.json`
+- Kinovea CSV parser 计划在后续独立 change 中实现

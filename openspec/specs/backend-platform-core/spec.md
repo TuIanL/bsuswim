@@ -148,3 +148,67 @@ TBD - created by archiving change refactor-backend-platform-core-postgres. Updat
 - **WHEN** 分析结果已保存但报告生成失败
 - **THEN** 系统 MUST 保留任务完成或失败状态的一致性，并返回可读错误用于前端展示或重试生成报告
 
+### Requirement: Annotation file persistence APIs
+业务后端 SHALL 扩展核心 API，支持标注文件的上传、查询、下载和归档操作。
+
+#### Scenario: Annotation upload endpoint registered
+- **WHEN** 后端应用启动
+- **THEN** 系统 MUST 注册 `POST /api/v1/sessions/{session_id}/videos/{video_id}/annotations` 端点，接受 multipart/form-data 格式的标注文件上传
+
+#### Scenario: Annotation list endpoint registered
+- **WHEN** 后端应用启动
+- **THEN** 系统 MUST 注册 `GET /api/v1/sessions/{session_id}/videos/{video_id}/annotations` 端点
+
+#### Scenario: Annotation detail endpoint registered
+- **WHEN** 后端应用启动
+- **THEN** 系统 MUST 注册 `GET /api/v1/annotations/{annotation_file_id}` 端点，并纳入 API router
+
+#### Scenario: Annotation download endpoint registered
+- **WHEN** 后端应用启动
+- **THEN** 系统 MUST 注册 `GET /api/v1/annotations/{annotation_file_id}/download` 端点
+
+#### Scenario: Annotation archive endpoint registered
+- **WHEN** 后端应用启动
+- **THEN** 系统 MUST 注册 `POST /api/v1/annotations/{annotation_file_id}/archive` 端点
+
+### Requirement: Annotation file database schema
+业务后端 SHALL 新增 `annotation_files` 表并通过 Alembic 管理其 schema 演进。
+
+#### Scenario: Annotation files table created
+- **WHEN** 开发者对数据库执行 annotation file migration
+- **THEN** 系统 MUST 创建 `annotation_files` 表，包含 `session_video_id` 外键引用 `session_videos.id`、`source` 和 `status` 的 PostgreSQL ENUM 约束、以及 `session_video_id + source + version` 唯一约束
+
+#### Scenario: Existing platform tables unaffected
+- **WHEN** 执行 annotation file migration
+- **THEN** 系统 MUST 不修改现有 `training_sessions`、`video_files`、`session_videos`、`analysis_tasks`、`analysis_results`、`report_metadata` 表结构
+
+### Requirement: Normalized annotation API endpoints
+业务后端 SHALL 扩展核心 API，注册标准化标注的创建、查询和列表端点。
+
+#### Scenario: Create normalized annotation endpoint registered
+- **WHEN** 后端应用启动
+- **THEN** 系统 MUST 注册 `POST /api/v1/session-videos/{session_video_id}/normalized-annotations` 端点
+
+#### Scenario: Parse annotation file endpoint registered
+- **WHEN** 后端应用启动
+- **THEN** 系统 MUST 注册 `POST /api/v1/annotations/{annotation_file_id}/parse` 端点
+
+#### Scenario: Get normalized annotation endpoint registered
+- **WHEN** 后端应用启动
+- **THEN** 系统 MUST 注册 `GET /api/v1/normalized-annotations/{normalized_annotation_id}` 端点
+
+#### Scenario: List normalized annotations endpoint registered
+- **WHEN** 后端应用启动
+- **THEN** 系统 MUST 注册 `GET /api/v1/session-videos/{session_video_id}/normalized-annotations` 端点
+
+### Requirement: Normalized annotations database schema
+业务后端 SHALL 新增 `normalized_annotations` 表并通过 Alembic 管理 schema 演进。
+
+#### Scenario: Normalized annotations table created
+- **WHEN** 开发者对数据库执行 normalized annotation migration
+- **THEN** 系统 MUST 创建 `normalized_annotations` 表，包含 `session_video_id` 外键引用 `session_videos.id`、`annotation_file_id` 可空外键引用 `annotation_files.id` 及 UNIQUE 约束、`revision` 字段默认值 1、以及 events/keypoint_frames/trajectories/manual_tags/scale/coordinate_system/quality 的 JSONB 列
+
+#### Scenario: Existing platform tables unaffected
+- **WHEN** 执行 normalized annotation migration
+- **THEN** 系统 MUST 不修改 `analysis_results`、`report_metadata` 等现有表结构
+

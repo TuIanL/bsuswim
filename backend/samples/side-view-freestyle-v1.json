@@ -1,0 +1,119 @@
+{
+  "schema_version": "swim-annotation.v1",
+  "source": "manual_json",
+  "fps": 60,
+  "frame_count": 5400,
+  "duration_sec": 90.0,
+  "video": {
+    "fps": 60,
+    "frame_count": 5400,
+    "duration_sec": 90.0,
+    "width": 1920,
+    "height": 1080
+  },
+  "scale": {
+    "method": "lane_marker",
+    "pixels_per_meter": 840.5,
+    "reference_length_m": 5.0,
+    "reference_points": [[100, 820], [4302, 820]],
+    "confidence": 0.95,
+    "note": "使用泳道线 5m 标记估算"
+  },
+  "coordinate_system": {
+    "origin": "top_left",
+    "x_axis": "right",
+    "y_axis": "down",
+    "unit": "pixel"
+  },
+  "events": [
+    {
+      "name": "cycle_start",
+      "label": "划水周期开始",
+      "frame": 100,
+      "time_sec": 1.67,
+      "side": "right",
+      "confidence": 1.0,
+      "labeled_by": "manual"
+    },
+    {
+      "name": "hand_entry",
+      "label": "入水",
+      "frame": 120,
+      "time_sec": 2.0,
+      "side": "right",
+      "confidence": 1.0,
+      "labeled_by": "manual"
+    },
+    {
+      "name": "catch_start",
+      "label": "抱水开始",
+      "frame": 145,
+      "time_sec": 2.42,
+      "side": "right",
+      "confidence": 1.0,
+      "labeled_by": "manual"
+    },
+    {
+      "name": "pull_end",
+      "label": "推水结束",
+      "frame": 180,
+      "time_sec": 3.0,
+      "side": "right",
+      "confidence": 1.0,
+      "labeled_by": "manual"
+    },
+    {
+      "name": "cycle_end",
+      "label": "划水周期结束",
+      "frame": 210,
+      "time_sec": 3.5,
+      "side": "right",
+      "confidence": 1.0,
+      "labeled_by": "manual"
+    }
+  ],
+  "keypoint_frames": [
+    {
+      "frame": 120,
+      "time_sec": 2.0,
+      "phase": "hand_entry",
+      "points": {
+        "right_shoulder": {"x": 512, "y": 240, "confidence": 1.0, "visibility": "visible"},
+        "right_elbow": {"x": 590, "y": 260, "confidence": 1.0, "visibility": "visible"},
+        "right_wrist": {"x": 675, "y": 275, "confidence": 1.0, "visibility": "visible"},
+        "right_hip": {"x": 430, "y": 310, "confidence": 1.0, "visibility": "visible"},
+        "right_knee": {"x": 510, "y": 350, "confidence": 1.0, "visibility": "visible"},
+        "right_ankle": {"x": 610, "y": 370, "confidence": 1.0, "visibility": "visible"}
+      },
+      "tags": ["front_arm_drop"]
+    }
+  ],
+  "trajectories": [
+    {
+      "name": "right_wrist_path",
+      "label": "右手腕轨迹",
+      "point": "right_wrist",
+      "frames": [120, 130, 140, 150, 160, 170, 180],
+      "points": [[675, 275], [660, 290], [640, 315], [610, 350], [575, 385], [540, 410], [500, 420]],
+      "source": "manual"
+    }
+  ],
+  "manual_tags": [
+    {
+      "code": "front_arm_drop",
+      "label": "前臂下压",
+      "severity": "medium",
+      "phase": "hand_entry",
+      "frame_range": [120, 160],
+      "comment": "入水后前臂持续下压，前伸支撑不足"
+    },
+    {
+      "code": "low_elbow_catch",
+      "label": "高肘不足",
+      "severity": "high",
+      "phase": "catch",
+      "frame_range": [145, 180],
+      "comment": "抱水阶段肘角偏大，有效迎水面积不足"
+    }
+  ]
+}

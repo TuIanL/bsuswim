@@ -80,3 +80,4 @@ class AnnotationFile(Base):
     )
 
     session_video = relationship("SessionVideo", back_populates="annotations")
+    normalized_annotation = relationship("NormalizedAnnotation", back_populates="annotation_file", uselist=False)
