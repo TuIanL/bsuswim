@@ -7,6 +7,13 @@ from app.schemas.analysis import (
     ModelAnalysisResult,
     WorkspaceData,
 )
+from app.schemas.annotation import (
+    AnnotationFileArchiveResponse,
+    AnnotationFileCreate,
+    AnnotationFileDetail,
+    AnnotationFileListItem,
+    AnnotationFileRead,
+)
 from app.schemas.athlete import AthleteCreate, AthleteRead
 from app.schemas.auth import Token, UserRegister
 from app.schemas.report import ReportData, ReportGenerate
@@ -19,6 +26,11 @@ __all__ = [
     "AnalysisStatusRead",
     "AnalysisSubmit",
     "AnalysisTaskRead",
+    "AnnotationFileArchiveResponse",
+    "AnnotationFileCreate",
+    "AnnotationFileDetail",
+    "AnnotationFileListItem",
+    "AnnotationFileRead",
     "AthleteCreate",
     "AthleteRead",
     "ModelAnalysisRequest",

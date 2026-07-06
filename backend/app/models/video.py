@@ -45,3 +45,4 @@ class SessionVideo(Base):
 
     session = relationship("TrainingSession", back_populates="videos")
     video_file = relationship("VideoFile", back_populates="session_links")
+    annotations = relationship("AnnotationFile", back_populates="session_video", cascade="all, delete-orphan")

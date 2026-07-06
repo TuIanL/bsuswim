@@ -69,6 +69,68 @@
           >
             {{ camera.status === 'failed' ? '重试上传' : '上传并绑定' }}
           </el-button>
+
+          <!-- 标注文件区域：仅视频已绑定后显示 -->
+          <div v-if="camera.status === 'success' && camera.sessionVideoId" class="annotation-section">
+            <el-divider />
+            <h4>标注文件</h4>
+
+            <div v-if="camera.annotations.length" class="annotation-list">
+              <div v-for="ann in camera.annotations" :key="ann.id" class="annotation-item">
+                <div class="annotation-info">
+                  <span class="ann-filename">{{ ann.original_filename }}</span>
+                  <span class="ann-meta">
+                    {{ sourceLabel(ann.source) }} · v{{ ann.version }}
+                  </span>
+                </div>
+                <div class="annotation-actions">
+                  <el-tag :type="ann.status === 'uploaded' ? 'info' : ann.status === 'parsed' ? 'success' : ann.status === 'archived' ? 'warning' : 'danger'" size="small">
+                    {{ annotationStatusLabel(ann.status) }}
+                  </el-tag>
+                  <el-button size="small" text @click="downloadAnnotation(ann.id)">下载</el-button>
+                  <el-button v-if="ann.status !== 'archived'" size="small" text type="warning" @click="archiveAnnotationFile(ann.id, camera.view)">归档</el-button>
+                </div>
+              </div>
+            </div>
+            <el-empty v-else description="暂无标注文件" :image-size="40" />
+
+            <div class="annotation-upload-row">
+              <el-select v-model="camera.annotationSource" size="small" class="source-select">
+                <el-option label="Kinovea" value="kinovea" />
+                <el-option label="Dartfish" value="dartfish" />
+                <el-option label="Manual JSON" value="manual_json" />
+                <el-option label="AI Pose" value="ai_pose" />
+              </el-select>
+              <el-input-number
+                v-model="camera.annotationFps"
+                size="small"
+                :min="1"
+                :max="240"
+                placeholder="FPS"
+                class="fps-input"
+              />
+              <el-upload
+                :auto-upload="false"
+                :limit="1"
+                :show-file-list="false"
+                accept=".csv,.json,.xml,.txt,.kva"
+                :on-change="makeAnnotationFileHandler(camera.view)"
+              >
+                <el-button size="small" type="primary" plain :loading="camera.annotationUploading" :disabled="!camera.annotationFile">
+                  {{ camera.annotationFileName || '选择标注文件' }}
+                </el-button>
+              </el-upload>
+              <el-button
+                size="small"
+                type="primary"
+                :loading="camera.annotationUploading"
+                :disabled="!camera.annotationFile"
+                @click="uploadAnnotationFile(camera.view)"
+              >
+                上传标注
+              </el-button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -88,8 +150,8 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { UploadFile } from 'element-plus'
 import { ElMessage } from 'element-plus'
-import { bindUploadedSessionVideo, getAthlete, getSession, listSessionVideos, submitAnalysis as submitBackendAnalysis, uploadVideo } from '../services/api'
-import type { Athlete, BackendSessionVideoView, SessionVideoView, TrainingSession, UploadStatus } from '../types'
+import { archiveAnnotation, bindUploadedSessionVideo, downloadAnnotationUrl, getAthlete, getSession, listAnnotations, listSessionVideos, submitAnalysis as submitBackendAnalysis, uploadAnnotation, uploadVideo } from '../services/api'
+import type { AnnotationFileListItem, Athlete, BackendSessionVideoView, SessionVideoView, TrainingSession, UploadStatus } from '../types'
 
 type CameraState = {
   view: SessionVideoView
@@ -103,6 +165,14 @@ type CameraState = {
   syncOffsetMs: number
   fps?: number
   resolution: string
+  sessionVideoId: number | null
+  videoFileId: number | null
+  annotations: AnnotationFileListItem[]
+  annotationFile: File | null
+  annotationFileName: string
+  annotationSource: string
+  annotationFps: number | undefined
+  annotationUploading: boolean
 }
 
 const props = defineProps<{ sessionId: string }>()
@@ -111,12 +181,23 @@ const loading = ref(true)
 const submitting = ref(false)
 const session = ref<TrainingSession | null>(null)
 const athlete = ref<Athlete | null>(null)
+function makeCamera(view: SessionVideoView, backendView: BackendSessionVideoView, label: string, description: string): CameraState {
+  return {
+    view, backendView, label, description,
+    file: null, fileName: '', fileSize: 0, status: 'pending' as UploadStatus,
+    syncOffsetMs: 0, fps: 60, resolution: '1920x1080',
+    sessionVideoId: null, videoFileId: null,
+    annotations: [],
+    annotationFile: null, annotationFileName: '', annotationSource: 'kinovea', annotationFps: 60, annotationUploading: false
+  }
+}
+
 const cameras = reactive<CameraState[]>([
-  { view: 'side', backendView: 'side', label: '侧面机位', description: '观察身体水平度、划水路径', file: null, fileName: '', fileSize: 0, status: 'pending', syncOffsetMs: 0, fps: 60, resolution: '1920x1080' },
-  { view: 'front', backendView: 'front', label: '正面机位', description: '观察身体中线与左右对称', file: null, fileName: '', fileSize: 0, status: 'pending', syncOffsetMs: 0, fps: 60, resolution: '1920x1080' },
-  { view: 'top', backendView: 'top', label: '俯视机位', description: '观察路线偏移与入水角度', file: null, fileName: '', fileSize: 0, status: 'pending', syncOffsetMs: 0, fps: 60, resolution: '1920x1080' },
-  { view: 'underwater', backendView: 'underwater', label: '水下机位', description: '观察抱水、推水和打腿', file: null, fileName: '', fileSize: 0, status: 'pending', syncOffsetMs: 0, fps: 60, resolution: '1920x1080' },
-  { view: 'semi_underwater', backendView: 'other', label: '半水下机位', description: '预留水面交界视角', file: null, fileName: '', fileSize: 0, status: 'pending', syncOffsetMs: 0, fps: 60, resolution: '1920x1080' }
+  makeCamera('side', 'side', '侧面机位', '观察身体水平度、划水路径'),
+  makeCamera('front', 'front', '正面机位', '观察身体中线与左右对称'),
+  makeCamera('top', 'top', '俯视机位', '观察路线偏移与入水角度'),
+  makeCamera('underwater', 'underwater', '水下机位', '观察抱水、推水和打腿'),
+  makeCamera('semi_underwater', 'other', '半水下机位', '预留水面交界视角')
 ])
 
 const hasSuccessVideo = computed(() => cameras.some((item) => item.status === 'success'))
@@ -138,8 +219,16 @@ async function load() {
           camera.syncOffsetMs = video.sync_offset_ms
           camera.fps = video.fps || camera.fps
           camera.resolution = video.resolution || camera.resolution
+          camera.sessionVideoId = video.id
+          camera.videoFileId = video.video_file_id
         }
       })
+      // 加载已有标注
+      for (const camera of cameras) {
+        if (camera.status === 'success' && camera.videoFileId) {
+          await loadAnnotations(camera.view)
+        }
+      }
     }
   } finally {
     loading.value = false
@@ -174,10 +263,69 @@ async function uploadCamera(view: SessionVideoView) {
     camera.status = 'success'
     camera.fileName = link.video.original_filename
     camera.fileSize = link.video.size_bytes
+    camera.sessionVideoId = link.id
+    camera.videoFileId = link.video_file_id
     ElMessage.success(`${camera.label}已绑定`)
+    await loadAnnotations(view)
   } catch (error: any) {
     camera.status = 'failed'
     ElMessage.error(error?.response?.data?.detail || error?.message || '上传失败')
+  }
+}
+
+async function loadAnnotations(view: SessionVideoView) {
+  const camera = cameras.find((item) => item.view === view)
+  if (!camera || !session.value || !camera.videoFileId) return
+  try {
+    camera.annotations = await listAnnotations(session.value.id, camera.videoFileId)
+  } catch {
+    // 静默失败
+  }
+}
+
+function makeAnnotationFileHandler(view: SessionVideoView) {
+  return (file: UploadFile) => {
+    const camera = cameras.find((item) => item.view === view)
+    if (!camera) return
+    camera.annotationFile = file.raw || null
+    camera.annotationFileName = file.name
+  }
+}
+
+async function uploadAnnotationFile(view: SessionVideoView) {
+  const camera = cameras.find((item) => item.view === view)
+  if (!camera?.annotationFile || !session.value || !camera.videoFileId) return
+  camera.annotationUploading = true
+  try {
+    await uploadAnnotation(
+      session.value.id,
+      camera.videoFileId,
+      camera.annotationFile,
+      camera.annotationSource,
+      camera.annotationFps || null
+    )
+    camera.annotationFile = null
+    camera.annotationFileName = ''
+    ElMessage.success('标注文件已上传')
+    await loadAnnotations(view)
+  } catch (error: any) {
+    ElMessage.error(error?.response?.data?.detail || error?.message || '标注上传失败')
+  } finally {
+    camera.annotationUploading = false
+  }
+}
+
+function downloadAnnotation(annotationId: number) {
+  window.open(downloadAnnotationUrl(annotationId), '_blank')
+}
+
+async function archiveAnnotationFile(annotationId: number, view: SessionVideoView) {
+  try {
+    await archiveAnnotation(annotationId)
+    ElMessage.success('标注文件已归档')
+    await loadAnnotations(view)
+  } catch (error: any) {
+    ElMessage.error(error?.response?.data?.detail || error?.message || '归档失败')
   }
 }
 
@@ -223,6 +371,14 @@ function statusText(value: UploadStatus) {
 
 function tagType(value: UploadStatus) {
   return { pending: 'info', uploading: 'warning', success: 'success', failed: 'danger' }[value]
+}
+
+function sourceLabel(value: string) {
+  return { kinovea: 'Kinovea', dartfish: 'Dartfish', manual_json: '手动 JSON', ai_pose: 'AI 姿态', unknown: '未知' }[value] || value
+}
+
+function annotationStatusLabel(value: string) {
+  return { uploaded: '待解析', parsed: '已解析', parse_failed: '解析失败', archived: '已归档' }[value] || value
 }
 
 onMounted(load)

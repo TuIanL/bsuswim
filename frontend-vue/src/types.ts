@@ -212,3 +212,61 @@ export interface ReportData {
   generated_at: string
   report: Record<string, any>
 }
+
+// ---- annotation file types ----
+
+export type AnnotationSource = 'kinovea' | 'dartfish' | 'manual_json' | 'ai_pose' | 'unknown'
+
+export type AnnotationFileStatus = 'uploaded' | 'parsed' | 'parse_failed' | 'archived'
+
+export interface AnnotationFileListItem {
+  id: number
+  session_video_id: number
+  source: AnnotationSource
+  view_type: BackendSessionVideoView | null
+  file_type: string | null
+  version: number
+  status: AnnotationFileStatus
+  original_filename: string
+  annotation_fps: number | null
+  uploaded_at: string | null
+}
+
+export interface AnnotationFileDetail {
+  id: number
+  session_video_id: number
+  session_id: number | null
+  video_file_id: number | null
+  view_type: BackendSessionVideoView | null
+  source: AnnotationSource
+  original_filename: string
+  stored_filename: string
+  storage_path: string
+  file_type: string | null
+  file_size_bytes: number | null
+  checksum_sha256: string | null
+  annotation_fps: number | null
+  frame_count: number | null
+  duration_sec: number | null
+  version: number
+  status: AnnotationFileStatus
+  parse_error: string | null
+  metadata: Record<string, any>
+  uploaded_by: number | null
+  uploaded_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AnnotationUploadResponse {
+  annotation_file_id: number
+  session_video_id: number
+  session_id: number
+  video_file_id: number
+  view_type: string
+  source: AnnotationSource
+  version: number
+  status: AnnotationFileStatus
+  original_filename: string
+  uploaded_at: string | null
+}

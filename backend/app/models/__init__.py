@@ -1,4 +1,5 @@
 from app.models.analysis import AnalysisResult, AnalysisTask, AnalysisTaskStatus
+from app.models.annotation import AnnotationFile, AnnotationFileStatus, AnnotationSource
 from app.models.athlete import Athlete
 from app.models.report import ReportMetadata
 from app.models.team import Team
@@ -10,6 +11,9 @@ __all__ = [
     "AnalysisResult",
     "AnalysisTask",
     "AnalysisTaskStatus",
+    "AnnotationFile",
+    "AnnotationFileStatus",
+    "AnnotationSource",
     "Athlete",
     "ReportMetadata",
     "SessionVideo",

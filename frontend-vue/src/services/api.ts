@@ -268,6 +268,64 @@ export async function getReport(sessionId: number): Promise<ReportData> {
   return response.data
 }
 
+// ---- annotation file APIs ----
+
+import type {
+  AnnotationFileDetail,
+  AnnotationFileListItem,
+  AnnotationUploadResponse
+} from '../types'
+
+export async function uploadAnnotation(
+  sessionId: number,
+  videoId: number,
+  file: File,
+  source: string = 'kinovea',
+  annotationFps?: number | null,
+  metadata?: Record<string, any> | null
+): Promise<AnnotationUploadResponse> {
+  const form = new FormData()
+  form.append('file', file)
+  form.append('source', source)
+  if (annotationFps != null) form.append('annotation_fps', String(annotationFps))
+  if (metadata) form.append('metadata', JSON.stringify(metadata))
+  const response = await client.post<AnnotationUploadResponse>(
+    `/sessions/${sessionId}/videos/${videoId}/annotations`,
+    form
+  )
+  return response.data
+}
+
+export async function listAnnotations(
+  sessionId: number,
+  videoId: number
+): Promise<AnnotationFileListItem[]> {
+  const response = await client.get<AnnotationFileListItem[]>(
+    `/sessions/${sessionId}/videos/${videoId}/annotations`
+  )
+  return response.data
+}
+
+export async function getAnnotationDetail(
+  annotationId: number
+): Promise<AnnotationFileDetail> {
+  const response = await client.get<AnnotationFileDetail>(`/annotations/${annotationId}`)
+  return response.data
+}
+
+export async function downloadAnnotationUrl(annotationId: number): string {
+  return `${apiBaseUrl}/api/v1/annotations/${annotationId}/download`
+}
+
+export async function archiveAnnotation(
+  annotationId: number
+): Promise<{ id: number; status: string }> {
+  const response = await client.post<{ id: number; status: string }>(
+    `/annotations/${annotationId}/archive`
+  )
+  return response.data
+}
+
 export function resolveMediaUrl(path?: string): string {
   if (!path) return ''
   if (path.startsWith('http')) return path
