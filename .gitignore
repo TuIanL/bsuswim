@@ -18,4 +18,4 @@ frontend-vue/.env*.local
 uploads/*
 !uploads/.gitkeep
 backend/.env
-model_service/.env
+model_service/.env.web-dev.log
