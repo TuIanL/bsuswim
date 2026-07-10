@@ -12,6 +12,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     func,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -72,7 +73,7 @@ class AnnotationFile(Base):
     uploaded_by: Mapped[int | None] = mapped_column(Integer, ForeignKey("users.id"))
     uploaded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    annotation_metadata: Mapped[dict] = mapped_column("metadata", JSONB, default=dict, server_default=func.text("'{}'::jsonb"))
+    annotation_metadata: Mapped[dict] = mapped_column("metadata", JSONB, default=dict, server_default=text("'{}'::jsonb"))
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

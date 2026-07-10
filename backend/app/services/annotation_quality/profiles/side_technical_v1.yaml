@@ -1,0 +1,72 @@
+id: side_technical_v1
+version: "1.0.0"
+
+global_gate:
+  minimum_ready_core_modules: 2
+
+modules:
+  overview:
+    core: true
+    required_metrics:
+      - stroke_rate_spm
+      - stroke_length_m
+    minimum_ready_core_modules: 3
+
+  body_position:
+    core: true
+    required_landmarks:
+      - shoulder
+      - hip
+      - ankle
+    minimum_landmark_coverage: 0.80
+    minimum_sample_frames: 3
+
+  arm_entry:
+    core: true
+    required_events:
+      - hand_entry
+    required_landmarks:
+      - shoulder
+      - elbow
+      - wrist
+    minimum_event_count: 2
+
+  catch_pull:
+    core: true
+    required_events:
+      - catch_start
+      - pull_end
+    required_landmarks:
+      - shoulder
+      - elbow
+      - wrist
+    minimum_complete_cycles: 2
+
+  leg_kick:
+    core: false
+    required_landmarks:
+      - hip
+      - knee
+      - ankle
+    minimum_landmark_coverage: 0.80
+    minimum_sample_frames: 3
+
+  efficiency:
+    core: false
+    required_references:
+      - scale
+    required_metrics:
+      - stroke_rate_spm
+      - stroke_length_m
+
+event_sequences:
+  freestyle_arm_cycle:
+    partition_by: side
+    cycle_boundary: hand_entry
+    order:
+      - hand_entry
+      - catch_start
+      - pull_end
+      - hand_exit
+    optional:
+      - recovery_peak

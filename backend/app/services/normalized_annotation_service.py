@@ -13,18 +13,27 @@ from app.schemas.normalized_annotation import (
     NormalizedAnnotationCreate,
     ParseSummary,
 )
+from app.services.annotation_quality.legacy import normalize_quality_payload
+from app.services.annotation_quality.validator import AnnotationQualityValidator
+from app.services.annotation_quality.provider import YamlQualityProfileProvider
 from app.services.parsers import (
     KinoveaParseError,
     build_parse_summary,
     parse_kinovea_annotation,
 )
-from app.services.quality_checker import evaluate_quality
+
+import os
+
+
+def _get_validator() -> AnnotationQualityValidator:
+    profiles_dir = os.path.join(os.path.dirname(__file__), "annotation_quality", "profiles")
+    provider = YamlQualityProfileProvider(profiles_dir)
+    return AnnotationQualityValidator(profile_provider=provider)
 
 
 def update_annotation_file_status(
     db: Session, annotation_file: AnnotationFile, success: bool, error_message: str | None = None
 ) -> None:
-    """联动更新 annotation_files.status：成功 → parsed，失败 → parse_failed + parse_error。"""
     if success:
         annotation_file.status = AnnotationFileStatus.PARSED
         annotation_file.parse_error = None
@@ -42,14 +51,20 @@ def create_normalized_annotation(
     data: NormalizedAnnotationCreate,
     created_by: int,
 ) -> NormalizedAnnotation:
-    """从 JSON 数据创建标准化标注记录。"""
-    quality = evaluate_quality(
-        fps=data.fps,
+    validator = _get_validator()
+    session_video = db.get(type(data), session_video_id) if hasattr(data, 'id') else None
+    video_fps = float(session_video.fps) if session_video and hasattr(session_video, 'fps') and session_video.fps else None
+    quality_report = validator.validate(
         events=[e.model_dump() for e in data.events],
         keypoint_frames=[k.model_dump() for k in data.keypoint_frames],
         scale=data.scale.model_dump() if data.scale else None,
+        fps=data.fps,
         frame_count=data.frame_count,
+        reference_lines=data.reference_lines,
+        swim_direction=data.swim_direction,
+        video_fps=video_fps,
     )
+    quality = quality_report.model_dump(mode="json")
 
     ann = NormalizedAnnotation(
         session_video_id=session_video_id,
@@ -67,7 +82,7 @@ def create_normalized_annotation(
         reference_lines=data.reference_lines,
         distance_markers=data.distance_markers,
         swim_direction=data.swim_direction,
-        quality=quality.model_dump(),
+        quality=quality,
         created_by=created_by,
     )
     db.add(ann)
@@ -78,8 +93,6 @@ def create_normalized_annotation(
 
 @dataclass
 class ParseAnnotationResult:
-    """``parse_annotation_file`` 的返回结果：标准化标注 + 解析摘要 + 语义 warnings。"""
-
     annotation: NormalizedAnnotation
     summary: ParseSummary
     warnings: list[str]
@@ -90,12 +103,6 @@ def parse_annotation_file(
     annotation_file_id: int,
     current_user_id: int,
 ) -> ParseAnnotationResult:
-    """解析 annotation_file 生成 normalized annotation。
-
-    - 权限：先经 ``get_with_ownership_check`` 校验（annotation → session_video → training_session → coach）
-    - 数据来源：``source=kinovea`` 走 Kinovea parser（JSON / CSV），``manual_json`` 保持原 JSON 路径
-    - 产物经 quality checker + upsert 写入，返回 ``ParseAnnotationResult``
-    """
     ann_file = get_with_ownership_check(db, annotation_file_id, current_user_id)
     source_value = getattr(ann_file.source, "value", str(ann_file.source))
 
@@ -103,7 +110,6 @@ def parse_annotation_file(
         update_annotation_file_status(db, ann_file, success=False, error_message=str(exc))
         raise HTTPException(status_code=status_code, detail=f"标注文件解析失败: {exc}")
 
-    # ── 数据来源 ──
     parsed = None
     raw = None
     try:
@@ -124,7 +130,6 @@ def parse_annotation_file(
             frame_count = parsed.frame_count or (int(ann_file.frame_count) if ann_file.frame_count else None)
             duration_sec = parsed.duration_sec or (float(ann_file.duration_sec) if ann_file.duration_sec else None)
         else:
-            # manual_json / json → 原 JSON 路径
             with open(ann_file.storage_path, "r", encoding="utf-8") as fh:
                 raw = json.load(fh)
             fps = raw.get("fps", float(ann_file.annotation_fps or 60))
@@ -141,14 +146,27 @@ def parse_annotation_file(
     except (FileNotFoundError, json.JSONDecodeError, ValueError) as exc:
         _fail(exc)
 
-    # ── quality ──
-    quality = evaluate_quality(
-        fps=fps,
+    # ── quality v2 ──
+    session_video = ann_file.session_video
+    video_fps = float(session_video.fps) if session_video and hasattr(session_video, 'fps') and session_video.fps else None
+    video_width = session_video.video_file.width if session_video and hasattr(session_video, 'video_file') and session_video.video_file else None
+    video_height = session_video.video_file.height if session_video and hasattr(session_video, 'video_file') and session_video.video_file else None
+
+    validator = _get_validator()
+    quality_report = validator.validate(
         events=events,
         keypoint_frames=keypoint_frames,
         scale=scale,
+        fps=fps,
         frame_count=frame_count,
+        reference_lines=raw.get("reference_lines") if raw else None,
+        swim_direction=raw.get("swim_direction") if raw else None,
+        video_fps=video_fps,
+        video_width=video_width,
+        video_height=video_height,
+        view_type=str(session_video.view_type.value) if session_video and hasattr(session_video, 'view_type') else None,
     )
+    quality = quality_report.model_dump(mode="json")
 
     # ── upsert ──
     metadata = parsed.model_dump() if parsed is not None else (raw.get("metadata", {}) if raw else {})
@@ -168,7 +186,7 @@ def parse_annotation_file(
         existing.reference_lines = raw.get("reference_lines") if raw else None
         existing.distance_markers = raw.get("distance_markers") if raw else None
         existing.swim_direction = raw.get("swim_direction") if raw else None
-        existing.quality = quality.model_dump()
+        existing.quality = quality
         existing.annotation_metadata = metadata
         ann = existing
         db.add(ann)
@@ -186,7 +204,7 @@ def parse_annotation_file(
             keypoint_frames=keypoint_frames,
             trajectories=trajectories,
             manual_tags=manual_tags,
-            quality=quality.model_dump(),
+            quality=quality,
             annotation_metadata=metadata,
             created_by=current_user_id,
         )
@@ -195,7 +213,6 @@ def parse_annotation_file(
     db.commit()
     db.refresh(ann)
 
-    # 联动更新 annotation_files.status
     update_annotation_file_status(db, ann_file, success=True)
 
     summary = build_parse_summary(parsed) if parsed is not None else ParseSummary(

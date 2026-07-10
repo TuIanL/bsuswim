@@ -1,5 +1,6 @@
 import axios from 'axios'
 import type {
+  AnalysisReadiness,
   AnalysisTask,
   AnalysisStatus,
   Athlete,
@@ -198,9 +199,19 @@ export async function listSessionVideos(sessionId: number): Promise<SessionVideo
   return response.data
 }
 
-export async function submitAnalysis(sessionId: number): Promise<AnalysisTask> {
+export async function submitAnalysis(
+  sessionId: number,
+  options?: {
+    normalized_annotation_id?: number
+    acknowledge_quality_warnings?: boolean
+  }
+): Promise<AnalysisTask> {
   if (demoMode) return submitDemoAnalysis(sessionId)
-  const response = await client.post<AnalysisTask>('/analysis/submit', { session_id: sessionId })
+  const response = await client.post<AnalysisTask>('/analysis/submit', {
+    session_id: sessionId,
+    normalized_annotation_id: options?.normalized_annotation_id,
+    acknowledge_quality_warnings: options?.acknowledge_quality_warnings ?? false
+  })
   return response.data
 }
 

@@ -8,6 +8,7 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
     func,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -30,10 +31,10 @@ class NormalizedAnnotation(Base):
         Integer, ForeignKey("annotation_files.id", ondelete="SET NULL"), nullable=True, unique=True
     )
 
-    revision: Mapped[int] = mapped_column(Integer, nullable=False, default=1, server_default=func.text("1"))
+    revision: Mapped[int] = mapped_column(Integer, nullable=False, default=1, server_default=text("1"))
 
     schema_version: Mapped[str] = mapped_column(
-        String(50), nullable=False, default="swim-annotation.v1", server_default=func.text("'swim-annotation.v1'")
+        String(50), nullable=False, default="swim-annotation.v1", server_default=text("'swim-annotation.v1'")
     )
     source: Mapped[str] = mapped_column(String(50), nullable=False)
 
@@ -42,12 +43,12 @@ class NormalizedAnnotation(Base):
     duration_sec: Mapped[float | None] = mapped_column(Numeric(10, 3))
 
     scale: Mapped[dict | None] = mapped_column(JSONB)
-    coordinate_system: Mapped[dict] = mapped_column(JSONB, default=dict, server_default=func.text("'{}'::jsonb"))
+    coordinate_system: Mapped[dict] = mapped_column(JSONB, default=dict, server_default=text("'{}'::jsonb"))
 
-    events: Mapped[list] = mapped_column(JSONB, default=list, server_default=func.text("'[]'::jsonb"))
-    keypoint_frames: Mapped[list] = mapped_column(JSONB, default=list, server_default=func.text("'[]'::jsonb"))
-    trajectories: Mapped[list] = mapped_column(JSONB, default=list, server_default=func.text("'[]'::jsonb"))
-    manual_tags: Mapped[list] = mapped_column(JSONB, default=list, server_default=func.text("'[]'::jsonb"))
+    events: Mapped[list] = mapped_column(JSONB, default=list, server_default=text("'[]'::jsonb"))
+    keypoint_frames: Mapped[list] = mapped_column(JSONB, default=list, server_default=text("'[]'::jsonb"))
+    trajectories: Mapped[list] = mapped_column(JSONB, default=list, server_default=text("'[]'::jsonb"))
+    manual_tags: Mapped[list] = mapped_column(JSONB, default=list, server_default=text("'[]'::jsonb"))
 
     # ── side-view metrics 上下文（Change #4 新增）──
     reference_lines: Mapped[dict | None] = mapped_column(JSONB)
@@ -55,10 +56,10 @@ class NormalizedAnnotation(Base):
     swim_direction: Mapped[str | None] = mapped_column(String(20))
 
     quality: Mapped[dict] = mapped_column(
-        JSONB, default=lambda: {"level": "error"}, server_default=func.text("'{\"level\": \"error\"}'::jsonb")
+        JSONB, default=lambda: {"level": "error"}, server_default=text("'{\"level\": \"error\"}'::jsonb")
     )
     annotation_metadata: Mapped[dict] = mapped_column(
-        "metadata", JSONB, default=dict, server_default=func.text("'{}'::jsonb")
+        "metadata", JSONB, default=dict, server_default=text("'{}'::jsonb")
     )
 
     created_by: Mapped[int | None] = mapped_column(Integer, ForeignKey("users.id"))

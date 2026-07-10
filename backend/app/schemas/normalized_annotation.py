@@ -7,7 +7,7 @@ from app.models.annotation import AnnotationSource, AnnotationFileStatus
 from app.models.video import ViewType
 
 
-# ── Quality ──
+# ── V1 Quality (legacy, keep for backward compat) ──
 
 
 class QualityCheck(BaseModel):
@@ -24,6 +24,16 @@ class AnnotationQuality(BaseModel):
     disabled_modules: list[dict[str, Any]] = Field(default_factory=list)
 
     model_config = ConfigDict(extra="allow")
+
+
+# ── V2 Quality schemas ──
+
+
+class AnalysisReadiness(BaseModel):
+    can_submit: bool = False
+    requires_acknowledgement: bool = False
+    blocking_issue_count: int = 0
+    affected_modules: list[str] = Field(default_factory=list)
 
 
 # ── Sub-structures ──
@@ -113,7 +123,6 @@ class NormalizedAnnotationCreate(BaseModel):
     keypoint_frames: list[KeypointFrame] = Field(default_factory=list)
     trajectories: list[Trajectory] = Field(default_factory=list)
     manual_tags: list[ManualTag] = Field(default_factory=list)
-    # ── side-view metrics 上下文（Change #4 新增）──
     reference_lines: dict | None = None
     distance_markers: list[dict] | None = None
     swim_direction: str | None = None
@@ -188,4 +197,5 @@ class ParseResponse(BaseModel):
     revision: int
     summary: ParseSummary
     quality: AnnotationQuality
+    analysis_readiness: AnalysisReadiness | None = None
     warnings: list[str] = Field(default_factory=list)

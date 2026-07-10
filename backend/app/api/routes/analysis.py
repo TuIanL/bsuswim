@@ -15,7 +15,13 @@ from app.schemas import (
     ModelAnalysisResult,
     WorkspaceData,
 )
-from app.services.analysis_service import create_analysis_task, run_analysis_task, save_analysis_result, task_actions
+from app.services.analysis_service import (
+    AnnotationQualityBlockedError,
+    create_analysis_task,
+    run_analysis_task,
+    save_analysis_result,
+    task_actions,
+)
 
 router = APIRouter()
 
@@ -39,6 +45,17 @@ async def submit_analysis(
 
     try:
         task = create_analysis_task(db, payload)
+    except AnnotationQualityBlockedError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={
+                "error": {
+                    "code": "ANNOTATION_QUALITY_BLOCKED",
+                    "message": str(exc),
+                    "details": exc.quality,
+                }
+            },
+        )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

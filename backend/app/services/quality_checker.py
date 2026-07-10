@@ -1,9 +1,13 @@
-"""Annotation quality checker — evaluates whether a normalized annotation is
-sufficient for report generation."""
+"""Legacy compatibility wrapper - delegates to annotation_quality/ service.
 
-from typing import Any, Literal
+Kept for backward compatibility. New code should use
+AnnotationQualityValidator directly.
+"""
 
-from app.schemas.normalized_annotation import AnnotationQuality, QualityCheck
+from app.services.annotation_quality.checks.coverage_checks import compute_landmark_coverage
+from app.services.annotation_quality.legacy import normalize_quality_payload, migrate_legacy_quality_payload
+from app.services.annotation_quality.models import AnnotationQualityReport
+from app.schemas.normalized_annotation import AnnotationQuality as AnnotationQualityV1, QualityCheck
 
 CORE_KEYPOINTS: set[str] = {
     "shoulder", "elbow", "wrist", "hip", "knee", "ankle",
@@ -35,23 +39,18 @@ def check_has_keypoint_frames(keypoint_frames: list | None) -> QualityCheck:
 
 
 def check_has_core_keypoints(keypoint_frames: list | None) -> QualityCheck:
-    """检查是否至少覆盖了核心关键点（肩/肘/腕/髋/膝/踝，支持左右或非侧标）。"""
     if not keypoint_frames:
         return QualityCheck(key="has_core_keypoints", status="failed", message="无关键帧数据，无法检查关键点覆盖")
-
     all_point_names: set[str] = set()
     for kf in keypoint_frames:
         points = kf.get("points", {}) if isinstance(kf, dict) else getattr(kf, "points", {})
         all_point_names.update(points.keys())
-
     has_plain = REQUIRED_KEYPOINTS_PLAIN.issubset(all_point_names)
     has_left = REQUIRED_KEYPOINTS_LEFT.issubset(all_point_names)
     has_right = REQUIRED_KEYPOINTS_RIGHT.issubset(all_point_names)
-
     if has_plain or has_left or has_right:
         side = "双侧" if (has_left and has_right) else ("左侧" if has_left else ("右侧" if has_right else "非侧标"))
         return QualityCheck(key="has_core_keypoints", status="passed", message=f"核心关键点完整（{side}）")
-
     missing = REQUIRED_KEYPOINTS_PLAIN - all_point_names
     return QualityCheck(
         key="has_core_keypoints",
@@ -73,7 +72,6 @@ def check_has_scale(scale: dict | None) -> QualityCheck:
 def check_event_frame_range(events: list | None, frame_count: int | None) -> QualityCheck:
     if not events or frame_count is None:
         return QualityCheck(key="event_frame_range_valid", status="passed", message="跳过帧范围检查（无事件或无帧数）")
-
     for evt in events:
         f = evt.get("frame", 0) if isinstance(evt, dict) else getattr(evt, "frame", 0)
         if f > frame_count:
@@ -88,7 +86,6 @@ def check_event_frame_range(events: list | None, frame_count: int | None) -> Qua
 def check_keypoint_frame_range(keypoint_frames: list | None, frame_count: int | None) -> QualityCheck:
     if not keypoint_frames or frame_count is None:
         return QualityCheck(key="keypoint_frame_range_valid", status="passed", message="跳过帧范围检查（无关键帧或无帧数）")
-
     for kf in keypoint_frames:
         f = kf.get("frame", 0) if isinstance(kf, dict) else getattr(kf, "frame", 0)
         if f > frame_count:
@@ -107,8 +104,7 @@ def evaluate_quality(
     keypoint_frames: list | None = None,
     scale: dict | None = None,
     frame_count: int | None = None,
-) -> AnnotationQuality:
-    """聚合所有检查项，返回 quality 对象。"""
+) -> AnnotationQualityV1:
     events = events or []
     keypoint_frames = keypoint_frames or []
 
@@ -124,24 +120,20 @@ def evaluate_quality(
         checks.append(check_keypoint_frame_range(keypoint_frames, frame_count))
 
     failed_keys = {c.key for c in checks if c.status == "failed"}
-
-    # 判定 level
     critical_failures = {"has_fps", "has_events", "has_keypoint_frames", "has_core_keypoints"}
     if critical_failures & failed_keys:
-        level: Literal["good", "warning", "error"] = "error"
+        level: str = "error"
     elif "has_scale" in failed_keys:
         level = "warning"
     else:
         level = "good"
 
-    # 计算分数
     passed = sum(1 for c in checks if c.status == "passed")
     total = len(checks)
     score = int(passed / total * 100) if total > 0 else 0
 
-    # 可用模块推断
     usable_modules: list[str] = []
-    disabled_modules: list[dict[str, Any]] = []
+    disabled_modules: list[dict[str, str]] = []
 
     if "has_keypoint_frames" not in failed_keys and "has_core_keypoints" not in failed_keys:
         usable_modules.extend(["body_angle", "elbow_angle", "knee_angle", "joint_positions"])
@@ -158,7 +150,7 @@ def evaluate_quality(
     else:
         disabled_modules.append({"module": "speed_distance", "reason": "缺少标尺信息"})
 
-    return AnnotationQuality(
+    return AnnotationQualityV1(
         level=level,
         score=score,
         checks=checks,

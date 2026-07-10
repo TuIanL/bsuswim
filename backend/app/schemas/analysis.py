@@ -9,6 +9,8 @@ from app.schemas.video import SessionVideoRead, VideoFileRead
 
 class AnalysisSubmit(BaseModel):
     session_id: int
+    normalized_annotation_id: int | None = None
+    acknowledge_quality_warnings: bool = False
 
 
 class AnalysisTaskRead(BaseModel):
@@ -97,6 +99,7 @@ class AnalysisResultRead(BaseModel):
     phases: list[dict[str, Any]]
     metrics: dict[str, Any]
     diagnostics: list[dict[str, Any]]
+    quality_summary: dict[str, Any] = {}
     created_at: datetime
 
 

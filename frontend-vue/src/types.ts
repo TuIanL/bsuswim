@@ -230,6 +230,7 @@ export interface AnnotationFileListItem {
   original_filename: string
   annotation_fps: number | null
   uploaded_at: string | null
+  quality_status?: QualityStatus
 }
 
 export interface AnnotationFileDetail {
@@ -256,6 +257,15 @@ export interface AnnotationFileDetail {
   uploaded_at: string | null
   created_at: string
   updated_at: string
+}
+
+export type QualityStatus = 'valid' | 'warning' | 'invalid'
+
+export interface AnalysisReadiness {
+  can_submit: boolean
+  requires_acknowledgement: boolean
+  blocking_issue_count: number
+  affected_modules: string[]
 }
 
 export interface AnnotationUploadResponse {

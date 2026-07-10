@@ -87,6 +87,9 @@
                   <el-tag :type="ann.status === 'uploaded' ? 'info' : ann.status === 'parsed' ? 'success' : ann.status === 'archived' ? 'warning' : 'danger'" size="small">
                     {{ annotationStatusLabel(ann.status) }}
                   </el-tag>
+                  <el-tag v-if="ann.quality_status" :type="qualityTagType(ann.quality_status)" size="small" effect="plain">
+                    {{ qualityLabel(ann.quality_status) }}
+                  </el-tag>
                   <el-button size="small" text @click="downloadAnnotation(ann.id)">下载</el-button>
                   <el-button v-if="ann.status !== 'archived'" size="small" text type="warning" @click="archiveAnnotationFile(ann.id, camera.view)">归档</el-button>
                 </div>
@@ -149,9 +152,9 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { UploadFile } from 'element-plus'
-import { ElMessage } from 'element-plus'
-import { archiveAnnotation, bindUploadedSessionVideo, downloadAnnotationUrl, getAthlete, getSession, listAnnotations, listSessionVideos, submitAnalysis as submitBackendAnalysis, uploadAnnotation, uploadVideo } from '../services/api'
-import type { AnnotationFileListItem, Athlete, BackendSessionVideoView, SessionVideoView, TrainingSession, UploadStatus } from '../types'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { archiveAnnotation, bindUploadedSessionVideo, downloadAnnotationUrl, getAthlete, getAnnotationDetail, getSession, listAnnotations, listSessionVideos, submitAnalysis as submitBackendAnalysis, uploadAnnotation, uploadVideo } from '../services/api'
+import type { AnalysisReadiness, AnnotationFileDetail, AnnotationFileListItem, Athlete, BackendSessionVideoView, QualityStatus, SessionVideoView, TrainingSession, UploadStatus } from '../types'
 
 type CameraState = {
   view: SessionVideoView
@@ -277,10 +280,25 @@ async function loadAnnotations(view: SessionVideoView) {
   const camera = cameras.find((item) => item.view === view)
   if (!camera || !session.value || !camera.videoFileId) return
   try {
-    camera.annotations = await listAnnotations(session.value.id, camera.videoFileId)
+    const annotations = await listAnnotations(session.value.id, camera.videoFileId)
+    for (const ann of annotations) {
+      if (ann.status === 'parsed') {
+        try {
+          const detail = await getAnnotationDetail(ann.id)
+          ann.quality_status = parseQualityLevel(detail)
+        } catch { /* ignore */ }
+      }
+    }
+    camera.annotations = annotations
   } catch {
     // 静默失败
   }
+}
+
+function parseQualityLevel(detail: AnnotationFileDetail): QualityStatus | undefined {
+  const q = (detail as any).quality
+  if (!q) return undefined
+  return q.status || (q.level === 'good' ? 'valid' : q.level === 'error' ? 'invalid' : q.level === 'warning' ? 'warning' : undefined)
 }
 
 function makeAnnotationFileHandler(view: SessionVideoView) {
@@ -339,13 +357,70 @@ async function submitAnalysis() {
     return
   }
   if (!session.value) return
+
+  // 找到已解析的侧方位标注
+  const sideCamera = cameras.find((c) => c.view === 'side' && c.status === 'success')
+  let annotationId: number | undefined
+  let qualityStatus: QualityStatus | undefined
+  let affectedModules: string[] = []
+  if (sideCamera) {
+    const parsed = sideCamera.annotations.find((a) => a.status === 'parsed')
+    if (parsed) {
+      annotationId = parsed.id
+      qualityStatus = parsed.quality_status
+      if (qualityStatus === 'warning') {
+        try {
+          const detail = await getAnnotationDetail(parsed.id)
+          const ar: AnalysisReadiness | undefined = (detail as any).analysis_readiness
+          affectedModules = ar?.affected_modules || []
+        } catch { /* ignore */ }
+      }
+    }
+  }
+
+  // invalid 直接阻断
+  if (qualityStatus === 'invalid') {
+    ElMessage.error('标注质量不足以开始分析，请检查后重试。')
+    return
+  }
+
+  // warning 弹窗确认
+  let acknowledge = false
+  if (qualityStatus === 'warning') {
+    try {
+      const msg = affectedModules.length
+        ? `以下模块将降级或不可用：${affectedModules.join('、')}`
+        : '部分标注数据质量不足，分析结果可能受限。'
+      await ElMessageBox.confirm(`${msg}是否继续？`, '数据质量警告', {
+        confirmButtonText: '仍然继续',
+        cancelButtonText: '返回检查',
+        type: 'warning'
+      })
+      acknowledge = true
+    } catch {
+      return // 用户取消
+    }
+  }
+
   submitting.value = true
   try {
-    const task = await submitBackendAnalysis(session.value.id)
+    const task = await submitBackendAnalysis(session.value.id, {
+      normalized_annotation_id: annotationId,
+      acknowledge_quality_warnings: acknowledge
+    })
     ElMessage.success('分析任务已提交')
     router.push(`/workspace/${task.id}`)
   } catch (error: any) {
-    ElMessage.error(error?.response?.data?.detail || error?.message || '提交分析失败')
+    const detail = error?.response?.data?.detail
+    if (detail?.error?.code === 'ANNOTATION_QUALITY_BLOCKED') {
+      ElMessageBox.alert(
+        detail.error.details?.issues?.map((i: any) => i.user_message).join('\n') || '标注质量不足',
+        '无法开始分析',
+        { type: 'error' }
+      )
+    } else {
+      ElMessage.error(detail || error?.message || '提交分析失败')
+    }
   } finally {
     submitting.value = false
   }
@@ -379,6 +454,14 @@ function sourceLabel(value: string) {
 
 function annotationStatusLabel(value: string) {
   return { uploaded: '待解析', parsed: '已解析', parse_failed: '解析失败', archived: '已归档' }[value] || value
+}
+
+function qualityTagType(value: QualityStatus) {
+  return { valid: 'success', warning: 'warning', invalid: 'danger' }[value] || 'info'
+}
+
+function qualityLabel(value: QualityStatus) {
+  return { valid: '可分析', warning: '警告', invalid: '不可分析' }[value] || value
 }
 
 onMounted(load)

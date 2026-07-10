@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from app.models import AnalysisResult, AnalysisTask
+from app.services.annotation_quality.models import AnalysisQualitySummary
 from app.services.reporting.metric_normalizer import (
     apply_phase_aliases,
     flatten_phase_metrics,
@@ -18,6 +19,14 @@ def build_report_data(task: AnalysisTask, result: AnalysisResult | None = None) 
     diagnostics = result.diagnostics if result else []
     session = task.session
     athlete = session.athlete if session else None
+    quality_summary = result.quality_summary if result else {}
+
+    quality_overall = quality_summary.get("decision", {}).get("report_availability", "full") if quality_summary else "full"
+    quality_notes: list[str] = []
+    if quality_overall == "degraded":
+        quality_notes.append("标注或指标质量不足，部分结果仅供参考。")
+    elif quality_overall == "blocked":
+        quality_notes.append("标注质量不足，无法生成完整报告。")
 
     return {
         "session": {
@@ -68,12 +77,15 @@ def build_report_data(task: AnalysisTask, result: AnalysisResult | None = None) 
             "generated_at": datetime.utcnow().isoformat(),
             "schema_version": result.schema_version if result else None,
         },
+        "quality_notes": quality_notes,
+        "quality_overall": quality_overall,
     }
 
 
 SWIM_REPORT_FIELDS = {
     "schema_version", "report_mode", "context", "metric_sets",
     "sections", "problem_ranking", "score", "source_trace",
+    "quality",
 }
 
 
@@ -101,6 +113,9 @@ def merge_into_existing(existing: dict, swim_report: dict) -> dict:
         "top_recommendations": swim_summary.get("top_recommendations", []),
     }
 
+    if "quality" in swim_report:
+        merged["quality"] = swim_report["quality"]
+
     return merged
 
 
@@ -108,6 +123,7 @@ def build_swim_report_data(
     result: AnalysisResult,
     annotation_metric: object,
     diagnostics: list[dict],
+    quality_summary: AnalysisQualitySummary | None = None,
 ) -> dict:
     annotation_metric_id = annotation_metric.id if hasattr(annotation_metric, "id") else None
     raw_metrics = annotation_metric.metrics if hasattr(annotation_metric, "metrics") else {}
@@ -120,6 +136,20 @@ def build_swim_report_data(
     sections = build_sections(merged_metrics, diagnostics)
     overview_section = build_overview_section(merged_metrics, diagnostics)
     recs_section = build_recommendations_section(diagnostics)
+
+    # ── inject quality into sections ──
+    if quality_summary:
+        decision = quality_summary.decision
+        module_avail = decision.module_availability
+        for section in sections:
+            sk = section.get("key")
+            if sk and hasattr(module_avail, sk):
+                avail = getattr(module_avail, sk)
+                section["availability"] = avail
+                section["data_confidence"] = "high" if avail == "ready" else ("medium" if avail == "degraded" else "low")
+                if avail in ("degraded", "blocked"):
+                    section["quality_notes"] = section.get("quality_notes", [])
+                    section["quality_notes"].append(f"数据可用性: {avail}")
 
     all_sections = [overview_section, *sections, recs_section]
 
@@ -140,6 +170,8 @@ def build_swim_report_data(
             key=lambda d: (d.get("priority", 999), {"high": 0, "medium": 1, "low": 2}.get(d.get("severity", "low"), 99)),
         )
     ]
+
+    quality_dict = quality_summary.model_dump(mode="json") if quality_summary else result.quality_summary if hasattr(result, "quality_summary") else {}
 
     return {
         "schema_version": "swim-report.v1",
@@ -173,4 +205,5 @@ def build_swim_report_data(
             "annotation_metric_id": annotation_metric_id,
             "analysis_result_id": result.id,
         },
+        "quality": quality_dict,
     }

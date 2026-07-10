@@ -10,18 +10,48 @@ from app.repositories.normalized_annotation_repository import (
     list_by_session_video,
 )
 from app.schemas.normalized_annotation import (
+    AnalysisReadiness,
     AnnotationQuality,
     NormalizedAnnotationCreate,
     NormalizedAnnotationListItem,
     NormalizedAnnotationRead,
     ParseResponse,
+    ParseSummary,
 )
+from app.services.annotation_quality.legacy import normalize_quality_payload
+from app.services.annotation_quality.validator import AnnotationQualityValidator
+from app.services.annotation_quality.provider import YamlQualityProfileProvider
 from app.services.normalized_annotation_service import (
     create_normalized_annotation,
     parse_annotation_file,
 )
 
+import os
+
 router = APIRouter()
+
+
+def _get_validator() -> AnnotationQualityValidator:
+    profiles_dir = os.path.join(os.path.dirname(__file__), "..", "..", "services", "annotation_quality", "profiles")
+    provider = YamlQualityProfileProvider(profiles_dir)
+    return AnnotationQualityValidator(profile_provider=provider)
+
+
+def _derive_readiness(quality: dict) -> AnalysisReadiness | None:
+    if not quality:
+        return None
+    report = normalize_quality_payload(quality)
+    status = report.status
+    blocking_count = report.summary.blocking_count
+    affected = [
+        mk for mk, mr in report.module_readiness.items()
+        if mr.status in ("degraded", "blocked")
+    ]
+    if status == "valid":
+        return AnalysisReadiness(can_submit=True, requires_acknowledgement=False, blocking_issue_count=0, affected_modules=[])
+    if status == "warning":
+        return AnalysisReadiness(can_submit=True, requires_acknowledgement=True, blocking_issue_count=0, affected_modules=affected)
+    return AnalysisReadiness(can_submit=False, requires_acknowledgement=False, blocking_issue_count=blocking_count, affected_modules=affected)
 
 
 # ── Create from JSON ──
@@ -37,13 +67,13 @@ def create_normalized_annotation_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """从 JSON 数据创建标准化标注记录。"""
     ann = create_normalized_annotation(
         db,
         session_video_id=session_video_id,
         data=data,
         created_by=current_user.id,
     )
+    quality = ann.quality or {}
     return {
         "id": ann.id,
         "session_video_id": ann.session_video_id,
@@ -51,7 +81,8 @@ def create_normalized_annotation_endpoint(
         "schema_version": ann.schema_version,
         "source": ann.source,
         "revision": ann.revision,
-        "quality": ann.quality,
+        "quality": quality,
+        "analysis_readiness": _derive_readiness(quality),
     }
 
 
@@ -64,7 +95,6 @@ def get_normalized_annotation(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> NormalizedAnnotationRead:
-    """获取单条标准化标注的完整详情。"""
     ann = get_with_ownership_check(db, normalized_annotation_id, current_user.id)
     link = ann.session_video
 
@@ -107,7 +137,6 @@ def list_normalized_annotations(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> list[NormalizedAnnotationListItem]:
-    """查询某个 session video 下的全部标准化标注。"""
     annotations = list_by_session_video(db, session_video_id)
     return [
         NormalizedAnnotationListItem(
@@ -118,7 +147,7 @@ def list_normalized_annotations(
             schema_version=a.schema_version,
             source=a.source,
             view_type=a.session_video.view_type if a.session_video else None,
-            quality_level=a.quality.get("level") if a.quality else None,
+            quality_level=a.quality.get("level") or a.quality.get("status") if a.quality else None,
             created_at=a.created_at,
         )
         for a in annotations
@@ -138,10 +167,10 @@ def parse_annotation_file_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """解析 annotation_file 生成标准化标注（Kinovea JSON/CSV 或 manual_json）。"""
     result = parse_annotation_file(db, annotation_file_id, current_user_id=current_user.id)
     ann = result.annotation
-    quality = AnnotationQuality(**ann.quality) if ann.quality else AnnotationQuality(level="error")
+    quality = AnnotationQuality(**ann.quality) if ann.quality and "level" in ann.quality else AnnotationQuality(level="error")
+    readiness = _derive_readiness(ann.quality or {})
     return ParseResponse(
         normalized_annotation_id=ann.id,
         annotation_file_id=annotation_file_id,
@@ -151,5 +180,68 @@ def parse_annotation_file_endpoint(
         revision=ann.revision,
         summary=result.summary,
         quality=quality,
+        analysis_readiness=readiness,
         warnings=result.warnings,
     )
+
+
+# ── Re-validate ──
+
+
+@router.post("/normalized-annotations/{normalized_annotation_id}/validate")
+def revalidate_normalized_annotation(
+    normalized_annotation_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    force: bool = False,
+):
+    ann = get_with_ownership_check(db, normalized_annotation_id, current_user.id)
+    current_quality = normalize_quality_payload(ann.quality)
+
+    VALIDATOR_VERSION = "1.0.0"
+    PROFILE_ID = "side_technical_v1"
+    PROFILE_VERSION = "1.0.0"
+
+    # ── cache check ──
+    if not force:
+        cached_revision = current_quality.source_revision
+        cached_validator = current_quality.validator_version
+        cached_profile_id = current_quality.profile.id if current_quality.profile else None
+        cached_profile_ver = current_quality.profile.version if current_quality.profile else None
+
+        if (cached_revision == ann.revision
+                and cached_validator == VALIDATOR_VERSION
+                and cached_profile_id == PROFILE_ID
+                and cached_profile_ver == PROFILE_VERSION):
+            return {
+                "normalized_annotation_id": ann.id,
+                "revision": ann.revision,
+                "quality": current_quality.model_dump(mode="json"),
+                "analysis_readiness": _derive_readiness(ann.quality),
+                "cached": True,
+            }
+
+    report = _get_validator().validate(
+        events=ann.events or [],
+        keypoint_frames=ann.keypoint_frames or [],
+        scale=ann.scale,
+        fps=float(ann.fps) if ann.fps else None,
+        frame_count=ann.frame_count,
+        reference_lines=ann.reference_lines,
+        swim_direction=ann.swim_direction,
+        source_revision=ann.revision,
+        validator_version=VALIDATOR_VERSION,
+    )
+
+    ann.quality = report.model_dump(mode="json")
+    db.add(ann)
+    db.commit()
+    db.refresh(ann)
+
+    return {
+        "normalized_annotation_id": ann.id,
+        "revision": ann.revision,
+        "quality": report.model_dump(mode="json"),
+        "analysis_readiness": _derive_readiness(ann.quality),
+        "cached": False,
+    }
