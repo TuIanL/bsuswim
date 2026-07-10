@@ -2,9 +2,7 @@
 
 ## Purpose
 定义标准化标注数据模型 `normalized_annotations`，作为 annotation_files 和 analysis_results 之间的稳定观测输入层。统一 events、keypoint_frames、trajectories、manual_tags、scale、coordinate_system、quality 子结构，使后续 metrics engine 和 diagnostics engine 不依赖 Kinovea 等具体标注工具。
-
-## ADDED Requirements
-
+## Requirements
 ### Requirement: Normalized annotation uses session_video_id as canonical reference
 系统 SHALL 以 `session_video_id` 作为 `normalized_annotations` 的唯一归属引用，关联到 `session_videos` 表。`camera_view` 从 `session_videos.view_type` 推导，不在 `normalized_annotations` 中冗余存储。
 
@@ -161,3 +159,81 @@ parse 端点成功生成 normalized annotation 后 SHALL 更新 `annotation_file
 #### Scenario: New normalized annotation has swim-annotation.v1 schema
 - **WHEN** 系统创建一条新的 normalized annotation 记录
 - **THEN** `schema_version` MUST 为 `swim-annotation.v1`
+
+### Requirement: Parse response schema includes summary and warnings
+`ParseResponse` SHALL 扩展为包含 `annotation_file_id`、`source`、`summary`（events/keypoint_frames/trajectories/manual_tags 计数）和 `warnings`（语义提醒列表）。Parse route SHALL 使用 `response_model=ParseResponse`。
+
+#### Scenario: Parse response includes summary
+- **WHEN** parse 成功
+- **THEN** 响应 MUST 包含 `summary.events_count`、`summary.keypoint_frames_count`、`summary.trajectories_count`、`summary.manual_tags_count`
+
+#### Scenario: Parse response includes warnings
+- **WHEN** parse 过程中 parser 生成语义 warnings（如缺少推荐事件）
+- **THEN** 响应 MUST 在 `warnings` 数组中包含这些提醒
+
+#### Scenario: Parse response includes annotation_file_id and source
+- **WHEN** parse 成功
+- **THEN** 响应 MUST 包含 `annotation_file_id` 和 `source` 字段
+
+#### Scenario: Parse route uses response_model
+- **WHEN** parse endpoint 返回响应
+- **THEN** 系统 MUST 通过 `response_model=ParseResponse` 进行序列化和校验，而非手写 dict
+
+### Requirement: Parse route returns typed ParseResponse
+Parse endpoint SHALL 返回 `ParseResponse` 实例，由 service 层提供 `ParseAnnotationResult`（含 annotation、summary、warnings），route 层装配为 `ParseResponse`。
+
+#### Scenario: Service returns ParseAnnotationResult
+- **WHEN** `parse_annotation_file` 成功解析
+- **THEN** service MUST 返回包含 `annotation`、`summary` 和 `warnings` 的结果对象
+
+#### Scenario: Quality checker scope remains structural
+- **WHEN** quality checker 评估 parse 产物
+- **THEN** 系统 MUST 继续保持 source-agnostic 结构检查（fps、events、keypoint_frames、scale），不新增游泳专项语义检查
+
+### Requirement: reference_lines carries waterline
+系统 SHALL 在 `normalized_annotations` 支持 `reference_lines` 字段（JSONB），至少含 `waterline` 子结构 `{points: [[x1,y1],[x2,y2]], confidence, source}`。
+
+#### Scenario: Create with waterline
+- **WHEN** 创建 normalized annotation 并在 `reference_lines.waterline` 提供两点
+- **THEN** 系统 MUST 存储该水面线，metrics 引擎可据此计算 `hip_depth_cm`
+
+#### Scenario: Absent waterline degrades hip_depth
+- **WHEN** annotation 不含 `reference_lines.waterline`
+- **THEN** quality checker MUST 允许创建成功，但 metrics 层 MUST 将 `hip_depth_cm` 置为 null 并记 `missing_waterline` warning
+
+### Requirement: distance_markers for speed and stroke length
+系统 SHALL 支持 `distance_markers` 字段（JSONB 数组），元素含 `frame`、`time_sec`、`distance_m`、`source`，用于在 clips 内推导瞬时速度、划幅与相位分段。
+
+#### Scenario: Create with distance_markers
+- **WHEN** 创建 normalized annotation 并提供 `distance_markers`
+- **THEN** 系统 MUST 存储，metrics 层可据其计算 `average_speed_mps`、`stroke_length_m`（优先级1）与 `phase_metrics`
+
+#### Scenario: Absent distance_markers
+- **WHEN** annotation 不含 `distance_markers`
+- **THEN** `average_speed_mps` / `stroke_length_m`（距离版）/ `phase_metrics` MUST 降级或为空，并记 `no_phase_context` / 相应 warning，不报错
+
+### Requirement: swim_direction for front reach sign
+系统 SHALL 支持 `swim_direction` 字段（如 `left_to_right` / `right_to_left`），用于消除 `front_reach_distance_cm` 等方向上的正负歧义。
+
+#### Scenario: Create with swim_direction
+- **WHEN** 创建 normalized annotation 并指定 `swim_direction`
+- **THEN** 系统 MUST 存储，metrics 层据其确定前伸距离的符号方向
+
+#### Scenario: Absent swim_direction
+- **WHEN** annotation 不含 `swim_direction`
+- **THEN** 系统 MUST 允许创建；`front_reach_distance_cm` 以绝对值计算，quality 标注方向未消歧（不阻塞）
+
+### Requirement: Schema migration adds three fields
+系统 SHALL 通过 alembic 迁移为 `normalized_annotations` 表新增 `reference_lines`、`distance_markers`、`swim_direction` 三列（JSONB / 字符串），不破坏现有数据。
+
+#### Scenario: Migration applies cleanly
+- **WHEN** 执行新增迁移
+- **THEN** 现有 `normalized_annotations` 记录的这三个字段 MUST 默认为空/Null，旧记录仍可正常读取
+
+### Requirement: Quality checker aware of new fields
+quality checker SHALL 在缺 `waterline` 时将 `hip_depth_cm` 相关模块标记为不可用（warning 级），不因新字段缺失而整体 error。
+
+#### Scenario: Waterline missing is warning not error
+- **WHEN** fps、scale、关键点、事件均完整但缺 `reference_lines.waterline`
+- **THEN** quality.level MUST 为 `warning`，`usable_modules` 排除依赖 waterline 的指标，`hip_depth_cm` 降级
+

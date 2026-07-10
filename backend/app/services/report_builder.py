@@ -1,6 +1,15 @@
 from datetime import datetime
 
 from app.models import AnalysisResult, AnalysisTask
+from app.services.reporting.metric_normalizer import (
+    apply_phase_aliases,
+    flatten_phase_metrics,
+    normalize_report_metrics,
+)
+from app.services.reporting.recommendation_builder import build_recommendations_section
+from app.services.reporting.score_builder import build_diagnostic_load_summary
+from app.services.reporting.section_builder import build_sections
+from app.services.reporting.summary_builder import build_overview_section, build_summary
 
 
 def build_report_data(task: AnalysisTask, result: AnalysisResult | None = None) -> dict:
@@ -58,5 +67,110 @@ def build_report_data(task: AnalysisTask, result: AnalysisResult | None = None) 
             "source": "model_service",
             "generated_at": datetime.utcnow().isoformat(),
             "schema_version": result.schema_version if result else None,
+        },
+    }
+
+
+SWIM_REPORT_FIELDS = {
+    "schema_version", "report_mode", "context", "metric_sets",
+    "sections", "problem_ranking", "score", "source_trace",
+}
+
+
+def merge_into_existing(existing: dict, swim_report: dict) -> dict:
+    merged = dict(existing)
+
+    for key in SWIM_REPORT_FIELDS:
+        merged[key] = swim_report[key]
+
+    merged["metrics"] = swim_report["metrics"]
+    merged["diagnostics"] = swim_report["diagnostics"]
+    merged["charts"] = swim_report.get("charts", {"radar": []})
+    merged["recommendations"] = swim_report.get("recommendations", [])
+    merged["recommendation_items"] = swim_report.get("recommendation_items", [])
+    merged["provenance"] = swim_report["provenance"]
+
+    legacy_summary = merged.get("summary") or {}
+    swim_summary = swim_report["summary"]
+    merged["summary"] = {
+        **legacy_summary,
+        "title": legacy_summary.get("title") or swim_summary.get("title"),
+        "overall_score": legacy_summary.get("overall_score"),
+        "overall_conclusion": swim_summary.get("overall_conclusion"),
+        "top_findings": swim_summary.get("top_findings", []),
+        "top_recommendations": swim_summary.get("top_recommendations", []),
+    }
+
+    return merged
+
+
+def build_swim_report_data(
+    result: AnalysisResult,
+    annotation_metric: object,
+    diagnostics: list[dict],
+) -> dict:
+    annotation_metric_id = annotation_metric.id if hasattr(annotation_metric, "id") else None
+    raw_metrics = annotation_metric.metrics if hasattr(annotation_metric, "metrics") else {}
+
+    canonical_metrics = normalize_report_metrics(raw_metrics)
+    phase_metrics = flatten_phase_metrics(raw_metrics)
+    phase_metrics_with_aliases = apply_phase_aliases(phase_metrics)
+    merged_metrics = {**canonical_metrics, **phase_metrics_with_aliases}
+
+    sections = build_sections(merged_metrics, diagnostics)
+    overview_section = build_overview_section(merged_metrics, diagnostics)
+    recs_section = build_recommendations_section(diagnostics)
+
+    all_sections = [overview_section, *sections, recs_section]
+
+    summary = build_summary(merged_metrics, diagnostics, all_sections)
+    score = build_diagnostic_load_summary(all_sections)
+
+    task = result.task
+    session_id = task.session_id if task else None
+    task_id = task.id if task else None
+
+    flat_recs = recs_section.get("_flat_recommendations", [])
+    structured_items = recs_section.get("_structured_items", [])
+
+    problem_ranking = [
+        {"code": d.get("code"), "title": d["title"], "severity": d.get("severity"), "suggestion": d.get("suggestion")}
+        for d in sorted(
+            diagnostics,
+            key=lambda d: (d.get("priority", 999), {"high": 0, "medium": 1, "low": 2}.get(d.get("severity", "low"), 99)),
+        )
+    ]
+
+    return {
+        "schema_version": "swim-report.v1",
+        "report_mode": "side_technical",
+        "summary": summary,
+        "metrics": canonical_metrics,
+        "diagnostics": diagnostics,
+        "charts": {"radar": []},
+        "recommendations": flat_recs,
+        "recommendation_items": structured_items,
+        "provenance": {
+            "source": "annotation_metrics",
+            "generated_at": datetime.utcnow().isoformat(),
+        },
+        "metric_sets": {
+            "canonical": canonical_metrics,
+            "phase": phase_metrics_with_aliases,
+            "raw": raw_metrics,
+        },
+        "sections": all_sections,
+        "problem_ranking": problem_ranking,
+        "score": score,
+        "context": {
+            "analysis_result_id": result.id,
+            "annotation_metric_id": annotation_metric_id,
+            "session_id": session_id,
+            "task_id": task_id,
+        },
+        "source_trace": {
+            "annotation_metric_schema_version": getattr(annotation_metric, "schema_version", None),
+            "annotation_metric_id": annotation_metric_id,
+            "analysis_result_id": result.id,
         },
     }

@@ -461,11 +461,220 @@ export function getDemoWorkspace(taskId: number): WorkspaceData {
   }
 }
 
-export function getDemoReport(sessionId: number): ReportData {
+export const swimReportV1DemoReport: ReportData = {
+  session_id: demoTask.session_id,
+  task_id: demoTask.id,
+  source: 'demo',
+  generated_at: new Date().toISOString(),
+  report: {
+    schema_version: 'swim-report.v1',
+    report_mode: 'side_technical',
+    title: '自由泳侧面技术分析报告',
+    summary: {
+      title: '自由泳侧面技术分析报告',
+      overall_score: 82,
+      overall_level: '良好',
+      overall_conclusion: '身体位置随速度提升改善，但高肘抱水和推进效率仍需重点优化。',
+      main_strengths: ['高速阶段身体位置改善明显', '腿部髋膝角度整体稳定'],
+      main_limitations: ['高肘抱水不足', '低速阶段身体支撑不足', '速度提升主要依赖划频增加'],
+      top_findings: [
+        { title: '低速阶段身体与水平面夹角较大', severity: 'high' },
+        { title: '高肘抱水不足贯穿全速度区间', severity: 'high' },
+        { title: '速度提升主要依赖划频增加', severity: 'medium' },
+      ],
+      top_recommendations: ['进行高肘抱水专项训练', '加强低速阶段核心控制'],
+    },
+    sections: [
+      {
+        key: 'overview',
+        type: 'overview',
+        title: '测试概况',
+        summary: '本报告基于侧面自由泳视频与 Kinovea 标注结果，评估身体位置、上肢抱水、腿部技术与推进效率。',
+        metrics: [
+          { key: 'body_angle_deg', label: '身体水平角', value: 12.4, unit: '°' },
+          { key: 'stroke_rate_spm', label: '平均划频', value: 64.8, unit: 'spm' },
+          { key: 'elbow_angle_deg', label: '抱水肘角', value: 154, unit: '°' },
+        ],
+        findings: [
+          { content: '本次分析识别出 3 个主要技术问题，其中高严重度问题 2 个。', severity: 'high' },
+        ],
+      },
+      {
+        key: 'body_position',
+        title: '身体位置与流线型效率分析',
+        summary: '身体位置随速度提升逐步改善，低速阶段身体支撑不足。',
+        metrics: [
+          { key: 'body_angle_deg', label: '平均身体水平角', value: 12.4, unit: '°' },
+          { key: 'body_angle_deg_low_speed', label: '低速阶段', value: 14, unit: '°' },
+          { key: 'body_angle_deg_high_speed', label: '高速阶段', value: 7, unit: '°' },
+        ],
+        assets: [
+          {
+            key: 'body_low_speed',
+            type: 'annotated_frame' as const,
+            label: '低速阶段',
+            value: '0.91 m/s',
+            caption: '身体与水平面夹角 14°',
+            status: 'poor' as const,
+          },
+          {
+            key: 'body_mid_speed',
+            type: 'annotated_frame' as const,
+            label: '中速阶段',
+            value: '1.28 m/s',
+            caption: '身体与水平面夹角 12°',
+            status: 'warning' as const,
+          },
+          {
+            key: 'body_high_speed',
+            type: 'annotated_frame' as const,
+            label: '高速阶段',
+            value: '1.45 m/s',
+            caption: '身体与水平面夹角 7°',
+            status: 'good' as const,
+          },
+        ],
+        findings: [
+          { title: '身体位置随速度提升而改善', content: '低速 14° → 高速 7°，流线型效率明显提升。', severity: 'medium' as const },
+          { title: '低速阶段身体支撑不足', content: '二次腿阶段更容易出现中段下沉。', severity: 'high' as const },
+        ],
+        recommendations: [
+          { content: '加强低速阶段核心支撑与身体水平控制训练。', category: 'technical' },
+          { content: '强化二次腿配合下的髋部支撑能力。', category: 'rhythm' },
+        ],
+      },
+      {
+        key: 'catch_pull',
+        title: '上肢抱水与推进效率分析',
+        summary: '高肘抱水不足，速度提升主要依赖划频增加，划幅下降。',
+        metrics: [
+          { key: 'elbow_angle_deg', label: '抱水肘角', value: 154, unit: '°' },
+          { key: 'stroke_rate_change_pct', label: '划频提升', value: 90.3, unit: '%' },
+          { key: 'stroke_length_change_pct', label: '划幅变化', value: -16.5, unit: '%' },
+        ],
+        assets: [
+          {
+            key: 'catch_low_speed',
+            type: 'annotated_frame' as const,
+            label: '抱水阶段',
+            caption: '高肘不足，前臂迎水面积受限',
+            status: 'poor' as const,
+          },
+          {
+            key: 'catch_high_speed',
+            type: 'annotated_frame' as const,
+            label: '高速抱水',
+            caption: '肘角偏大，支撑不足',
+            status: 'warning' as const,
+          },
+        ],
+        charts: [
+          {
+            key: 'stroke_rate_trend',
+            type: 'line' as const,
+            title: '划频变化趋势',
+            x_axis: ['1', '2', '3', '4', '5', '6', '7'],
+            series: [
+              { name: '划频', data: [0.72, 0.84, 0.91, 0.99, 1.08, 1.19, 1.37], unit: 'Hz' },
+            ],
+          },
+          {
+            key: 'stroke_length_trend',
+            type: 'line' as const,
+            title: '划幅变化趋势',
+            x_axis: ['1', '2', '3', '4', '5', '6', '7'],
+            series: [
+              { name: '划幅', data: [1.27, 1.27, 1.24, 1.23, 1.18, 1.14, 1.06], unit: 'm/次' },
+            ],
+          },
+        ],
+        findings: [
+          { title: '高肘抱水不足贯穿全速度区间', content: '低速阶段已经存在，高速阶段仍未改善。', severity: 'high' as const },
+          { title: '速度提升主要依赖划频代偿', content: '划频 +90.3%，划幅 -16.5%。', severity: 'medium' as const },
+        ],
+        recommendations: [
+          { content: '进行高肘抱水专项、单臂划水训练。', category: 'technical' },
+          { content: '优化划频—划幅协调，避免单纯依赖高划频。', category: 'rhythm' },
+        ],
+      },
+      {
+        key: 'leg_kick',
+        title: '腿部技术角度分析',
+        summary: '腿部技术整体表现较稳定，低速阶段膝角控制仍需优化。',
+        metrics: [
+          { key: 'knee_angle_deg', label: '平均膝关节角', value: 125, unit: '°' },
+          { key: 'ankle_extension_angle_deg', label: '踝伸展角', value: 45, unit: '°' },
+        ],
+        findings: [
+          { title: '髋膝角度整体稳定', content: '随着速度提升，膝关节角度保持在合理范围。', severity: 'low' as const },
+        ],
+        recommendations: [
+          { content: '踝关节柔韧性训练，提升脚踝伸展能力。', category: 'mobility' },
+        ],
+      },
+      {
+        key: 'efficiency',
+        title: '专项技术效率分析',
+        summary: '游进效率受推进效率不足影响，SWOLF 偏高。',
+        metrics: [
+          { key: 'speed_mps', label: '平均速度', value: 1.45, unit: 'm/s' },
+          { key: 'stroke_rate_spm', label: '平均划频', value: 64.8, unit: 'spm' },
+          { key: 'stroke_length_m', label: '平均划幅', value: 1.06, unit: 'm' },
+        ],
+        charts: [
+          {
+            key: 'speed_trend',
+            type: 'line' as const,
+            title: '速度变化',
+            x_axis: ['1', '2', '3', '4', '5', '6', '7'],
+            series: [
+              { name: '速度', data: [0.91, 1.06, 1.13, 1.21, 1.28, 1.34, 1.45], unit: 'm/s' },
+            ],
+          },
+        ],
+        findings: [
+          { content: '速度提升过程中划频增加但划幅下降，提示推进效率有提升空间。', severity: 'medium' as const },
+        ],
+        recommendations: [
+          { content: '通过高肘抱水专项训练提升单次划水推进距离。', category: 'technical' },
+          { content: '复测目标：划幅下降幅度控制在 10% 以内。', category: 'retest' },
+        ],
+      },
+      {
+        key: 'recommendations',
+        type: 'recommendation' as const,
+        title: '训练建议与复测目标',
+        summary: '建议围绕身体支撑、高肘抱水和推进效率进行 3–4 周训练后复测。',
+        recommendations: [
+          { content: '高肘抱水专项训练', category: 'technical' },
+          { content: '上肢力量提升训练', category: 'strength' },
+          { content: '身体水平角控制在 10° 以内', category: 'retest' },
+          { content: '划幅下降幅度控制在 10% 以内', category: 'retest' },
+        ],
+      },
+    ],
+    provenance: {
+      source: 'demo',
+      schema_version: 'swim-report.v1',
+    },
+  },
+}
+
+export function getDemoReport(
+  sessionId: number,
+  format?: 'legacy' | 'swim_v1'
+): ReportData {
+  if (format === 'swim_v1') {
+    return {
+      ...swimReportV1DemoReport,
+      session_id: sessionId,
+    }
+  }
+
   const task = tasks.find((item) => item.session_id === sessionId) || demoTask
   return {
     ...demoReport,
     session_id: sessionId,
-    task_id: task.id
+    task_id: task.id,
   }
 }

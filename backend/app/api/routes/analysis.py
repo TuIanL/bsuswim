@@ -163,3 +163,9 @@ def _get_owned_task(
 
 def _read_task(task: AnalysisTask) -> AnalysisTaskRead:
     return AnalysisTaskRead.model_validate({**task.__dict__, "actions": task_actions(task)})
+
+
+# 挂载诊断子路由（前缀继承 /analysis）：/api/v1/analysis/analysis-results/{id}/diagnostics[/run]
+from app.api.routes.diagnostics import router as _diagnostics_router  # noqa: E402
+
+router.include_router(_diagnostics_router)

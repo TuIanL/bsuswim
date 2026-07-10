@@ -49,6 +49,11 @@ class NormalizedAnnotation(Base):
     trajectories: Mapped[list] = mapped_column(JSONB, default=list, server_default=func.text("'[]'::jsonb"))
     manual_tags: Mapped[list] = mapped_column(JSONB, default=list, server_default=func.text("'[]'::jsonb"))
 
+    # ── side-view metrics 上下文（Change #4 新增）──
+    reference_lines: Mapped[dict | None] = mapped_column(JSONB)
+    distance_markers: Mapped[list | None] = mapped_column(JSONB)
+    swim_direction: Mapped[str | None] = mapped_column(String(20))
+
     quality: Mapped[dict] = mapped_column(
         JSONB, default=lambda: {"level": "error"}, server_default=func.text("'{\"level\": \"error\"}'::jsonb")
     )

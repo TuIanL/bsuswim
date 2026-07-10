@@ -6,6 +6,7 @@ Requires: pip install pytest pytest-mock
 
 import json
 from datetime import datetime, timezone
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -187,36 +188,171 @@ class TestListNormalizedAnnotations:
 
 
 class TestParseAnnotation:
+    def _result(self):
+        from app.services.normalized_annotation_service import ParseAnnotationResult
+        from app.schemas.normalized_annotation import ParseSummary
+
+        return ParseAnnotationResult(
+            annotation=_mock_normalized_annotation(),
+            summary=ParseSummary(
+                events_count=1, keypoint_frames_count=1, trajectories_count=0, manual_tags_count=0
+            ),
+            warnings=[],
+        )
+
     def test_parse_skeleton(self, client):
-        """10.6: parse endpoint 骨架"""
-        mock_ann = _mock_normalized_annotation()
-        with patch(f"{ROUTE}.parse_annotation_file", return_value=mock_ann):
+        """parse endpoint 骨架"""
+        with patch(f"{ROUTE}.parse_annotation_file", return_value=self._result()):
             response = client.post("/api/v1/annotations/301/parse")
         assert response.status_code == 201
         assert response.json()["normalized_annotation_id"] == 401
 
     def test_parse_status_linked(self, client):
-        """10.7: parse 成功联动 annotation_files.status = parsed"""
-        mock_ann = _mock_normalized_annotation()
-        with patch(f"{ROUTE}.parse_annotation_file", return_value=mock_ann):
+        """parse 成功 status = parsed"""
+        with patch(f"{ROUTE}.parse_annotation_file", return_value=self._result()):
             response = client.post("/api/v1/annotations/301/parse")
         assert response.status_code == 201
         assert response.json()["status"] == "parsed"
 
     def test_parse_not_implemented(self, client):
-        """10.6: parse 对不支持类型返回错误"""
+        """parse 对不支持类型返回错误（service 直接抛错）"""
         from fastapi import HTTPException
         with patch(f"{ROUTE}.parse_annotation_file", side_effect=HTTPException(status_code=501, detail="not implemented")):
             response = client.post("/api/v1/annotations/302/parse")
         assert response.status_code == 501
 
 
+class TestParseResponseShape:
+    def test_parse_response_contains_all_fields(self, client):
+        """7.10: parse 成功响应含 ParseResponse 所有字段"""
+        from app.services.normalized_annotation_service import ParseAnnotationResult
+        from app.schemas.normalized_annotation import ParseSummary
+
+        result = ParseAnnotationResult(
+            annotation=_mock_normalized_annotation(),
+            summary=ParseSummary(
+                events_count=1, keypoint_frames_count=1, trajectories_count=0, manual_tags_count=0
+            ),
+            warnings=["缺少推荐事件: hand_entry（入水）"],
+        )
+        with patch(f"{ROUTE}.parse_annotation_file", return_value=result):
+            response = client.post("/api/v1/annotations/301/parse")
+        assert response.status_code == 201
+        data = response.json()
+        for field in [
+            "normalized_annotation_id", "annotation_file_id", "source",
+            "status", "schema_version", "revision", "summary", "quality", "warnings",
+        ]:
+            assert field in data
+        assert data["annotation_file_id"] == 301
+        assert data["source"] == "manual_json"
+        assert data["status"] == "parsed"
+        assert data["summary"]["events_count"] == 1
+        assert data["summary"]["keypoint_frames_count"] == 1
+        assert data["warnings"] == ["缺少推荐事件: hand_entry（入水）"]
+
+    def test_parse_response_quality_shape(self, client):
+        """7.11: parse 响应 quality 含 level / score"""
+        from app.services.normalized_annotation_service import ParseAnnotationResult
+        from app.schemas.normalized_annotation import ParseSummary
+
+        result = ParseAnnotationResult(
+            annotation=_mock_normalized_annotation(),
+            summary=ParseSummary(),
+            warnings=[],
+        )
+        with patch(f"{ROUTE}.parse_annotation_file", return_value=result):
+            response = client.post("/api/v1/annotations/301/parse")
+        assert response.status_code == 201
+        assert response.json()["quality"]["level"] == "good"
+
+
+class TestParseOwnership:
+    def test_unauthorized_returns_404(self, client):
+        """7.14: 无权限返回 404（ownership check 在 service 层触发）"""
+        from fastapi import HTTPException
+
+        with patch(
+            "app.services.normalized_annotation_service.get_with_ownership_check",
+            side_effect=HTTPException(status_code=404, detail="标注文件不存在"),
+        ):
+            response = client.post("/api/v1/annotations/999/parse")
+        assert response.status_code == 404
+
+
 class TestRevisionIncrement:
     def test_revision(self, client):
         """10.8: revision 递增"""
+        from app.services.normalized_annotation_service import ParseAnnotationResult
+        from app.schemas.normalized_annotation import ParseSummary
+
         mock_ann = _mock_normalized_annotation()
         mock_ann.revision = 2
-        with patch(f"{ROUTE}.parse_annotation_file", return_value=mock_ann):
+        result = ParseAnnotationResult(annotation=mock_ann, summary=ParseSummary(), warnings=[])
+        with patch(f"{ROUTE}.parse_annotation_file", return_value=result):
             response = client.post("/api/v1/annotations/301/parse")
         assert response.status_code == 201
         assert response.json()["revision"] == 2
+
+
+# ── Service-level tests: status transitions (7.12 / 7.13) ──
+
+
+def _fake_annotation_file(file_type: str, storage_path: str, annotation_fps=None):
+    from app.models.annotation import AnnotationFileStatus
+
+    ann_file = MagicMock()
+    ann_file.id = 1
+    ann_file.session_video_id = 1001
+    ann_file.source.value = "kinovea"
+    ann_file.file_type = file_type
+    ann_file.storage_path = storage_path
+    ann_file.annotation_fps = annotation_fps
+    ann_file.frame_count = None
+    ann_file.duration_sec = None
+    ann_file.status = AnnotationFileStatus.UPLOADED
+    ann_file.parse_error = None
+    return ann_file
+
+
+class TestParseServiceTransitions:
+    def test_parse_failed_sets_status(self, tmp_path):
+        """7.12: parse 失败 → annotation_files.status = parse_failed + parse_error"""
+        from app.models.annotation import AnnotationFileStatus
+        from fastapi import HTTPException
+
+        from app.services.normalized_annotation_service import parse_annotation_file
+
+        bad = tmp_path / "bad.csv"
+        bad.write_text(
+            "type,name,label,frame,time_sec,side,point,y,tag,severity,comment\n"
+            "event,e1,入水,100,1.0,right,,,,,,\n",
+            encoding="utf-8",
+        )
+        ann_file = _fake_annotation_file("csv", str(bad))
+        db = MagicMock()
+        with patch("app.services.normalized_annotation_service.get_with_ownership_check", return_value=ann_file):
+            with patch("app.services.normalized_annotation_service.get_by_annotation_file", return_value=None):
+                with pytest.raises(HTTPException) as exc:
+                    parse_annotation_file(db, 1, current_user_id=1)
+        assert exc.value.status_code == 400
+        assert ann_file.status == AnnotationFileStatus.PARSE_FAILED
+        assert ann_file.parse_error is not None
+
+    def test_repeat_parse_increments_revision(self):
+        """7.13: 重复 parse 同一 annotation_file → revision += 1"""
+        from app.models.annotation import AnnotationFileStatus
+
+        from app.services.normalized_annotation_service import parse_annotation_file
+
+        csv_sample = str(Path(__file__).resolve().parent.parent / "samples" / "kinovea-side-freestyle.csv")
+        ann_file = _fake_annotation_file("csv", csv_sample, annotation_fps=60)
+        existing = MagicMock()
+        existing.revision = 1
+        db = MagicMock()
+        with patch("app.services.normalized_annotation_service.get_with_ownership_check", return_value=ann_file):
+            with patch("app.services.normalized_annotation_service.get_by_annotation_file", return_value=existing):
+                result = parse_annotation_file(db, 1, current_user_id=1)
+        assert result.annotation is existing
+        assert result.annotation.revision == 2
+        assert ann_file.status == AnnotationFileStatus.PARSED

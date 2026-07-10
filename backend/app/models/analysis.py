@@ -50,6 +50,7 @@ class AnalysisResult(Base):
     phases: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     metrics: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     diagnostics: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    quality_summary: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     raw_result: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

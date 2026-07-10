@@ -113,6 +113,10 @@ class NormalizedAnnotationCreate(BaseModel):
     keypoint_frames: list[KeypointFrame] = Field(default_factory=list)
     trajectories: list[Trajectory] = Field(default_factory=list)
     manual_tags: list[ManualTag] = Field(default_factory=list)
+    # ── side-view metrics 上下文（Change #4 新增）──
+    reference_lines: dict | None = None
+    distance_markers: list[dict] | None = None
+    swim_direction: str | None = None
 
 
 class NormalizedAnnotationRead(BaseModel):
@@ -138,6 +142,9 @@ class NormalizedAnnotationRead(BaseModel):
     keypoint_frames: list
     trajectories: list
     manual_tags: list
+    reference_lines: dict | None = None
+    distance_markers: list | None = None
+    swim_direction: str | None = None
     quality: dict
     annotation_metadata: dict
     created_by: int | None
@@ -161,11 +168,24 @@ class NormalizedAnnotationListItem(BaseModel):
     created_at: datetime
 
 
+class ParseSummary(BaseModel):
+    """解析结果计数摘要（events / keypoint_frames / trajectories / manual_tags 数量）。"""
+
+    events_count: int = 0
+    keypoint_frames_count: int = 0
+    trajectories_count: int = 0
+    manual_tags_count: int = 0
+
+
 class ParseResponse(BaseModel):
     """parse endpoint 响应。"""
 
     normalized_annotation_id: int
+    annotation_file_id: int
+    source: AnnotationSource
     status: AnnotationFileStatus
     schema_version: str
     revision: int
+    summary: ParseSummary
     quality: AnnotationQuality
+    warnings: list[str] = Field(default_factory=list)

@@ -16,6 +16,12 @@ from app.schemas.annotation import (
 )
 from app.schemas.athlete import AthleteCreate, AthleteRead
 from app.schemas.auth import Token, UserRegister
+from app.schemas.metrics import (
+    AnnotationMetricRead,
+    CalculateMetricsResponse,
+    MetricValue,
+    SideViewMetrics,
+)
 from app.schemas.normalized_annotation import (
     AnnotationEvent,
     AnnotationQuality,
@@ -26,6 +32,7 @@ from app.schemas.normalized_annotation import (
     NormalizedAnnotationListItem,
     NormalizedAnnotationRead,
     ParseResponse,
+    ParseSummary,
     ScaleInfo,
     Trajectory,
     VideoContext,
@@ -47,22 +54,27 @@ __all__ = [
     "AnnotationFileRead",
     "AnnotationEvent",
     "AnnotationQuality",
+    "AnnotationMetricRead",
     "AthleteCreate",
     "AthleteRead",
+    "CalculateMetricsResponse",
     "CoordinateSystem",
     "KeypointFrame",
     "ManualTag",
+    "MetricValue",
     "ModelAnalysisRequest",
     "ModelAnalysisResult",
     "NormalizedAnnotationCreate",
     "NormalizedAnnotationListItem",
     "NormalizedAnnotationRead",
     "ParseResponse",
+    "ParseSummary",
     "ReportData",
     "ReportGenerate",
     "SessionVideoCreate",
     "SessionVideoRead",
     "ScaleInfo",
+    "SideViewMetrics",
     "Token",
     "TrainingSessionCreate",
     "TrainingSessionRead",

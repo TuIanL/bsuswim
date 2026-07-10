@@ -36,5 +36,24 @@ class StorageService:
         }
 
 
+    async def save_bytes(
+        self,
+        data: bytes,
+        relative_path: str,
+        content_type: str = "application/pdf",
+    ) -> dict:
+        destination = self.upload_dir / relative_path
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(data)
+        return {
+            "relative_path": relative_path,
+            "absolute_path": str(destination),
+            "size_bytes": len(data),
+        }
+
+    def resolve_path(self, relative_path: str) -> Path:
+        return self.upload_dir / relative_path
+
+
 def playback_url(stored_filename: str) -> str:
     return f"/uploads/{stored_filename}"

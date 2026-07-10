@@ -262,9 +262,43 @@ export async function generateReport(sessionId: number): Promise<ReportData> {
   return response.data
 }
 
-export async function getReport(sessionId: number): Promise<ReportData> {
-  if (demoMode) return getDemoReport(sessionId)
+export async function getReport(
+  sessionId: number,
+  options?: { demoFormat?: 'legacy' | 'swim_v1' }
+): Promise<ReportData> {
+  if (demoMode) {
+    const format = options?.demoFormat === 'swim_v1' ? 'swim_v1' : 'legacy'
+    return getDemoReport(sessionId, format)
+  }
   const response = await client.get<ReportData>(`/reports/${sessionId}`)
+  return response.data
+}
+
+// ---- PDF export APIs ----
+
+export async function exportReportPdf(
+  sessionId: number,
+  force: boolean = false
+): Promise<{ pdf_status: string; pdf_url?: string; pdf_exported_at?: string }> {
+  if (demoMode) {
+    return { pdf_status: 'exported', pdf_url: '#demo-pdf', pdf_exported_at: new Date().toISOString() }
+  }
+  const response = await client.post(`/sessions/${sessionId}/report/export/pdf`, { force })
+  return response.data
+}
+
+export async function getReportPdfUrl(sessionId: number): Promise<string> {
+  if (demoMode) return '#demo-pdf'
+  return `/api/v1/sessions/${sessionId}/report/pdf`
+}
+
+export async function getReportPdfStatus(
+  sessionId: number
+): Promise<{ pdf_status: string; pdf_exported_at?: string; pdf_error?: string }> {
+  if (demoMode) {
+    return { pdf_status: 'not_exported' }
+  }
+  const response = await client.get(`/sessions/${sessionId}/report/export/pdf/status`)
   return response.data
 }
 

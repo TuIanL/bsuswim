@@ -1,5 +1,6 @@
 from app.models.analysis import AnalysisResult, AnalysisTask, AnalysisTaskStatus
 from app.models.annotation import AnnotationFile, AnnotationFileStatus, AnnotationSource
+from app.models.annotation_metric import AnnotationMetric
 from app.models.athlete import Athlete
 from app.models.normalized_annotation import NormalizedAnnotation
 from app.models.report import ReportMetadata
@@ -15,6 +16,7 @@ __all__ = [
     "AnnotationFile",
     "AnnotationFileStatus",
     "AnnotationSource",
+    "AnnotationMetric",
     "Athlete",
     "NormalizedAnnotation",
     "ReportMetadata",

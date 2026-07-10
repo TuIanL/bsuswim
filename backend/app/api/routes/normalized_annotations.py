@@ -4,11 +4,13 @@ from sqlalchemy.orm import Session
 from app.core.deps import get_current_user
 from app.db.session import get_db
 from app.models import User
+from app.models.annotation import AnnotationFileStatus, AnnotationSource
 from app.repositories.normalized_annotation_repository import (
     get_with_ownership_check,
     list_by_session_video,
 )
 from app.schemas.normalized_annotation import (
+    AnnotationQuality,
     NormalizedAnnotationCreate,
     NormalizedAnnotationListItem,
     NormalizedAnnotationRead,
@@ -85,6 +87,9 @@ def get_normalized_annotation(
         keypoint_frames=ann.keypoint_frames or [],
         trajectories=ann.trajectories or [],
         manual_tags=ann.manual_tags or [],
+        reference_lines=ann.reference_lines,
+        distance_markers=ann.distance_markers,
+        swim_direction=ann.swim_direction,
         quality=ann.quality or {},
         annotation_metadata=ann.annotation_metadata or {},
         created_by=ann.created_by,
@@ -123,19 +128,28 @@ def list_normalized_annotations(
 # ── Parse annotation file ──
 
 
-@router.post("/annotations/{annotation_file_id}/parse", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/annotations/{annotation_file_id}/parse",
+    status_code=status.HTTP_201_CREATED,
+    response_model=ParseResponse,
+)
 def parse_annotation_file_endpoint(
     annotation_file_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """解析 annotation_file 生成标准化标注。MVP 对 CSV 返回 501，对 JSON 直接读取。"""
-    ann = parse_annotation_file(db, annotation_file_id, created_by=current_user.id)
-
-    return {
-        "normalized_annotation_id": ann.id,
-        "status": "parsed",
-        "schema_version": ann.schema_version,
-        "revision": ann.revision,
-        "quality": ann.quality,
-    }
+    """解析 annotation_file 生成标准化标注（Kinovea JSON/CSV 或 manual_json）。"""
+    result = parse_annotation_file(db, annotation_file_id, current_user_id=current_user.id)
+    ann = result.annotation
+    quality = AnnotationQuality(**ann.quality) if ann.quality else AnnotationQuality(level="error")
+    return ParseResponse(
+        normalized_annotation_id=ann.id,
+        annotation_file_id=annotation_file_id,
+        source=AnnotationSource(ann.source),
+        status=AnnotationFileStatus.PARSED,
+        schema_version=ann.schema_version,
+        revision=ann.revision,
+        summary=result.summary,
+        quality=quality,
+        warnings=result.warnings,
+    )
