@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<annotations>
+  <version>1.1</version>
+  <meta>
+    <job>
+      <id>1</id>
+      <size>10</size>
+      <mode>annotation</mode>
+      <start_frame>0</start_frame>
+      <stop_frame>9</stop_frame>
+    </job>
+  </meta>
+  <track id="0" label="骨架" source="manual">
+    <skeleton frame="0" keyframe="1" z_order="0">
+      <points label="nose" outside="0" occluded="0" points="100,100"/>
+      <points label="left-shoulder" outside="0" occluded="0" points="200,200"/>
+      <points label="right-shoulder" outside="0" occluded="0" points="150,250"/>
+    </skeleton>
+    <skeleton frame="1" keyframe="1" z_order="0">
+      <points label="nose" outside="1" occluded="0" points="100,100"/>
+      <points label="left-shoulder" outside="1" occluded="0" points="200,200"/>
+      <points label="right-shoulder" outside="1" occluded="0" points="150,250"/>
+    </skeleton>
+  </track>
+  <track id="1" label="骨架" source="manual">
+    <skeleton frame="0" keyframe="1" z_order="0">
+      <points label="nose" outside="0" occluded="0" points="300,300"/>
+      <points label="left-shoulder" outside="0" occluded="0" points="400,400"/>
+      <points label="right-shoulder" outside="0" occluded="0" points="350,450"/>
+    </skeleton>
+  </track>
+</annotations>

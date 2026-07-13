@@ -13,6 +13,10 @@ from app.services.annotation_quality.checks.coverage_checks import (
     check_reference_elements,
     check_required_events,
 )
+from app.services.annotation_quality.checks.cvat_checks import (
+    check_frame_mapping,
+    check_sequence_coverage,
+)
 from app.services.annotation_quality.checks.geometry_checks import (
     check_coordinate_validity,
     check_scale_validity,
@@ -110,6 +114,9 @@ class AnnotationQualityValidator:
         profile_id: str = "side_technical_v1",
         source_revision: int = 0,
         validator_version: str = "1.0.0",
+        frame_mapping: dict | None = None,
+        annotation_sequence: dict | None = None,
+        analysis_ranges: list | None = None,
     ) -> AnnotationQualityReport:
         profile = self.profile_provider.get(profile_id)
         issues: list[QualityIssue] = []
@@ -139,6 +146,11 @@ class AnnotationQualityValidator:
 
         issues.extend(check_reference_elements(reference_lines, swim_direction, scale))
         issues.extend(check_cycle_completeness(events or []))
+        issues.extend(check_frame_mapping(frame_mapping))
+        if annotation_sequence:
+            seq_frame_count = annotation_sequence.get("frame_count")
+            annotated_count = annotation_sequence.get("annotated_frame_count")
+            issues.extend(check_sequence_coverage(annotated_count, seq_frame_count, analysis_ranges))
 
         module_readiness = compute_module_readiness(issues, profile)
         status = derive_global_status(issues, module_readiness, profile)

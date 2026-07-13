@@ -3,7 +3,7 @@ set -e
 
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 FRONTEND_DIR="$ROOT_DIR/frontend-vue"
-PORT="${PORT:-5173}"
+PORT="${PORT:-5174}"
 HOST="127.0.0.1"
 PID_FILE="$ROOT_DIR/.web-dev.pid"
 LOG_FILE="$ROOT_DIR/.web-dev.log"

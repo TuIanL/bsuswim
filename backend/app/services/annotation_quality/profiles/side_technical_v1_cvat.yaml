@@ -1,0 +1,50 @@
+id: side_technical_v1_cvat
+version: "1.0.0"
+
+global_gate:
+  minimum_ready_core_modules: 2
+
+modules:
+  body_position:
+    core: true
+    required_landmarks:
+      - shoulder
+      - hip
+      - ankle
+    minimum_landmark_coverage: 0.80
+    minimum_sample_frames: 3
+
+  arm_entry:
+    core: false
+    required_landmarks:
+      - shoulder
+      - elbow
+      - wrist
+    minimum_landmark_coverage: 0.80
+
+  catch_pull:
+    core: false
+    required_landmarks:
+      - shoulder
+      - elbow
+      - wrist
+    minimum_landmark_coverage: 0.80
+
+  leg_kick:
+    core: false
+    required_landmarks:
+      - hip
+      - knee
+      - ankle
+    minimum_landmark_coverage: 0.80
+    minimum_sample_frames: 3
+
+  efficiency:
+    core: false
+    required_references:
+      - scale
+    required_metrics:
+      - stroke_rate_spm
+      - stroke_length_m
+
+event_sequences: {}

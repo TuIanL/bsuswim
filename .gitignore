@@ -8,10 +8,6 @@ data/swim_coco/annotations/*.json
 __pycache__/
 *.pyc
 .DS_Store
-frontend/node_modules/
-frontend/.next/
-frontend/out/
-frontend/.env*.local
 frontend-vue/node_modules/
 frontend-vue/dist/
 frontend-vue/.env*.local

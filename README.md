@@ -54,8 +54,7 @@
 
 ```text
 backend/         业务后端 FastAPI
-frontend/        早期 Next/React 原型
-frontend-vue/    正式 Vue3 分析平台
+frontend-vue/    正式且唯一的 Vue 3 Web 分析平台
 model_service/   独立模型服务
 docs/            项目文档
 data/            训练与标注数据目录
@@ -123,7 +122,7 @@ VITE_API_BASE_URL=http://127.0.0.1:8000 npm run dev
 
 ### 5. 访问地址
 
-- Vue 前端：`http://127.0.0.1:5173`
+- Vue 前端：`http://127.0.0.1:5174`
 - 业务后端：`http://127.0.0.1:8000`
 - 模型服务：`http://127.0.0.1:8100`
 
@@ -155,8 +154,18 @@ data/swim_coco/images/val/
 
 ## 文档导航
 
-- [技术栈与架构说明](/Users/tuian/Documents/大学/竞赛/大创/游泳/swim/docs/tech-stack.md)
-- [数据库设计](/Users/tuian/Documents/大学/竞赛/大创/游泳/swim/docs/database-design.md)
-- [AI 接口规范](/Users/tuian/Documents/大学/竞赛/大创/游泳/swim/docs/ai-api-spec.md)
-- [本地开发说明](/Users/tuian/Documents/大学/竞赛/大创/游泳/swim/docs/local-development.md)
-- [后期升级边界](/Users/tuian/Documents/大学/竞赛/大创/游泳/swim/docs/upgrade-paths.md)
+- [技术栈与架构说明](docs/tech-stack.md)
+- [数据库设计](docs/database-design.md)
+- [AI 接口规范](docs/ai-api-spec.md)
+- [本地开发说明](docs/local-development.md)
+- [后期升级边界](docs/upgrade-paths.md)
+
+## 迁移说明
+
+旧 Next.js 14 + React 18 原型（`frontend/`）已在此版本中正式退休并删除。该原型包含一个营销 landing page 和基于 localStorage 的 React 演示 SPA。所有 Web 开发和维护已统一到 `frontend-vue/`。
+
+如果本地 clone 中仍残留已被 Git 忽略的 `frontend/` 目录，请手动删除：
+
+```bash
+rm -rf frontend
+```

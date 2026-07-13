@@ -1,0 +1,72 @@
+{
+  "schema_version": "swim-annotation.v1",
+  "fps": 60,
+  "frame_count": 5400,
+  "duration_sec": 90.0,
+  "scale": {
+    "method": "lane_marker",
+    "pixels_per_meter": 840.5,
+    "reference_length_m": 2.5,
+    "reference_points": [[112, 540], [112, 745]],
+    "confidence": 0.9,
+    "note": "泳道分道线 2.5m 标定"
+  },
+  "coordinate_system": {
+    "origin": "top_left",
+    "x_axis": "right",
+    "y_axis": "down",
+    "unit": "pixel"
+  },
+  "events": [
+    {"name": "hand_entry", "label": "入水", "side": "right", "frame": 120, "time_sec": 2.0, "confidence": 1.0, "labeled_by": "kinovea"},
+    {"name": "catch_start", "label": "抱水开始", "side": "right", "frame": 150, "time_sec": 2.5, "confidence": 0.95, "labeled_by": "kinovea"},
+    {"name": "pull_end", "label": "推水结束", "side": "right", "frame": 240, "time_sec": 4.0, "confidence": 0.95, "labeled_by": "kinovea"},
+    {"name": "cycle_start", "label": "划水周期开始", "side": "right", "frame": 120, "time_sec": 2.0, "confidence": 1.0, "labeled_by": "kinovea"},
+    {"name": "cycle_end", "label": "划水周期结束", "side": "right", "frame": 360, "time_sec": 6.0, "confidence": 1.0, "labeled_by": "kinovea"}
+  ],
+  "keypoint_frames": [
+    {
+      "frame": 120,
+      "time_sec": 2.0,
+      "phase": "hand_entry",
+      "points": {
+        "right_shoulder": {"x": 512, "y": 240, "confidence": 0.98, "visibility": "visible"},
+        "right_elbow": {"x": 540, "y": 300, "confidence": 0.97, "visibility": "visible"},
+        "right_wrist": {"x": 560, "y": 350, "confidence": 0.96, "visibility": "visible"},
+        "right_hip": {"x": 500, "y": 360, "confidence": 0.98, "visibility": "visible"},
+        "right_knee": {"x": 520, "y": 460, "confidence": 0.97, "visibility": "visible"},
+        "right_ankle": {"x": 540, "y": 560, "confidence": 0.95, "visibility": "visible"}
+      },
+      "tags": ["entry"]
+    },
+    {
+      "frame": 240,
+      "time_sec": 4.0,
+      "phase": "pull_end",
+      "points": {
+        "right_shoulder": {"x": 520, "y": 250, "confidence": 0.98, "visibility": "visible"},
+        "right_elbow": {"x": 500, "y": 320, "confidence": 0.97, "visibility": "visible"},
+        "right_wrist": {"x": 470, "y": 370, "confidence": 0.96, "visibility": "visible"},
+        "right_hip": {"x": 505, "y": 365, "confidence": 0.98, "visibility": "visible"},
+        "right_knee": {"x": 525, "y": 465, "confidence": 0.97, "visibility": "visible"},
+        "right_ankle": {"x": 545, "y": 565, "confidence": 0.95, "visibility": "visible"}
+      },
+      "tags": ["release"]
+    }
+  ],
+  "trajectories": [
+    {
+      "name": "right_wrist_path",
+      "label": "右手腕轨迹",
+      "point": "right_wrist",
+      "frames": [120, 150, 180, 210, 240],
+      "points": [[560, 350], [550, 360], [510, 365], [490, 368], [470, 370]],
+      "source": "kinovea"
+    }
+  ],
+  "manual_tags": [
+    {"name": "early_vertical_forearm", "label": "高肘抱水不足", "severity": "medium", "phase": "catch_start", "frame": 150, "comment": "抱水阶段肘部下沉"},
+    {"name": "head_position", "label": "头部位置偏高", "severity": "low", "phase": "hand_entry", "frame": 120, "comment": "入水时头部略高"}
+  ],
+  "metadata": {"athlete": "sample", "stroke": "freestyle", "view": "side"}
+}

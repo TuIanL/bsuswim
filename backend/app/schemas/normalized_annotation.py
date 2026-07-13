@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.models.annotation import AnnotationSource, AnnotationFileStatus
 from app.models.video import ViewType
@@ -50,10 +50,22 @@ class AnnotationEvent(BaseModel):
 
 
 class KeypointPoint(BaseModel):
-    x: float
-    y: float
-    confidence: float = 1.0
+    x: float | None = None
+    y: float | None = None
+    confidence: float | None = None
     visibility: Literal["visible", "occluded", "estimated", "missing"] = "visible"
+
+    @model_validator(mode="after")
+    def validate_coordinate_visibility(self):
+        if self.visibility == "missing":
+            if self.x is not None or self.y is not None:
+                raise ValueError("missing point must not contain coordinates")
+        else:
+            if self.x is None or self.y is None:
+                raise ValueError(
+                    "visible, occluded or estimated point requires coordinates"
+                )
+        return self
 
 
 class KeypointFrame(BaseModel):
@@ -62,6 +74,10 @@ class KeypointFrame(BaseModel):
     phase: str = ""
     points: dict[str, KeypointPoint] = Field(default_factory=dict)
     tags: list[str] = Field(default_factory=list)
+    annotation_frame: int | None = None
+    source_video_frame: int | None = None
+    timestamp_sec: float | None = None
+    image_name: str | None = None
 
 
 class Trajectory(BaseModel):
@@ -104,6 +120,67 @@ class VideoContext(BaseModel):
     duration_sec: float | None = None
     width: int | None = None
     height: int | None = None
+
+
+# ── Frame mapping schemas ──
+
+
+class FrameMappingEntry(BaseModel):
+    annotation_frame: int
+    source_video_frame: int | None = None
+    timestamp_sec: float | None = None
+    image_name: str | None = None
+
+
+class FrameMapping(BaseModel):
+    mode: Literal["explicit", "affine", "identity", "unknown"] = "unknown"
+    verified: bool = False
+    verification_reason: str | None = None
+    source_frame_offset: int | None = None
+    source_frame_stride: int | None = None
+    video_fps: float | None = None
+    entries: list[FrameMappingEntry] | None = None
+
+
+class AnalysisRange(BaseModel):
+    start_annotation_frame: int
+    end_annotation_frame: int
+    purpose: str = ""
+    source: str = "manual"
+
+
+class FrameMappingOverride(BaseModel):
+    mode: Literal["affine", "identity"]
+    source_frame_offset: int | None = None
+    source_frame_stride: int | None = None
+    confirmed: bool = False
+
+
+class ParseAnnotationOptions(BaseModel):
+    companion_annotation_file_id: int | None = None
+    frame_mapping_override: FrameMappingOverride | None = None
+    analysis_ranges: list[AnalysisRange] = []
+
+
+# ── CVAT raw data schemas ──
+
+
+class RawCvatPoint(BaseModel):
+    x: float
+    y: float
+    visibility: Literal["visible", "occluded", "missing"]
+
+
+class RawCvatKeypointFrame(BaseModel):
+    annotation_frame: int
+    points: dict[str, RawCvatPoint] = Field(default_factory=dict)
+    source_track_ids: list[str] = Field(default_factory=list)
+
+
+class ParsedCvatAnnotation(BaseModel):
+    raw_keypoint_frames: list[RawCvatKeypointFrame] = Field(default_factory=list)
+    native_metadata: dict = Field(default_factory=dict)
+    warnings: list[str] = Field(default_factory=list)
 
 
 # ── API schemas ──

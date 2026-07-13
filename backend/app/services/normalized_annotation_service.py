@@ -1,4 +1,5 @@
 import json
+import os
 from dataclasses import dataclass
 
 from fastapi import HTTPException
@@ -11,18 +12,23 @@ from app.repositories.normalized_annotation_repository import get_by_annotation_
 from app.schemas.normalized_annotation import (
     AnnotationQuality,
     NormalizedAnnotationCreate,
+    ParseAnnotationOptions,
     ParseSummary,
 )
+from app.services.annotation_derivation.builder import AnnotationDerivedDataBuilder
 from app.services.annotation_quality.legacy import normalize_quality_payload
 from app.services.annotation_quality.validator import AnnotationQualityValidator
 from app.services.annotation_quality.provider import YamlQualityProfileProvider
 from app.services.parsers import (
+    CvatParseError,
+    CvatAnnotationNormalizer,
+    FrameMapping,
+    FrameMappingResolver,
     KinoveaParseError,
     build_parse_summary,
+    parse_cvat_xml,
     parse_kinovea_annotation,
 )
-
-import os
 
 
 def _get_validator() -> AnnotationQualityValidator:
@@ -102,6 +108,7 @@ def parse_annotation_file(
     db: Session,
     annotation_file_id: int,
     current_user_id: int,
+    options: ParseAnnotationOptions | None = None,
 ) -> ParseAnnotationResult:
     ann_file = get_with_ownership_check(db, annotation_file_id, current_user_id)
     source_value = getattr(ann_file.source, "value", str(ann_file.source))
@@ -112,6 +119,7 @@ def parse_annotation_file(
 
     parsed = None
     raw = None
+    raw_json = None
     try:
         if source_value == AnnotationSource.KINOVEA.value:
             fallback_fps = float(ann_file.annotation_fps) if ann_file.annotation_fps else None
@@ -129,19 +137,116 @@ def parse_annotation_file(
             coordinate_system = parsed.coordinate_system.model_dump()
             frame_count = parsed.frame_count or (int(ann_file.frame_count) if ann_file.frame_count else None)
             duration_sec = parsed.duration_sec or (float(ann_file.duration_sec) if ann_file.duration_sec else None)
+            build_metadata = parsed.model_dump()
+
+        elif source_value == AnnotationSource.CVAT.value:
+            cvat_parsed = parse_cvat_xml(ann_file.storage_path)
+
+            session_video = ann_file.session_video
+            video_fps = float(session_video.fps) if session_video and hasattr(session_video, 'fps') and session_video.fps else None
+            video_file = session_video.video_file if session_video and hasattr(session_video, 'video_file') else None
+
+            json_manifest = None
+            if options and options.companion_annotation_file_id:
+                companion = db.get(AnnotationFile, options.companion_annotation_file_id)
+                if companion is None:
+                    raise CvatParseError(f"companion annotation file {options.companion_annotation_file_id} not found")
+                if companion.session_video_id != ann_file.session_video_id:
+                    raise CvatParseError(
+                        "companion JSON does not belong to the same session_video"
+                    )
+                try:
+                    with open(companion.storage_path, "r", encoding="utf-8") as fh:
+                        manifest_data = json.load(fh)
+                    images = manifest_data.get("images", [])
+                    json_manifest = [
+                        {
+                            "annotation_frame": i,
+                            "image_name": img.get("file_name", ""),
+                            "source_video_frame": None,
+                            "timestamp_sec": None,
+                        }
+                        for i, img in enumerate(images)
+                    ]
+                except (FileNotFoundError, json.JSONDecodeError) as exc:
+                    raise CvatParseError(f"failed to read companion JSON: {exc}")
+
+            frame_mapping = FrameMappingResolver.resolve(
+                cvat_parsed.native_metadata,
+                video_fps=video_fps,
+                options=options,
+                json_manifest=json_manifest,
+            )
+
+            normalizer = CvatAnnotationNormalizer()
+            keypoint_frames = normalizer.normalize(
+                cvat_parsed.raw_keypoint_frames, frame_mapping
+            )
+
+            derived = AnnotationDerivedDataBuilder.build(keypoint_frames)
+            derived_trajectories = derived.get("trajectories", [])
+            derived_warnings = derived.get("warnings", [])
+
+            all_trajectories = derived_trajectories
+            all_warnings = cvat_parsed.warnings + derived_warnings
+
+            kf_dicts = [k.model_dump() for k in keypoint_frames]
+            events = []
+            trajectories = all_trajectories
+            manual_tags = []
+            scale = None
+            coordinate_system = {"origin": "top_left", "x_axis": "right", "y_axis": "down", "unit": "pixel"}
+            fps = float(video_fps) if video_fps else 60.0
+            frame_count = len(keypoint_frames)
+            duration_sec = float(video_file.duration_sec) if video_file and hasattr(video_file, 'duration_sec') and video_file.duration_sec else None
+            video_frame_count = int(video_file.frame_count) if video_file and hasattr(video_file, 'frame_count') and video_file.frame_count else None
+
+            annotation_sequence = {
+                "frame_count": cvat_parsed.native_metadata.get("meta", {}).get("size"),
+                "start_frame": cvat_parsed.native_metadata.get("meta", {}).get("start_frame", 0),
+                "end_frame": cvat_parsed.native_metadata.get("meta", {}).get("stop_frame"),
+            }
+            annotated_frame_count = len(keypoint_frames)
+            analysis_ranges = []
+            if options and options.analysis_ranges:
+                analysis_ranges = [r.model_dump() for r in options.analysis_ranges]
+            coverage = {
+                "annotated_frame_count": annotated_frame_count,
+                "annotated_ranges": analysis_ranges if analysis_ranges else (
+                    [{"start_frame": 0, "end_frame": annotated_frame_count - 1}] if annotated_frame_count > 0 else []
+                ),
+            }
+
+            build_metadata = {
+                "video": {
+                    "fps": fps,
+                    "frame_count": video_frame_count,
+                    "duration_sec": duration_sec,
+                },
+                "annotation_sequence": annotation_sequence,
+                "frame_mapping": frame_mapping.model_dump(),
+                "annotation_coverage": coverage,
+                "analysis_ranges": analysis_ranges,
+                "derived": {
+                    "visibility_summary": derived.get("visibility_summary", {}),
+                },
+            }
         else:
             with open(ann_file.storage_path, "r", encoding="utf-8") as fh:
-                raw = json.load(fh)
-            fps = raw.get("fps", float(ann_file.annotation_fps or 60))
-            events = raw.get("events", [])
-            keypoint_frames = raw.get("keypoint_frames", [])
-            trajectories = raw.get("trajectories", [])
-            manual_tags = raw.get("manual_tags", [])
-            scale = raw.get("scale")
-            coordinate_system = raw.get("coordinate_system", {})
-            frame_count = raw.get("frame_count") or raw.get("video", {}).get("frame_count")
-            duration_sec = raw.get("duration_sec") or raw.get("video", {}).get("duration_sec")
+                raw_json = json.load(fh)
+            fps = raw_json.get("fps", float(ann_file.annotation_fps or 60))
+            events = raw_json.get("events", [])
+            keypoint_frames = raw_json.get("keypoint_frames", [])
+            trajectories = raw_json.get("trajectories", [])
+            manual_tags = raw_json.get("manual_tags", [])
+            scale = raw_json.get("scale")
+            coordinate_system = raw_json.get("coordinate_system", {})
+            frame_count = raw_json.get("frame_count") or raw_json.get("video", {}).get("frame_count")
+            duration_sec = raw_json.get("duration_sec") or raw_json.get("video", {}).get("duration_sec")
+            build_metadata = raw_json.get("metadata", {})
     except KinoveaParseError as exc:
+        _fail(exc)
+    except CvatParseError as exc:
         _fail(exc)
     except (FileNotFoundError, json.JSONDecodeError, ValueError) as exc:
         _fail(exc)
@@ -152,6 +257,11 @@ def parse_annotation_file(
     video_width = session_video.video_file.width if session_video and hasattr(session_video, 'video_file') and session_video.video_file else None
     video_height = session_video.video_file.height if session_video and hasattr(session_video, 'video_file') and session_video.video_file else None
 
+    if source_value == AnnotationSource.CVAT.value:
+        profile_id = "side_technical_v1_cvat"
+    else:
+        profile_id = "side_technical_v1"
+
     validator = _get_validator()
     quality_report = validator.validate(
         events=events,
@@ -159,17 +269,24 @@ def parse_annotation_file(
         scale=scale,
         fps=fps,
         frame_count=frame_count,
-        reference_lines=raw.get("reference_lines") if raw else None,
-        swim_direction=raw.get("swim_direction") if raw else None,
+        reference_lines=raw_json.get("reference_lines") if raw_json else None,
+        swim_direction=raw_json.get("swim_direction") if raw_json else None,
         video_fps=video_fps,
         video_width=video_width,
         video_height=video_height,
         view_type=str(session_video.view_type.value) if session_video and hasattr(session_video, 'view_type') else None,
+        profile_id=profile_id,
+        frame_mapping=build_metadata.get("frame_mapping") if source_value == AnnotationSource.CVAT.value else None,
+        annotation_sequence={
+            "frame_count": build_metadata.get("annotation_sequence", {}).get("frame_count"),
+            "annotated_frame_count": build_metadata.get("annotation_coverage", {}).get("annotated_frame_count"),
+        } if source_value == AnnotationSource.CVAT.value else None,
+        analysis_ranges=build_metadata.get("analysis_ranges") if source_value == AnnotationSource.CVAT.value else None,
     )
     quality = quality_report.model_dump(mode="json")
 
     # ── upsert ──
-    metadata = parsed.model_dump() if parsed is not None else (raw.get("metadata", {}) if raw else {})
+    metadata = build_metadata if build_metadata else {}
     existing = get_by_annotation_file(db, annotation_file_id)
     if existing:
         existing.revision += 1
@@ -183,9 +300,9 @@ def parse_annotation_file(
         existing.keypoint_frames = keypoint_frames
         existing.trajectories = trajectories
         existing.manual_tags = manual_tags
-        existing.reference_lines = raw.get("reference_lines") if raw else None
-        existing.distance_markers = raw.get("distance_markers") if raw else None
-        existing.swim_direction = raw.get("swim_direction") if raw else None
+        existing.reference_lines = raw_json.get("reference_lines") if raw_json else None
+        existing.distance_markers = raw_json.get("distance_markers") if raw_json else None
+        existing.swim_direction = raw_json.get("swim_direction") if raw_json else None
         existing.quality = quality
         existing.annotation_metadata = metadata
         ann = existing
@@ -215,11 +332,13 @@ def parse_annotation_file(
 
     update_annotation_file_status(db, ann_file, success=True)
 
-    summary = build_parse_summary(parsed) if parsed is not None else ParseSummary(
+    summary = ParseSummary(
         events_count=len(events),
         keypoint_frames_count=len(keypoint_frames),
         trajectories_count=len(trajectories),
         manual_tags_count=len(manual_tags),
     )
-    warnings = parsed.warnings if parsed is not None else []
+    warnings = all_warnings if source_value == AnnotationSource.CVAT.value else (
+        parsed.warnings if parsed is not None else []
+    )
     return ParseAnnotationResult(annotation=ann, summary=summary, warnings=warnings)

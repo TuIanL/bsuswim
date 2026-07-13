@@ -1,0 +1,409 @@
+schema_version: swim-diagnostics-rules.v1
+stroke: freestyle
+camera_view: side
+
+# ──────────────────────────────────────────────────────────────────────────
+# 规则集说明
+# - status: active | dormant。dormant 永远跳过（reason=dormant）。
+# - required_metrics：任一缺失 → 跳过（reason=missing_metric:<keys>）。
+#   phase_context 为特殊 token，缺失/不足时给出细分原因（见引擎 _phase_context_skip_reason）。
+# - condition / severity 仅结构化 all/any + metric/manual_tag 子句，不支持字符串表达式。
+# - 模板占位符使用稳定逻辑键（body_angle_deg / swolf_value 等），由 adapter 映射而来。
+# ──────────────────────────────────────────────────────────────────────────
+
+rules:
+  # ── A. 身体位置与流线型 ──
+  - id: R001
+    code: low_body_position
+    category: body_position
+    title: 身体位置偏低
+    status: active
+    enabled: true
+    required_metrics: [body_angle_deg]
+    condition:
+      all:
+        - metric: body_angle_deg
+          op: ">="
+          value: 12
+    severity:
+      high:
+        any:
+          - metric: body_angle_deg
+            op: ">="
+            value: 14
+      medium:
+        any:
+          - metric: body_angle_deg
+            op: ">="
+            value: 12
+    priority_base: 80
+    evidence_template: "身体与水平面夹角为 {body_angle_deg}，提示身体位置偏低。"
+    reason_template: "身体未能保持接近水平的流线型姿态，可能增加迎水阻力。"
+    suggestion_template: "加强核心控制、髋部支撑与低速阶段身体稳定训练。"
+    metric_refs: [body_angle_deg]
+    recommendation_tags: [core_control, hip_support, streamline]
+    section_key: body_position
+
+  - id: R002
+    code: hip_drop
+    category: body_position
+    title: 髋位下沉明显
+    status: active
+    enabled: true
+    required_metrics: [hip_depth_cm]
+    condition:
+      all:
+        - metric: hip_depth_cm
+          op: ">="
+          value: 8
+    severity:
+      high:
+        any:
+          - metric: hip_depth_cm
+            op: ">="
+            value: 12
+      medium:
+        any:
+          - metric: hip_depth_cm
+            op: ">="
+            value: 8
+    priority_base: 70
+    evidence_template: "髋部低于参考水平线 {hip_depth_cm} cm。"
+    reason_template: "髋位下沉会破坏身体流线型，增加身体中后段阻力。"
+    suggestion_template: "强化髋部支撑、核心抗伸展能力和打腿连续性。"
+    metric_refs: [hip_depth_cm]
+    recommendation_tags: [hip_support, core_control]
+    section_key: body_position
+
+  - id: R003
+    code: body_position_improves_with_speed
+    category: body_position
+    title: 身体位置随速度提升而改善
+    status: active
+    enabled: true
+    required_metrics: [phase_context]
+    condition:
+      all:
+        - metric: body_angle_low_speed_deg
+          op: ">"
+          value: 0
+    severity:
+      info:
+        any:
+          - metric: body_angle_high_speed_deg
+            op: "<"
+            value: 999
+    priority_base: 30
+    evidence_template: "低速阶段身体角度 {body_angle_low_speed_deg}°，高速阶段改善至 {body_angle_high_speed_deg}°。"
+    reason_template: "随着配合节奏提升，下肢支撑和身体流线型有所改善。"
+    suggestion_template: "继续巩固高速阶段的身体控制，并向低速阶段迁移。"
+    metric_refs: [body_angle_low_speed_deg, body_angle_high_speed_deg]
+    recommendation_tags: [streamline, speed_control]
+    section_key: body_position
+
+  # ── B. 上肢入水与前端支撑 ──
+  - id: R004
+    code: forearm_press_down
+    category: arm_entry
+    title: 前臂下压明显
+    status: active
+    enabled: true
+    required_metrics: [forearm_drop_angle_deg]
+    condition:
+      any:
+        - manual_tag: 前臂下压
+        - metric: forearm_drop_angle_deg
+          op: ">="
+          value: 20
+    severity:
+      high:
+        any:
+          - metric: forearm_drop_angle_deg
+            op: ">="
+            value: 30
+      medium:
+        any:
+          - metric: forearm_drop_angle_deg
+            op: ">="
+            value: 20
+    priority_base: 60
+    evidence_template: "入水后前臂下压角度为 {forearm_drop_angle_deg}°，前伸支撑不足。"
+    reason_template: "前臂过早下压会缩短有效前伸距离，影响后续抱水阶段效率。"
+    suggestion_template: "进行指尖斜插入水、前伸保持和前端支撑稳定性训练。"
+    metric_refs: [forearm_drop_angle_deg]
+    recommendation_tags: [front_extension, entry_control]
+    section_key: arm_entry
+
+  - id: R005
+    code: insufficient_front_reach
+    category: arm_entry
+    title: 有效前伸距离不足
+    status: dormant
+    enabled: true
+    required_metrics: [front_reach_distance_cm]
+    condition:
+      all:
+        - metric: front_reach_distance_cm
+          op: "<"
+          value: 60
+    severity:
+      high:
+        any:
+          - metric: front_reach_distance_cm
+            op: "<"
+            value: 45
+      medium:
+        any:
+          - metric: front_reach_distance_cm
+            op: "<"
+            value: 60
+    priority_base: 50
+    evidence_template: "有效前伸距离为 {front_reach_distance_cm} cm，低于建议范围。"
+    reason_template: "前端延伸不足会限制入水后的支撑建立，影响后续抱水效率。"
+    suggestion_template: "加强前伸保持、单臂前伸和身体流线型控制训练。"
+    metric_refs: [front_reach_distance_cm]
+    recommendation_tags: [front_extension, streamline]
+    section_key: arm_entry
+
+  # ── C. 抱水与推进效率 ──
+  - id: R006
+    code: insufficient_high_elbow_catch
+    category: catch_pull
+    title: 高肘抱水不足
+    status: active
+    enabled: true
+    required_metrics: [elbow_angle_deg]
+    condition:
+      any:
+        - manual_tag: 高肘不足
+        - metric: elbow_angle_deg
+          op: ">="
+          value: 150
+    severity:
+      high:
+        any:
+          - metric: elbow_angle_deg
+            op: ">="
+            value: 160
+      medium:
+        any:
+          - metric: elbow_angle_deg
+            op: ">="
+            value: 150
+    priority_base: 90
+    evidence_template: "抱水阶段肘关节角度为 {elbow_angle_deg}°，提示高肘支撑不足。"
+    reason_template: "肘关节角度偏大时，前臂难以形成稳定有效迎水面，推进效率下降。"
+    suggestion_template: "进行高肘抱水专项、单臂划水和 Paddle 抓水训练。"
+    metric_refs: [elbow_angle_deg]
+    recommendation_tags: [high_elbow, catch_area, propulsion]
+    section_key: catch_pull
+
+  - id: R007
+    code: insufficient_catch_area
+    category: catch_pull
+    title: 抓水面积不足
+    status: active
+    enabled: true
+    required_metrics: [catch_area_score]
+    condition:
+      any:
+        - manual_tag: 抓水面积不足
+        - metric: catch_area_score
+          op: "<"
+          value: 60
+    severity:
+      high:
+        any:
+          - metric: catch_area_score
+            op: "<"
+            value: 45
+      medium:
+        any:
+          - metric: catch_area_score
+            op: "<"
+            value: 60
+    priority_base: 75
+    evidence_template: "抓水面积评分为 {catch_area_score}/100，低于建议水平。"
+    reason_template: "有效抓水面积不足会降低单次划水推进距离。"
+    suggestion_template: "强化前臂垂直阶段控制，增加有效迎水面积。"
+    metric_refs: [catch_area_score]
+    recommendation_tags: [catch_area, propulsion]
+    section_key: catch_pull
+
+  - id: R008
+    code: low_propulsive_efficiency
+    category: catch_pull
+    title: 上肢推进效率不足
+    status: active
+    enabled: true
+    required_metrics: [stroke_length_m]
+    condition:
+      any:
+        - metric: stroke_length_m
+          op: "<"
+          value: 1.15
+        - metric: propulsive_efficiency_score
+          op: "<"
+          value: 60
+    severity:
+      high:
+        any:
+          - metric: stroke_length_m
+            op: "<"
+            value: 1.05
+      medium:
+        any:
+          - metric: stroke_length_m
+            op: "<"
+            value: 1.15
+    priority_base: 80
+    evidence_template: "单次划幅为 {stroke_length_m} m，提示单次推进距离不足。"
+    reason_template: "单次划水推进距离不足，可能与抱水面积不足和推水阶段发力不充分有关。"
+    suggestion_template: "加强抱水—推水衔接训练，提高单次划水推进质量。"
+    metric_refs: [stroke_length_m]
+    recommendation_tags: [propulsion, stroke_efficiency]
+    section_key: catch_pull
+
+  # ── D. 腿部技术与打腿节奏 ──
+  - id: R009
+    code: excessive_knee_flexion
+    category: leg_kick
+    title: 膝关节屈曲过大
+    status: active
+    enabled: true
+    required_metrics: [knee_angle_deg]
+    condition:
+      all:
+        - metric: knee_angle_deg
+          op: "<"
+          value: 125
+    severity:
+      high:
+        any:
+          - metric: knee_angle_deg
+            op: "<"
+            value: 110
+      medium:
+        any:
+          - metric: knee_angle_deg
+            op: "<"
+            value: 125
+    priority_base: 55
+    evidence_template: "打腿阶段膝关节角度为 {knee_angle_deg}°，提示膝关节屈曲较大。"
+    reason_template: "膝关节屈曲过大可能增加迎水阻力，影响打腿推进效率。"
+    suggestion_template: "进行踝关节柔韧性、髋主导打腿和小幅连续打腿训练。"
+    metric_refs: [knee_angle_deg]
+    recommendation_tags: [ankle_mobility, kick_rhythm]
+    section_key: leg_kick
+
+  - id: R010
+    code: unstable_kick_rhythm
+    category: leg_kick
+    title: 打腿节奏不稳定
+    status: active
+    enabled: true
+    required_metrics: [kick_interval_cv]
+    condition:
+      all:
+        - metric: kick_interval_cv
+          op: ">="
+          value: 0.25
+    severity:
+      high:
+        any:
+          - metric: kick_interval_cv
+            op: ">="
+            value: 0.35
+      medium:
+        any:
+          - metric: kick_interval_cv
+            op: ">="
+            value: 0.25
+    priority_base: 50
+    evidence_template: "打腿间隔变异系数为 {kick_interval_cv}，节奏波动较大。"
+    reason_template: "打腿节奏不稳定会影响身体支撑和划水节奏衔接。"
+    suggestion_template: "进行固定节奏打腿、节拍器配合和分段配速训练。"
+    metric_refs: [kick_interval_cv]
+    recommendation_tags: [kick_rhythm, tempo_control]
+    section_key: leg_kick
+
+  # ── E. 速度、划频、划幅与效率 ──
+  - id: R011
+    code: stroke_rate_compensation
+    category: efficiency
+    title: 速度提升主要依赖划频代偿
+    status: active
+    enabled: true
+    required_metrics: [stroke_rate_by_phase, stroke_length_by_phase]
+    condition:
+      all:
+        - metric: stroke_rate_by_phase
+          op: ">="
+          value: 0
+    severity:
+      high:
+        any:
+          - metric: stroke_rate_by_phase
+            op: ">="
+            value: 30
+      medium:
+        any:
+          - metric: stroke_length_by_phase
+            op: "<="
+            value: 0.15
+    priority_base: 85
+    evidence_template: "划频由 {stroke_rate_low_speed} 提升至 {stroke_rate_high_speed}，划幅由 {stroke_length_low_speed} m 下降至 {stroke_length_high_speed} m。"
+    reason_template: "速度提升主要依靠提高划频，而非单次划水推进质量提升。"
+    suggestion_template: "优化抱水推进效率，提升高速状态下的划幅保持能力。"
+    metric_refs: [stroke_rate_by_phase, stroke_length_by_phase]
+    recommendation_tags: [stroke_efficiency, tempo_control]
+    section_key: efficiency
+
+  - id: R012
+    code: low_swim_efficiency
+    category: efficiency
+    title: 游进效率偏低
+    status: active
+    enabled: true
+    required_metrics: [swolf_value]
+    condition:
+      any:
+        - metric: swolf_value
+          op: ">"
+          value: 85
+        - metric: efficiency_score
+          op: "<"
+          value: 70
+    severity:
+      high:
+        any:
+          - metric: swolf_value
+            op: ">"
+            value: 90
+          - metric: efficiency_score
+            op: "<"
+            value: 60
+      medium:
+        any:
+          - metric: swolf_value
+            op: ">"
+            value: 85
+          - metric: efficiency_score
+            op: "<"
+            value: 70
+    priority_base: 75
+    evidence_template: "SWOLF 为 {swolf_value}，技术效率评分为 {efficiency_score}/100。"
+    reason_template: "当前速度与划水效率之间的平衡不足，可能存在能量消耗偏高问题。"
+    suggestion_template: "优化划幅保持、抱水推进和节奏稳定性，降低单位距离能量消耗。"
+    metric_refs: [swolf_value]
+    recommendation_tags: [stroke_efficiency, tempo_control]
+    section_key: efficiency
+
+# ── 诊断合并分组（教练可读，非机器罗列）──
+diagnostic_groups:
+  - name: upper_limb_propulsion
+    primary: insufficient_high_elbow_catch
+    related:
+      - low_propulsive_efficiency
+    strategy: keep_primary_attach_related_evidence
+    merged_title: "高肘抱水不足，影响上肢推进效率"

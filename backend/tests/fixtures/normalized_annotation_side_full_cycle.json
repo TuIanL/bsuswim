@@ -1,0 +1,79 @@
+{
+  "fps": 60,
+  "scale": { "method": "lane_marker", "pixels_per_meter": 840.5, "reference_length_m": 2.5 },
+  "swim_direction": "left_to_right",
+  "reference_lines": {
+    "waterline": { "points": [[100, 220], [1600, 220]], "confidence": 1.0, "source": "manual" }
+  },
+  "distance_markers": [
+    { "frame": 120, "time_sec": 2.0, "distance_m": 5.0, "source": "manual" },
+    { "frame": 180, "time_sec": 3.0, "distance_m": 7.0, "source": "manual" },
+    { "frame": 240, "time_sec": 4.0, "distance_m": 8.0, "source": "manual" },
+    { "frame": 300, "time_sec": 5.0, "distance_m": 9.5, "source": "manual" }
+  ],
+  "events": [
+    { "name": "hand_entry", "label": "入水", "frame": 120, "time_sec": 2.0, "side": "left", "labeled_by": "manual" },
+    { "name": "catch_start", "label": "抱水开始", "frame": 145, "time_sec": 2.417, "side": "left", "labeled_by": "manual" },
+    { "name": "pull_end", "label": "推水结束", "frame": 180, "time_sec": 3.0, "side": "left", "labeled_by": "manual" },
+    { "name": "hand_entry", "label": "入水", "frame": 180, "time_sec": 3.0, "side": "right", "labeled_by": "manual" },
+    { "name": "hand_entry", "label": "入水", "frame": 240, "time_sec": 4.0, "side": "left", "labeled_by": "manual" },
+    { "name": "hand_entry", "label": "入水", "frame": 300, "time_sec": 5.0, "side": "right", "labeled_by": "manual" },
+    { "name": "kick_downbeat", "label": "打腿下打", "frame": 120, "time_sec": 2.0, "labeled_by": "manual" },
+    { "name": "kick_downbeat", "label": "打腿下打", "frame": 150, "time_sec": 2.5, "labeled_by": "manual" },
+    { "name": "kick_downbeat", "label": "打腿下打", "frame": 180, "time_sec": 3.0, "labeled_by": "manual" },
+    { "name": "kick_downbeat", "label": "打腿下打", "frame": 210, "time_sec": 3.5, "labeled_by": "manual" },
+    { "name": "kick_downbeat", "label": "打腿下打", "frame": 240, "time_sec": 4.0, "labeled_by": "manual" },
+    { "name": "kick_downbeat", "label": "打腿下打", "frame": 270, "time_sec": 4.5, "labeled_by": "manual" },
+    { "name": "kick_downbeat", "label": "打腿下打", "frame": 300, "time_sec": 5.0, "labeled_by": "manual" }
+  ],
+  "keypoint_frames": [
+    {
+      "frame": 120,
+      "time_sec": 2.0,
+      "points": {
+        "shoulder": { "x": 512, "y": 300, "confidence": 0.9, "visibility": "visible" },
+        "elbow": { "x": 560, "y": 305, "confidence": 0.9, "visibility": "visible" },
+        "wrist": { "x": 640, "y": 300, "confidence": 0.85, "visibility": "visible" },
+        "hip": { "x": 560, "y": 312, "confidence": 0.9, "visibility": "visible" },
+        "knee": { "x": 640, "y": 340, "confidence": 0.9, "visibility": "visible" },
+        "ankle": { "x": 700, "y": 320, "confidence": 0.85, "visibility": "visible" }
+      }
+    },
+    {
+      "frame": 180,
+      "time_sec": 3.0,
+      "points": {
+        "shoulder": { "x": 520, "y": 302, "confidence": 0.9, "visibility": "visible" },
+        "elbow": { "x": 568, "y": 306, "confidence": 0.9, "visibility": "visible" },
+        "wrist": { "x": 645, "y": 302, "confidence": 0.85, "visibility": "visible" },
+        "hip": { "x": 566, "y": 314, "confidence": 0.9, "visibility": "visible" },
+        "knee": { "x": 645, "y": 342, "confidence": 0.9, "visibility": "visible" },
+        "ankle": { "x": 705, "y": 322, "confidence": 0.85, "visibility": "visible" }
+      }
+    },
+    {
+      "frame": 240,
+      "time_sec": 4.0,
+      "points": {
+        "shoulder": { "x": 528, "y": 304, "confidence": 0.9, "visibility": "visible" },
+        "elbow": { "x": 574, "y": 307, "confidence": 0.9, "visibility": "visible" },
+        "wrist": { "x": 650, "y": 303, "confidence": 0.85, "visibility": "visible" },
+        "hip": { "x": 572, "y": 316, "confidence": 0.9, "visibility": "visible" },
+        "knee": { "x": 650, "y": 344, "confidence": 0.9, "visibility": "visible" },
+        "ankle": { "x": 710, "y": 324, "confidence": 0.85, "visibility": "visible" }
+      }
+    },
+    {
+      "frame": 300,
+      "time_sec": 5.0,
+      "points": {
+        "shoulder": { "x": 536, "y": 306, "confidence": 0.9, "visibility": "visible" },
+        "elbow": { "x": 580, "y": 308, "confidence": 0.9, "visibility": "visible" },
+        "wrist": { "x": 655, "y": 304, "confidence": 0.85, "visibility": "visible" },
+        "hip": { "x": 578, "y": 318, "confidence": 0.9, "visibility": "visible" },
+        "knee": { "x": 655, "y": 346, "confidence": 0.9, "visibility": "visible" },
+        "ankle": { "x": 715, "y": 326, "confidence": 0.85, "visibility": "visible" }
+      }
+    }
+  ]
+}

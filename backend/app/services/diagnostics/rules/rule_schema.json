@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "swim-diagnostics-rules",
+  "description": "规则集 YAML 结构参考 schema（文档性，registry 做轻量校验，不强制 jsonschema 依赖）。",
+  "type": "object",
+  "required": ["schema_version", "stroke", "camera_view", "rules"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "stroke": { "type": "string" },
+    "camera_view": { "type": "string" },
+    "rules": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/rule" }
+    },
+    "diagnostic_groups": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/diagnostic_group" }
+    }
+  },
+  "definitions": {
+    "rule": {
+      "type": "object",
+      "required": ["id", "code", "category", "title", "status", "required_metrics", "condition", "severity"],
+      "properties": {
+        "id": { "type": "string" },
+        "code": { "type": "string" },
+        "category": { "type": "string" },
+        "title": { "type": "string" },
+        "status": { "enum": ["active", "dormant"] },
+        "enabled": { "type": "boolean" },
+        "required_metrics": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "稳定逻辑键；phase_context 为特殊 token"
+        },
+        "condition": { "$ref": "#/definitions/condition" },
+        "severity": {
+          "type": "object",
+          "description": "仅结构化 all/any 分支，取值 critical/high/medium/low/info"
+        },
+        "priority_base": { "type": "number" },
+        "evidence_template": { "type": "string" },
+        "reason_template": { "type": "string" },
+        "suggestion_template": { "type": "string" },
+        "metric_refs": { "type": "array", "items": { "type": "string" } },
+        "recommendation_tags": { "type": "array", "items": { "type": "string" } },
+        "section_key": { "type": "string" }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "description": "结构化条件：all/any + metric/manual_tag 子句，可嵌套",
+      "properties": {
+        "all": { "type": "array", "items": { "type": "object" } },
+        "any": { "type": "array", "items": { "type": "object" } },
+        "metric": { "type": "string" },
+        "manual_tag": { "type": "string" },
+        "op": { "enum": [">=", ">", "<", "<=", "==", "!="] },
+        "value": {}
+      }
+    },
+    "diagnostic_group": {
+      "type": "object",
+      "required": ["primary", "related"],
+      "properties": {
+        "name": { "type": "string" },
+        "primary": { "type": "string" },
+        "related": { "type": "array", "items": { "type": "string" } },
+        "strategy": { "type": "string" },
+        "merged_title": { "type": "string" }
+      }
+    }
+  }
+}

@@ -15,6 +15,7 @@ from app.schemas.normalized_annotation import (
     NormalizedAnnotationCreate,
     NormalizedAnnotationListItem,
     NormalizedAnnotationRead,
+    ParseAnnotationOptions,
     ParseResponse,
     ParseSummary,
 )
@@ -164,10 +165,11 @@ def list_normalized_annotations(
 )
 def parse_annotation_file_endpoint(
     annotation_file_id: int,
+    options: ParseAnnotationOptions | None = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    result = parse_annotation_file(db, annotation_file_id, current_user_id=current_user.id)
+    result = parse_annotation_file(db, annotation_file_id, current_user_id=current_user.id, options=options)
     ann = result.annotation
     quality = AnnotationQuality(**ann.quality) if ann.quality and "level" in ann.quality else AnnotationQuality(level="error")
     readiness = _derive_readiness(ann.quality or {})

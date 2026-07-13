@@ -358,7 +358,7 @@ export async function getAnnotationDetail(
   return response.data
 }
 
-export async function downloadAnnotationUrl(annotationId: number): string {
+export function downloadAnnotationUrl(annotationId: number): string {
   return `${apiBaseUrl}/api/v1/annotations/${annotationId}/download`
 }
 

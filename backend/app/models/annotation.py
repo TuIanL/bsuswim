@@ -25,6 +25,7 @@ class AnnotationSource(str, PyEnum):
     DARTFISH = "dartfish"
     MANUAL_JSON = "manual_json"
     AI_POSE = "ai_pose"
+    CVAT = "cvat"
     UNKNOWN = "unknown"
 
 

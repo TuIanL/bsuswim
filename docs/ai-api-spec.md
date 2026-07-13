@@ -259,30 +259,140 @@ Content-Type: application/json
 
 ### 概述
 
-`NormalizedAnnotation`（`swim-annotation.v1`）是业务后端与模型服务之间的**稳定观测输入格式**。它统一了 Kinovea 人工标注、Dartfish、AI 姿态识别和人工 JSON 补录等多种来源的标注数据，作为下游 metrics engine 和 diagnostics engine 的唯一输入。
+`NormalizedAnnotation`（当前版本 `swim-annotation.v2`）是业务后端与模型服务之间的**稳定观测输入格式**。它统一了 Kinovea 人工标注、CVAT 骨架标注、Dartfish、AI 姿态识别和人工 JSON 补录等多种来源的标注数据，作为下游 metrics engine 和 diagnostics engine 的唯一输入。
 
 ### 在整体架构中的位置
 
 ```text
-annotation_files (原始文件)
-  → parse / create
-    → NormalizedAnnotation (标准化观测输入)  ← 本文档定义
-      → Metrics Engine (未来)
-        → Diagnostics Engine (未来)
-          → analysis_results (计算结果)
-            → report_metadata
+annotation_files (原始文件: XML / JSON / CSV)
+  → parse（source=cvat 或 source=kinovea）
+    → FrameMappingResolver（仅 CVAT：帧号 → 时间戳映射）
+    → CvatAnnotationNormalizer（仅 CVAT：注入时间信息）
+    → AnnotationDerivedDataBuilder（仅 CVAT：推导轨迹/身体中心）
+    → NormalizedAnnotation (标准化观测输入, swim-annotation.v2)
+      → Metrics Engine → Diagnostics Engine
+        → analysis_results → report_metadata
 ```
 
 ### 关键原则
 
 - NormalizedAnnotation **只描述观测事实**（在哪个帧、哪个关节、什么位置），不包含计算结论
 - `analysis_results` **只存储计算结果**（角度、划频、SWOLF、诊断），不重复存储观测数据
-- 不同来源（Kinovea / AI / manual）的输出只要转换为 `swim-annotation.v1` schema，即可复用后续整条分析链路
+- 不同来源（Kinovea / CVAT / AI / manual）的输出只要转换为 `swim-annotation.v2` schema，即可复用后续整条分析链路
+- CVAT 来源的 parse 链路包含三层：Parser（忠实提取）→ Normalizer（时间映射）→ Builder（数据派生），各层职责完全正交
+
+### 支持的数据来源
+
+| 来源 | 文件格式 | 特点 |
+|------|---------|------|
+| Kinovea | `.json` / `.csv` | 含 events、trajectories、manual_tags |
+| CVAT | `.xml` + 可选 `.json` | COCO 17 点骨架，仅关键点，无 events/轨迹 |
+| AI Pose | `.json` | 模型推理输出（待接入） |
+| Manual JSON | `.json` | 直接构造的符合 schema 的 JSON |
+
+### CVAT 标注导入流程
+
+#### 文件上传
+
+CVAT 标注包含两个文件：
+- **主文件**：`annotations.xml`（CVAT Task XML 格式，必须上传）
+- **Companion 文件**：`instances_default.json`（COCO JSON 格式，可选，提供帧名→帧号映射）
+
+上传时分别创建两个 `AnnotationFile`，source 均为 `cvat`。XML 作为主 annotation_file，JSON 在 parse 时通过 `ParseAnnotationOptions.companion_annotation_file_id` 关联。
+
+#### Parse 请求
+
+```http
+POST /api/v1/annotations/{annotation_file_id}/parse
+Content-Type: application/json
+
+{
+  "companion_annotation_file_id": 123,
+  "frame_mapping_override": {
+    "mode": "affine",
+    "source_frame_offset": 32,
+    "source_frame_stride": 1,
+    "confirmed": true
+  },
+  "analysis_ranges": [
+    {"start_annotation_frame": 0, "end_annotation_frame": 55}
+  ]
+}
+```
+
+##### ParseAnnotationOptions 字段说明
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `companion_annotation_file_id` | int | 否 | CVAT JSON companion 文件的 annotation_file_id，用于获取精确帧映射 |
+| `frame_mapping_override` | object | 否 | 用户手动指定的帧映射参数，优先级高于自动推断 |
+| `frame_mapping_override.mode` | `"affine"` / `"identity"` | 是 | 映射模式：affine 为线性映射，identity 为直接对应 |
+| `frame_mapping_override.source_frame_offset` | int | 否 | 首帧在原视频中的帧号（affine 模式需要） |
+| `frame_mapping_override.source_frame_stride` | int | 否 | 帧间隔步长（affine 模式需要，通常为 1） |
+| `frame_mapping_override.confirmed` | bool | 否 | 用户确认映射准确，设为 `true` 时时间类指标可用 |
+| `analysis_ranges` | array | 否 | 指定感兴趣的分析帧范围，格式 `[{start_annotation_frame, end_annotation_frame}]` |
+
+##### Frame Mapping 四种模式
+
+| 模式 | 触发条件 | verified | 时间类指标 |
+|------|---------|----------|-----------|
+| `explicit` | Companion JSON 提供逐帧 `source_video_frame` | `true` | 可用 |
+| `affine` | 文件名连续，用户提供 offset/stride | 用户确认后 `true` | 确认后方可用 |
+| `identity` | annotation_frame = source_video_frame | 用户确认后 `true` | 确认后方可用 |
+| `unknown` | 无法推断映射关系 | `false` | 被 blocked |
+
+当 `verified = false` 时，姿态类指标（角度）仍可计算，但时间类指标（速度、划频、阶段时长）均被 blocked。
+
+#### Parse 响应
+
+```json
+{
+  "normalized_annotation_id": 42,
+  "annotation_file_id": 1,
+  "source": "cvat",
+  "status": "parsed",
+  "schema_version": "swim-annotation.v2",
+  "revision": 1,
+  "summary": {
+    "keypoint_frame_count": 56,
+    "trajectory_count": 19,
+    "event_count": 0,
+    "warnings": ["FRAME_MAPPING_UNVERIFIED: 时间映射未经验证"]
+  },
+  "quality": {
+    "level": "degraded",
+    "score": 0.65,
+    "issues": [...]
+  },
+  "analysis_readiness": {
+    "kinematic": "ready",
+    "temporal": "blocked",
+    "strength": "ready"
+  },
+  "warnings": [
+    "FRAME_MAPPING_UNVERIFIED: 时间映射未经验证，时间类指标不可用"
+  ]
+}
+```
+
+### 数据派生层 (CVAT 特有)
+
+CVAT 只有骨架关键点，没有轨迹和 events。parse 完成后自动执行数据派生：
+
+| 派生数据 | 说明 |
+|---------|------|
+| Trajectories | 串联各帧同一关键点位置的时序轨迹 |
+| Body Center (hip_center) | 双髋 visible 时取 midpoint，单髋时跳过 |
+| Visibility Summary | 各关键点 visible/occluded/missing 帧数统计 |
+
+派生层异常时降级为 warning，不阻止 parse。
 
 ### 当前实现状态
 
+- Schema 版本：`swim-annotation.v2`
 - 表：`normalized_annotations`（关联 `session_videos`）
 - API：`POST /api/v1/session-videos/{id}/normalized-annotations`（JSON 创建）
-- API：`POST /api/v1/annotations/{id}/parse`（从 annotation_file 解析，MVP 仅支持 JSON 文件）
+- API：`POST /api/v1/annotations/{id}/parse`（支持 source = kinovea / cvat / manual_json）
+- 解析器：Kinovea JSON/CSV parser、CVAT XML parser
 - 示例文件：`backend/samples/side-view-freestyle-v1.json`
-- Kinovea CSV parser 计划在后续独立 change 中实现
+- 元数据存储：`annotation_metadata` JSONB 列，包含 `video`、`annotation_sequence`、`frame_mapping`、`annotation_coverage`、`analysis_ranges`

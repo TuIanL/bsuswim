@@ -1,10 +1,10 @@
 # 本地开发说明
 
-本项目保留现有 `frontend/` Next/React 原型作为交互参考，正式分析平台从 `frontend-vue/` 起步。
+本仓库唯一正式 Web 应用为 `frontend-vue/`，所有前端开发、构建和预览命令均在该目录下执行。
 
 ## 服务划分
 
-- `frontend-vue/`: Vue3 + TypeScript + Vite + Element Plus + ECharts + Pinia + Axios
+- `frontend-vue/`: Vue3 + TypeScript + Vite + Element Plus + ECharts + Pinia + Axios（唯一正式前端）
 - `backend/`: FastAPI 业务后端，负责认证、运动员、训练记录、上传、分析、结果、报告和模型服务调度
 - `model_service/`: 独立 FastAPI 模型服务，MVP 使用 stub runtime，后期替换为 YOLO/MMPose 推理
 - `uploads/`: MVP 本地视频存储目录

@@ -312,6 +312,17 @@ def _fake_annotation_file(file_type: str, storage_path: str, annotation_fps=None
     ann_file.duration_sec = None
     ann_file.status = AnnotationFileStatus.UPLOADED
     ann_file.parse_error = None
+    mock_video = MagicMock()
+    mock_video.fps = None
+    mock_video.frame_count = None
+    mock_video.duration_sec = None
+    mock_video_file = MagicMock()
+    mock_video_file.width = None
+    mock_video_file.height = None
+    mock_video_file.frame_count = None
+    mock_video_file.duration_sec = None
+    mock_video.video_file = mock_video_file
+    ann_file.session_video = mock_video
     return ann_file
 
 

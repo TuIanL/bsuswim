@@ -95,10 +95,9 @@
 
 ## 5. 当前实现状态
 
-- `frontend-vue/` 已具备上传页、任务页、工作台、报告页
+- `frontend-vue/` 已具备上传页、任务页、工作台、报告页（唯一正式 Web 前端）
 - `backend/` 已具备上传、任务、结果、报告 API
 - `model_service/` 已提供 stub 分析 API
-- `frontend/` 仍保留为早期 Next/React 原型参考
 
 ## 6. 升级路径
 

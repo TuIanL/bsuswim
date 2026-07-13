@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<annotations>
+  <version>1.1</version>
+  <meta>
+    <job>
+      <id>2</id>
+      <size>356</size>
+      <mode>annotation</mode>
+      <start_frame>0</start_frame>
+      <stop_frame>355</stop_frame>
+      <labels>
+        <label>
+          <name>骨架</name>
+          <color>#a3bea1</color>
+          <type>skeleton</type>
+        </label>
+      </labels>
+    </job>
+    <dumped>2026-07-10 10:54:35.255332+00:00</dumped>
+  </meta>
+  <track id="0" label="骨架" source="manual">
+    <skeleton frame="0" keyframe="1" z_order="0">
+      <points label="nose" outside="0" occluded="0" points="1640.02,1104.48"/>
+      <points label="left-shoulder" outside="0" occluded="0" points="1825.20,1083.62"/>
+      <points label="right-shoulder" outside="0" occluded="0" points="1673.37,1297.82"/>
+      <points label="left-elbow" outside="0" occluded="0" points="2064.93,785.63"/>
+      <points label="right-elbow" outside="0" occluded="0" points="1354.94,1309.98"/>
+      <points label="left-wrist" outside="0" occluded="0" points="2336.86,838.19"/>
+      <points label="right-wrist" outside="0" occluded="0" points="993.81,1325.96"/>
+      <points label="left-hip" outside="0" occluded="0" points="2451.99,1283.88"/>
+      <points label="right-hip" outside="0" occluded="0" points="2450.17,1585.25"/>
+      <points label="left-knee" outside="0" occluded="0" points="2911.71,1353.04"/>
+      <points label="right-knee" outside="0" occluded="0" points="2926.91,1550.47"/>
+      <points label="left-ankle" outside="0" occluded="0" points="3643.66,1167.67"/>
+      <points label="right-ankle" outside="0" occluded="0" points="3651.78,1589.90"/>
+      <points label="left-eye" outside="0" occluded="0" points="1644.40,1036.19"/>
+      <points label="right-eye" outside="0" occluded="0" points="1580.49,1098.32"/>
+      <points label="left-ear" outside="0" occluded="0" points="1710.13,1043.22"/>
+      <points label="right-ear" outside="0" occluded="0" points="1556.07,1151.84"/>
+    </skeleton>
+    <skeleton frame="1" keyframe="1" z_order="0">
+      <points label="nose" outside="1" occluded="0" points="1640.02,1104.48"/>
+      <points label="left-shoulder" outside="1" occluded="0" points="1825.20,1083.62"/>
+      <points label="right-shoulder" outside="1" occluded="0" points="1673.37,1297.82"/>
+      <points label="left-elbow" outside="1" occluded="0" points="2064.93,785.63"/>
+      <points label="right-elbow" outside="1" occluded="0" points="1354.94,1309.98"/>
+      <points label="left-wrist" outside="1" occluded="0" points="2336.86,838.19"/>
+      <points label="right-wrist" outside="1" occluded="0" points="993.81,1325.96"/>
+      <points label="left-hip" outside="1" occluded="0" points="2451.99,1283.88"/>
+      <points label="right-hip" outside="1" occluded="0" points="2450.17,1585.25"/>
+      <points label="left-knee" outside="1" occluded="0" points="2911.71,1353.04"/>
+      <points label="right-knee" outside="1" occluded="0" points="2926.91,1550.47"/>
+      <points label="left-ankle" outside="1" occluded="0" points="3643.66,1167.67"/>
+      <points label="right-ankle" outside="1" occluded="0" points="3651.78,1589.90"/>
+      <points label="left-eye" outside="1" occluded="0" points="1644.40,1036.19"/>
+      <points label="right-eye" outside="1" occluded="0" points="1580.49,1098.32"/>
+      <points label="left-ear" outside="1" occluded="0" points="1710.13,1043.22"/>
+      <points label="right-ear" outside="1" occluded="0" points="1556.07,1151.84"/>
+    </skeleton>
+  </track>
+  <track id="1" label="骨架" source="manual">
+    <skeleton frame="1" keyframe="1" z_order="0">
+      <points label="nose" outside="0" occluded="0" points="1619.29,1129.92"/>
+      <points label="left-shoulder" outside="0" occluded="0" points="1823.73,1099.42"/>
+      <points label="right-shoulder" outside="0" occluded="0" points="1626.97,1278.33"/>
+      <points label="left-elbow" outside="0" occluded="0" points="1825.96,807.86"/>
+      <points label="right-elbow" outside="0" occluded="0" points="1343.84,1383.55"/>
+      <points label="left-wrist" outside="0" occluded="0" points="1744.85,757.72"/>
+      <points label="right-wrist" outside="0" occluded="0" points="1053.32,1518.28"/>
+      <points label="left-hip" outside="0" occluded="0" points="2419.50,1295.41"/>
+      <points label="right-hip" outside="0" occluded="0" points="2449.77,1595.71"/>
+      <points label="left-knee" outside="0" occluded="0" points="2961.59,1449.08"/>
+      <points label="right-knee" outside="0" occluded="0" points="2983.21,1540.60"/>
+      <points label="left-ankle" outside="0" occluded="0" points="3369.39,1218.77"/>
+      <points label="right-ankle" outside="0" occluded="0" points="3627.85,1580.03"/>
+      <points label="left-eye" outside="0" occluded="0" points="1623.68,1039.15"/>
+      <points label="right-eye" outside="0" occluded="0" points="1530.88,1110.92"/>
+      <points label="left-ear" outside="0" occluded="0" points="1676.57,1033.35"/>
+      <points label="right-ear" outside="0" occluded="0" points="1528.92,1167.65"/>
+    </skeleton>
+    <skeleton frame="2" keyframe="1" z_order="0">
+      <points label="nose" outside="1" occluded="0" points="1619.29,1129.92"/>
+      <points label="left-shoulder" outside="1" occluded="0" points="1823.73,1099.42"/>
+      <points label="right-shoulder" outside="1" occluded="0" points="1626.97,1278.33"/>
+      <points label="left-elbow" outside="1" occluded="0" points="1825.96,807.86"/>
+      <points label="right-elbow" outside="1" occluded="0" points="1343.84,1383.55"/>
+      <points label="left-wrist" outside="1" occluded="0" points="1744.85,757.72"/>
+      <points label="right-wrist" outside="1" occluded="0" points="1053.32,1518.28"/>
+      <points label="left-hip" outside="1" occluded="0" points="2419.50,1295.41"/>
+      <points label="right-hip" outside="1" occluded="0" points="2449.77,1595.71"/>
+      <points label="left-knee" outside="1" occluded="0" points="2961.59,1449.08"/>
+      <points label="right-knee" outside="1" occluded="0" points="2983.21,1540.60"/>
+      <points label="left-ankle" outside="1" occluded="0" points="3369.39,1218.77"/>
+      <points label="right-ankle" outside="1" occluded="0" points="3627.85,1580.03"/>
+      <points label="left-eye" outside="1" occluded="0" points="1623.68,1039.15"/>
+      <points label="right-eye" outside="1" occluded="0" points="1530.88,1110.92"/>
+      <points label="left-ear" outside="1" occluded="0" points="1676.57,1033.35"/>
+      <points label="right-ear" outside="1" occluded="0" points="1528.92,1167.65"/>
+    </skeleton>
+  </track>
+</annotations>
