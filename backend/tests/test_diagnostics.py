@@ -238,6 +238,7 @@ def test_bridge_resolves_side_metrics_and_writes_back(db_session):
         NormalizedAnnotation,
         TrainingSession,
         User,
+        VideoFile,
     )
     from app.models.video import SessionVideo, ViewType
     from app.services.diagnostics.bridge import run_diagnostics_for_analysis_result
@@ -260,7 +261,10 @@ def test_bridge_resolves_side_metrics_and_writes_back(db_session):
                             phases=[], metrics={}, diagnostics=[], raw_result={})
     db_session.add(result)
     db_session.flush()
-    video = SessionVideo(session_id=session.id, video_file_id=1, view_type=ViewType.SIDE)
+    video_file = VideoFile(original_filename="diag_test.mp4", storage_path="/tmp/diag_test.mp4", mime_type="video/mp4")
+    db_session.add(video_file)
+    db_session.flush()
+    video = SessionVideo(session_id=session.id, video_file_id=video_file.id, view_type=ViewType.SIDE)
     db_session.add(video)
     db_session.flush()
     norm = NormalizedAnnotation(session_video_id=video.id, revision=1,
