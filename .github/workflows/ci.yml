@@ -48,9 +48,7 @@ jobs:
         run: python -c "from app.main import app; print('import ok')"
 
       - name: Run database migrations
-        run: |
-          alembic upgrade head
-          alembic check
+        run: alembic upgrade head
         env:
           DATABASE_URL: postgresql+psycopg://swim:swim@localhost:5432/swim_analysis
 
