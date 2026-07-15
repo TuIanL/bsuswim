@@ -234,6 +234,7 @@ def test_bridge_resolves_side_metrics_and_writes_back(db_session):
         AnalysisResult,
         AnalysisTask,
         AnnotationMetric,
+        Athlete,
         NormalizedAnnotation,
         TrainingSession,
         User,
@@ -246,7 +247,10 @@ def test_bridge_resolves_side_metrics_and_writes_back(db_session):
                  full_name="c", role="COACH", is_active=True)
     db_session.add(coach)
     db_session.flush()
-    session = TrainingSession(athlete_id=1, coach_id=coach.id, title="t", stroke_type="freestyle")
+    athlete = Athlete(name="diag_athlete", coach_id=coach.id)
+    db_session.add(athlete)
+    db_session.flush()
+    session = TrainingSession(athlete_id=athlete.id, coach_id=coach.id, title="t", stroke_type="freestyle")
     db_session.add(session)
     db_session.flush()
     task = AnalysisTask(session_id=session.id, status="completed")
