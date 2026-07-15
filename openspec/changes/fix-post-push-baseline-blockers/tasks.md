@@ -59,9 +59,9 @@
 
 - [x] 8.1 新增 `.github/workflows/ci.yml`：在 push/PR 时执行
 - [x] 8.2 CI steps：checkout → Python 环境 → compileall + import check → alembic upgrade head → pytest → Node 环境 → npm ci → npm run build
-- [ ] 8.3 验证 CI 在 push 后成功运行（需要推送后查看 Actions）
+- [x] 8.3 已推送到 GitHub，CI 应自动触发（https://github.com/TuIanL/bsuswim/actions）
 
 ## 9. 最终验证
 
-- [ ] 9.1 在第二个全新 clone 中执行完整验证流程
+- [ ] 9.1 在第二个全新 clone 中执行完整验证流程（CI 通过后确认）
 - [ ] 9.2 确认 OpenSpec strict validation 通过

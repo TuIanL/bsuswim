@@ -155,9 +155,8 @@ def run_diagnostics_for_analysis_result(
     # ── write back ──
     result.diagnostics = [_dump(d) for d in output.diagnostics]
 
-    if result.raw_result is None:
-        result.raw_result = {}
-    result.raw_result["diagnostics_meta"] = {
+    raw = dict(result.raw_result) if result.raw_result else {}
+    raw["diagnostics_meta"] = {
         "rule_set": rule_set,
         "rule_version": engine.registry.rule_version(rule_set),
         "engine_version": engine.engine_version,
@@ -167,6 +166,7 @@ def run_diagnostics_for_analysis_result(
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "blocked_modules": list(blocked_modules),
     }
+    result.raw_result = raw
 
     db.add(result)
     db.commit()

@@ -254,6 +254,18 @@ def test_bridge_resolves_side_metrics_and_writes_back(db_session):
     session = TrainingSession(athlete_id=athlete.id, coach_id=coach.id, title="t", stroke_type="freestyle")
     db_session.add(session)
     db_session.flush()
+    quality_snapshot = {
+        "schema_version": "annotation-quality.v2",
+        "status": "valid",
+        "score": 100,
+        "source_revision": 1,
+        "validator_version": "1.0.0",
+        "profile": {"id": "side_technical_v1", "version": "1.0.0"},
+        "summary": {"blocking_count": 0, "error_count": 0, "warning_count": 0, "info_count": 0},
+        "issues": [],
+        "module_readiness": {},
+    }
+
     task = AnalysisTask(session_id=session.id, status="completed")
     db_session.add(task)
     db_session.flush()
@@ -275,8 +287,17 @@ def test_bridge_resolves_side_metrics_and_writes_back(db_session):
     db_session.add(video)
     db_session.flush()
     norm = NormalizedAnnotation(session_video_id=video.id, revision=1,
-                                schema_version="swim-annotation.v1", source="kinovea", fps=30)
+                                schema_version="swim-annotation.v1", source="kinovea", fps=30,
+                                quality=quality_snapshot)
     db_session.add(norm)
+    db_session.flush()
+    task.request_payload = {
+        "analysis_input": {
+            "annotation_id": norm.id,
+            "annotation_quality_snapshot": quality_snapshot,
+        },
+    }
+    db_session.add(task)
     db_session.flush()
     ann_metric = AnnotationMetric(
         normalized_annotation_id=norm.id,
@@ -290,7 +311,29 @@ def test_bridge_resolves_side_metrics_and_writes_back(db_session):
                 "swolf": {"value": 88.0},
             }
         },
-        quality={},
+        quality={
+            "schema_version": "metric-quality.v1",
+            "status": "valid",
+            "metric_availability": {
+                "body_angle_deg_avg": "available",
+                "hip_depth_cm_avg": "available",
+                "streamline_index": "available",
+                "entry_angle_deg_avg": "available",
+                "front_reach_distance_cm_avg": "available",
+                "elbow_angle_deg_avg": "available",
+                "forearm_drop_angle_deg_avg": "available",
+                "knee_angle_deg_avg": "available",
+                "hip_angle_deg_avg": "available",
+                "ankle_extension_angle_deg_avg": "available",
+                "kick_frequency_hz": "available",
+                "stroke_rate_spm_avg": "available",
+                "stroke_length_m_avg": "available",
+                "average_speed_mps": "available",
+                "swolf": "available",
+            },
+            "computed_metric_count": 15,
+            "skipped_metric_count": 0,
+        },
     )
     db_session.add(ann_metric)
     db_session.commit()
