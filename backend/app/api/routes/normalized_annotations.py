@@ -11,7 +11,6 @@ from app.repositories.normalized_annotation_repository import (
 )
 from app.schemas.normalized_annotation import (
     AnalysisReadiness,
-    AnnotationQuality,
     NormalizedAnnotationCreate,
     NormalizedAnnotationListItem,
     NormalizedAnnotationRead,
@@ -20,6 +19,7 @@ from app.schemas.normalized_annotation import (
     ParseSummary,
 )
 from app.services.annotation_quality.legacy import normalize_quality_payload
+from app.services.annotation_quality.profile_resolver import resolve_quality_profile_id
 from app.services.annotation_quality.validator import AnnotationQualityValidator
 from app.services.annotation_quality.provider import YamlQualityProfileProvider
 from app.services.normalized_annotation_service import (
@@ -171,7 +171,7 @@ def parse_annotation_file_endpoint(
 ):
     result = parse_annotation_file(db, annotation_file_id, current_user_id=current_user.id, options=options)
     ann = result.annotation
-    quality = AnnotationQuality(**ann.quality) if ann.quality and "level" in ann.quality else AnnotationQuality(level="error")
+    quality = normalize_quality_payload(ann.quality or {})
     readiness = _derive_readiness(ann.quality or {})
     return ParseResponse(
         normalized_annotation_id=ann.id,
@@ -201,7 +201,7 @@ def revalidate_normalized_annotation(
     current_quality = normalize_quality_payload(ann.quality)
 
     VALIDATOR_VERSION = "1.0.0"
-    PROFILE_ID = "side_technical_v1"
+    PROFILE_ID = resolve_quality_profile_id(ann.source)
     PROFILE_VERSION = "1.0.0"
 
     # ── cache check ──

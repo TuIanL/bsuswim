@@ -28,7 +28,7 @@ class NormalizedAnnotation(Base):
         Integer, ForeignKey("session_videos.id", ondelete="CASCADE"), nullable=False, index=True
     )
     annotation_file_id: Mapped[int | None] = mapped_column(
-        Integer, ForeignKey("annotation_files.id", ondelete="SET NULL"), nullable=True, unique=True
+        Integer, ForeignKey("annotation_files.id", ondelete="SET NULL"), nullable=True
     )
 
     revision: Mapped[int] = mapped_column(Integer, nullable=False, default=1, server_default=text("1"))

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, func
+from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -15,6 +15,14 @@ class AnnotationMetric(Base):
     """
 
     __tablename__ = "annotation_metrics"
+    __table_args__ = (
+        UniqueConstraint(
+            "normalized_annotation_id",
+            "calculator",
+            "calculator_version",
+            name="uq_annotation_metrics_calc",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 

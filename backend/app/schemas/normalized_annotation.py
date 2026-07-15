@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.models.annotation import AnnotationSource, AnnotationFileStatus
 from app.models.video import ViewType
+from app.services.annotation_quality.models import AnnotationQualityReport
 
 
 # ── V1 Quality (legacy, keep for backward compat) ──
@@ -273,6 +274,6 @@ class ParseResponse(BaseModel):
     schema_version: str
     revision: int
     summary: ParseSummary
-    quality: AnnotationQuality
+    quality: AnnotationQualityReport
     analysis_readiness: AnalysisReadiness | None = None
     warnings: list[str] = Field(default_factory=list)

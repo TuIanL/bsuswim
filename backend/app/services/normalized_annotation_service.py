@@ -17,6 +17,7 @@ from app.schemas.normalized_annotation import (
 )
 from app.services.annotation_derivation.builder import AnnotationDerivedDataBuilder
 from app.services.annotation_quality.legacy import normalize_quality_payload
+from app.services.annotation_quality.profile_resolver import resolve_quality_profile_id
 from app.services.annotation_quality.validator import AnnotationQualityValidator
 from app.services.annotation_quality.provider import YamlQualityProfileProvider
 from app.services.parsers import (
@@ -257,10 +258,7 @@ def parse_annotation_file(
     video_width = session_video.video_file.width if session_video and hasattr(session_video, 'video_file') and session_video.video_file else None
     video_height = session_video.video_file.height if session_video and hasattr(session_video, 'video_file') and session_video.video_file else None
 
-    if source_value == AnnotationSource.CVAT.value:
-        profile_id = "side_technical_v1_cvat"
-    else:
-        profile_id = "side_technical_v1"
+    profile_id = resolve_quality_profile_id(source_value)
 
     validator = _get_validator()
     quality_report = validator.validate(

@@ -252,7 +252,7 @@ class TestParseResponseShape:
         assert data["warnings"] == ["缺少推荐事件: hand_entry（入水）"]
 
     def test_parse_response_quality_shape(self, client):
-        """7.11: parse 响应 quality 含 level / score"""
+        """7.11: parse 响应 quality 含 status / score"""
         from app.services.normalized_annotation_service import ParseAnnotationResult
         from app.schemas.normalized_annotation import ParseSummary
 
@@ -264,7 +264,8 @@ class TestParseResponseShape:
         with patch(f"{ROUTE}.parse_annotation_file", return_value=result):
             response = client.post("/api/v1/annotations/301/parse")
         assert response.status_code == 201
-        assert response.json()["quality"]["level"] == "good"
+        body = response.json()
+        assert body["quality"]["status"] in ("valid", "warning", "invalid")
 
 
 class TestParseOwnership:

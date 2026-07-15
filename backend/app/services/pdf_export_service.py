@@ -6,6 +6,7 @@ from app.core.config import get_settings
 from app.models import ReportMetadata
 from app.services.playwright_renderer import render_pdf_from_url
 from app.services.print_token_service import generate_print_token
+from app.services.reporting.pdf_url import build_session_report_pdf_url
 from app.services.storage import StorageService
 
 
@@ -25,7 +26,7 @@ class PdfExportService:
             raise ValueError("Report not found")
 
         settings = get_settings()
-        frontend_url = settings.pdf_render_base_url or settings.frontend_base_url or "http://localhost:5173"
+        frontend_url = settings.pdf_render_base_url or settings.frontend_base_url or "http://localhost:5174"
 
         token = generate_print_token(
             report_id=report.id,
@@ -40,7 +41,7 @@ class PdfExportService:
         next_version = (report.pdf_version or 0) + 1
         relative_path = f"reports/{report.id}/report_v{next_version}.pdf"
 
-        result = self.storage.save_bytes(
+        result = await self.storage.save_bytes(
             pdf_bytes,
             relative_path=relative_path,
             content_type="application/pdf",
@@ -56,6 +57,6 @@ class PdfExportService:
         return {
             "report_id": report.id,
             "pdf_status": "exported",
-            "pdf_url": f"/api/sessions/{session_id}/report/pdf",
+            "pdf_url": build_session_report_pdf_url(session_id),
             "pdf_exported_at": report.pdf_exported_at.isoformat(),
         }

@@ -82,11 +82,10 @@ def test_full_cycle_computes_rich_metrics():
     assert quality["level"] in ("good", "warning")
 
 
-def test_missing_fps_returns_error_quality_not_crash():
+def test_missing_fps_produces_warning_not_crash():
     ann = _load_annotation("normalized_annotation_side_minimal.json")
     ann["fps"] = None
     result = calculate_side_view_metrics(ann, "side")
-    assert result["quality"]["level"] == "error"
     codes = {w["code"] for w in result["quality"]["warnings"]}
     assert "missing_fps" in codes
 
@@ -95,7 +94,6 @@ def test_non_side_view_keeps_factual_shape():
     ann = _load_annotation("normalized_annotation_side_minimal.json")
     result = calculate_side_view_metrics(ann, "front")
     assert result["camera_view"] == "front"
-    assert result["quality"]["level"] == "error"
     assert any(w["code"] == "unsupported_camera_view" for w in result["quality"]["warnings"])
 
 

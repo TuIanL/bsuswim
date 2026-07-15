@@ -86,9 +86,12 @@
 - [x] 9.1 `node_modules` 已存在，`npm ci` 可执行
 - [x] 9.2 执行 `npm run build`（`vue-tsc --noEmit` + Vite 打包均通过）
 - [x] 9.3 Vite production bundle 成功生成（`dist/` 目录存在）
-- [ ] 9.4 启动 Vue dev server 并检查根路径（手动验证）
-- [ ] 9.5 检查未登录 API 模式跳转到 `/login`（手动验证）
-- [ ] 9.6 检查 demo 模式可进入 `/athletes`（手动验证）
+- [x] 9.4 启动 Vue dev server 并检查根路径（手动验证）
+  - 手动验证通过：`http://127.0.0.1:5174/` → 自动重定向到 `/athletes`
+- [x] 9.5 检查未登录 API 模式跳转到 `/login`（手动验证）
+  - 手动验证通过：`http://127.0.0.1:5175/`（VITE_API_BASE_URL 已设置）→ 跳转到 `/login`
+- [x] 9.6 检查 demo 模式可进入 `/athletes`（手动验证）
+  - 手动验证通过：demo 模式 `http://127.0.0.1:5174/` → 直接进入 `/athletes`，侧边栏可见
 
 ## 10. 后端回归
 

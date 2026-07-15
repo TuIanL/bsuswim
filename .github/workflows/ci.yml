@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: swim_analysis
+          POSTGRES_USER: swim
+          POSTGRES_PASSWORD: swim
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check Python syntax
+        run: python -m compileall app
+
+      - name: Check backend import
+        run: python -c "from app.main import app; print(f'import ok: {len(app.routes)} routes')"
+
+      - name: Run database migrations
+        run: |
+          alembic upgrade head
+          alembic check
+        env:
+          DATABASE_URL: postgresql+psycopg://swim:swim@localhost:5432/swim_analysis
+
+      - name: Verify CVAT enum
+        run: |
+          RESULT=$(psql -h localhost -U swim -d swim_analysis -t -c "SELECT unnest(enum_range(NULL::annotationsource));")
+          echo "$RESULT" | grep -q "cvat" && echo "cvat enum present"
+        env:
+          PGPASSWORD: swim
+
+      - name: Run tests
+        run: python -m pytest -q --tb=short
+        env:
+          DATABASE_URL: postgresql+psycopg://swim:swim@localhost:5432/swim_analysis
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend-vue
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend-vue/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
