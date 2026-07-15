@@ -40,6 +40,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install pytest pytest-mock anyio
 
       - name: Check Python syntax
         run: python -m compileall app
