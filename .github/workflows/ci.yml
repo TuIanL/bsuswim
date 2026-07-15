@@ -45,7 +45,7 @@ jobs:
         run: python -m compileall app
 
       - name: Check backend import
-        run: python -c "from app.main import app; print('import ok: %d routes' % len(app.routes))"
+        run: python -c "from app.main import app; print('import ok')"
 
       - name: Run database migrations
         run: |
