@@ -261,7 +261,14 @@ def test_bridge_resolves_side_metrics_and_writes_back(db_session):
                             phases=[], metrics={}, diagnostics=[], raw_result={})
     db_session.add(result)
     db_session.flush()
-    video_file = VideoFile(original_filename="diag_test.mp4", storage_path="/tmp/diag_test.mp4", mime_type="video/mp4")
+    video_file = VideoFile(
+        original_filename="diag_test.mp4",
+        stored_filename="diag_test.mp4",
+        storage_path="/tmp/diag_test.mp4",
+        mime_type="video/mp4",
+        size_bytes=1024,
+        checksum_sha256="x" * 64,
+    )
     db_session.add(video_file)
     db_session.flush()
     video = SessionVideo(session_id=session.id, video_file_id=video_file.id, view_type=ViewType.SIDE)
