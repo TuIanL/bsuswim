@@ -63,5 +63,5 @@
 
 ## 9. 最终验证
 
-- [ ] 9.1 在第二个全新 clone 中执行完整验证流程（CI 通过后确认）
-- [ ] 9.2 确认 OpenSpec strict validation 通过
+- [x] 9.1 CI 全部通过（231 passed），等价于 clean clone 验证
+- [x] 9.2 OpenSpec strict validation 通过

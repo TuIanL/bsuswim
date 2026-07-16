@@ -1,10 +1,10 @@
 ## MODIFIED Requirements
 
-### Requirement: Source enum includes cvat (MODIFIED)
+### Requirement: Source enum includes cvat
 
 系统 SHALL 扩展 `AnnotationSource` 枚举，增加 `cvat` 为有效来源值。**PostgreSQL 数据库中的 `annotationsource` 枚举类型 SHALL 同时通过 ALTER TYPE 语句增加 `cvat` 值，确保 ORM 写入不报错。**
 
-#### Scenario: Valid source values include cvat (MODIFIED)
+#### Scenario: Valid source values include cvat
 
 - **WHEN** 创建或更新 normalized annotation 时提供 `source = "cvat"`
 - **THEN** 系统 MUST 接受 `cvat` 作为有效值
@@ -21,7 +21,9 @@
 - **WHEN** 开发者执行 `alembic downgrade -1`
 - **THEN** migration 的 downgrade MUST 不报错（PostgreSQL 不支持安全移除 enum value）
 
-### Requirement: Unique constraint alignment (ADDED)
+## ADDED Requirements
+
+### Requirement: Unique constraint alignment
 
 SQLAlchemy model 的约束定义 SHALL 与 Alembic migration 中的约束定义一致，避免 `alembic check` 报漂移。
 

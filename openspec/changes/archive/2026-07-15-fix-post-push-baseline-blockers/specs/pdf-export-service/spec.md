@@ -1,8 +1,14 @@
 ## MODIFIED Requirements
 
-### Requirement: Export API uses session-level key (MODIFIED)
+### Requirement: Export API uses session-level key
 
 PDF 导出相关 API SHALL 使用 `session_id` 作为公开查找键。**公共 API 路径从 `/api/sessions/{session_id}/report/export/pdf` 模式正式定为 `/sessions/{session_id}/report/export/pdf`（无 `/reports` 前缀）**。差异化 endpoints 定义移至 `pdf-api-contract` spec。
+
+#### Scenario: Route registered at session level
+
+- **WHEN** 后端应用启动
+- **THEN** PDF 导出相关路由 MUST 以 `/sessions/{session_id}/report/` 为前缀
+- **THEN** 路由 MUST NOT 包含 `/reports` 前缀
 
 ### Requirement: Export API common router registration (ADDED)
 

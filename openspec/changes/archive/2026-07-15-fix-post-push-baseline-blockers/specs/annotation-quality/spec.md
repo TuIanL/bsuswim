@@ -1,17 +1,17 @@
-## MODIFIED Requirements
+## ADDED Requirements
 
-### Requirement: Parse response quality uses v2 AnnotationQualityReport (MODIFIED)
+### Requirement: Parse response quality uses v2 AnnotationQualityReport
 
 `ParseResponse.quality` SHALL 使用 `AnnotationQualityReport`（已有的 v2 Pydantic model），不应强制转换为 legacy `AnnotationQuality` 类型。`quality` 字段类型 SHALL 为 `AnnotationQualityReport`，使用 `model_validate()` 装配，保留强类型校验。
 
-#### Scenario: CVAT parse returns v2 quality (MODIFIED)
+#### Scenario: CVAT parse returns v2 quality
 
 - **WHEN** API 请求 `POST /api/annotations/{annotation_file_id}/parse` 且 `source = "cvat"`
 - **THEN** `response.quality.status` MUST 为 `valid`/`warning`/`invalid` 之一
 - **THEN** `response.quality` MUST NOT 包含 `level` 字段
 - **THEN** `response.analysis_readiness` MUST 与 `response.quality.status` 语义一致，不自相矛盾
 
-### Requirement: Re-validate uses correct profile (ADDED)
+### Requirement: Re-validate uses correct profile
 
 `POST /api/normalized-annotations/{id}/validate` 端点 SHALL 根据 `NormalizedAnnotation.source` 选择对应的 quality profile，而不是硬编码为 `side_technical_v1`。
 
@@ -25,7 +25,7 @@
 - **WHEN** `ann.source == "kinovea"`
 - **THEN** validate 端点 MUST 使用 `side_technical_v1` profile
 
-### Requirement: Profile resolver is shared (ADDED)
+### Requirement: Profile resolver is shared
 
 parse 和 validate 端点 SHALL 共用同一个 profile 解析函数，确保两个阶段使用相同的 profile。
 
