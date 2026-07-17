@@ -42,6 +42,8 @@ class AnnotationMetric(Base):
     calculator: Mapped[str] = mapped_column(String(100), nullable=False, default="side_view_metrics")
     calculator_version: Mapped[str] = mapped_column(String(50), nullable=False, default="0.1.0")
 
+    source_revision: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+
     created_by: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

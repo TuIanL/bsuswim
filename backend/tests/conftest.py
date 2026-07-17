@@ -119,3 +119,26 @@ def test_session_video(db_session: Session, test_session: TrainingSession, test_
     db_session.add(sv)
     db_session.flush()
     return sv
+
+
+@pytest.fixture
+def test_normalized_annotation(db_session: Session, test_session_video: SessionVideo) -> NormalizedAnnotation:
+    """侧视角 COCO17 合成标注，供 side_2d_kinematics API/持久化测试。"""
+    from fixtures.synthetic_kinematics import build_synthetic_annotation
+
+    ann = build_synthetic_annotation(96)
+    record = NormalizedAnnotation(
+        session_video_id=test_session_video.id,
+        revision=1,
+        schema_version="swim-annotation.v1",
+        source="cvat",
+        fps=ann["fps"],
+        frame_count=len(ann["keypoint_frames"]),
+        scale=ann["scale"],
+        keypoint_frames=ann["keypoint_frames"],
+        annotation_metadata={"stroke_type": "freestyle"},
+        swim_direction=ann["swim_direction"],
+    )
+    db_session.add(record)
+    db_session.flush()
+    return record
