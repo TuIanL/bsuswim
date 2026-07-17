@@ -13,6 +13,7 @@ from app.models import (
     SessionVideo,
     TrainingSession,
     TrainingSessionStatus,
+    ViewType,
 )
 from app.schemas import AnalysisSubmit, ModelAnalysisRequest, ModelAnalysisResult
 from app.services.annotation_quality.legacy import normalize_quality_payload
@@ -35,6 +36,18 @@ class AnnotationQualityBlockedError(Exception):
         if blockers:
             message = f"存在 {len(blockers)} 个必须修复的问题"
         super().__init__(message)
+
+
+class AnnotationSelectionRequiredError(Exception):
+    def __init__(self, candidate_ids: list[int]):
+        self.candidate_ids = candidate_ids
+        super().__init__("存在可用标准化标注，请明确选择")
+
+
+class AnnotationInputUnavailableError(Exception):
+    def __init__(self, reason: str):
+        self.reason = reason
+        super().__init__("没有可用的标准化标注")
 
 
 def _get_validator() -> AnnotationQualityValidator:
@@ -95,16 +108,34 @@ def create_analysis_task(db: Session, payload: AnalysisSubmit) -> AnalysisTask:
         if not annotation or annotation.session_video.session_id != payload.session_id:
             raise ValueError("指定的标准化标注不存在或不属于当前训练记录")
     else:
-        side_video = next(
-            (v for v in session.videos if hasattr(v, 'view_type') and v.view_type.value == "side"),
-            None,
-        )
-        if side_video:
-            annotation = db.scalars(
-                select(NormalizedAnnotation)
-                .where(NormalizedAnnotation.session_video_id == side_video.id)
-                .order_by(NormalizedAnnotation.revision.desc())
-            ).first()
+        all_side = db.scalars(
+            select(NormalizedAnnotation)
+            .join(SessionVideo)
+            .where(
+                SessionVideo.session_id == payload.session_id,
+                SessionVideo.view_type == ViewType.SIDE,
+            )
+        ).all()
+
+        submittable = [
+            na for na in all_side
+            if na.annotation_file
+            and na.annotation_file.status.value == "parsed"
+            and na.quality
+            and na.quality.get("status") in ("valid", "warning")
+        ]
+
+        if submittable:
+            raise AnnotationSelectionRequiredError(
+                candidate_ids=[na.id for na in submittable]
+            )
+
+        if all_side:
+            raise AnnotationInputUnavailableError(
+                reason="NO_SUBMITTABLE_ANNOTATION"
+            )
+
+        annotation = None
 
     # ── quality gate ──
     quality_snapshot: dict | None = None

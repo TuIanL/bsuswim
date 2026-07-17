@@ -16,7 +16,9 @@ from app.schemas import (
     WorkspaceData,
 )
 from app.services.analysis_service import (
+    AnnotationInputUnavailableError,
     AnnotationQualityBlockedError,
+    AnnotationSelectionRequiredError,
     create_analysis_task,
     run_analysis_task,
     save_analysis_result,
@@ -53,6 +55,28 @@ async def submit_analysis(
                     "code": "ANNOTATION_QUALITY_BLOCKED",
                     "message": str(exc),
                     "details": exc.quality,
+                }
+            },
+        )
+    except AnnotationSelectionRequiredError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": {
+                    "code": "ANNOTATION_SELECTION_REQUIRED",
+                    "message": str(exc),
+                    "candidate_normalized_annotation_ids": exc.candidate_ids,
+                }
+            },
+        )
+    except AnnotationInputUnavailableError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": {
+                    "code": "ANNOTATION_INPUT_UNAVAILABLE",
+                    "message": str(exc),
+                    "reason": exc.reason,
                 }
             },
         )

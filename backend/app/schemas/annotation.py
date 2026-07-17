@@ -1,21 +1,25 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.models import AnnotationFileStatus, AnnotationSource, ViewType
+from app.schemas.normalized_annotation import (
+    AnalysisReadiness,
+    ParseSummary,
+)
+
+
+QualityStatus = Literal["valid", "warning", "invalid"]
 
 
 class AnnotationFileCreate(BaseModel):
-    """上传标注文件的请求参数（文件本身通过 multipart/form-data 传递）。"""
-
     source: AnnotationSource = AnnotationSource.KINOVEA
     annotation_fps: float | None = Field(default=None, ge=0)
     metadata: dict = Field(default_factory=dict)
 
 
 class AnnotationFileRead(BaseModel):
-    """标注文件列表项和详情响应。"""
-
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -41,8 +45,6 @@ class AnnotationFileRead(BaseModel):
 
 
 class AnnotationFileListItem(BaseModel):
-    """标注文件列表项（精简字段），包含从 session_video 继承的 view_type。"""
-
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -56,10 +58,36 @@ class AnnotationFileListItem(BaseModel):
     annotation_fps: float | None
     uploaded_at: datetime | None
 
+    normalized_annotation_id: int | None = None
+    normalized_revision: int | None = None
+    quality_status: QualityStatus | None = None
+    analysis_readiness: AnalysisReadiness | None = None
+    parse_warnings: list[str] = Field(default_factory=list)
+    parse_error: str | None = None
+
+
+class AnnotationIngestResponse(BaseModel):
+    annotation_file_id: int
+    session_video_id: int
+    session_id: int
+    video_file_id: int
+
+    source: AnnotationSource
+    file_status: AnnotationFileStatus
+    file_version: int
+    original_filename: str
+
+    normalized_annotation_id: int
+    normalized_revision: int
+    schema_version: str
+
+    parse_summary: ParseSummary
+    quality: dict
+    analysis_readiness: AnalysisReadiness
+    warnings: list[str] = Field(default_factory=list)
+
 
 class AnnotationFileDetail(BaseModel):
-    """标注文件详情（含 session 和 video 上下文）。"""
-
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -88,7 +116,5 @@ class AnnotationFileDetail(BaseModel):
 
 
 class AnnotationFileArchiveResponse(BaseModel):
-    """归档操作响应。"""
-
     id: int
     status: AnnotationFileStatus

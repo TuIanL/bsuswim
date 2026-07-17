@@ -3,7 +3,7 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.core.deps import get_current_user
 from app.db.session import get_db
@@ -11,6 +11,7 @@ from app.models import (
     AnnotationFile,
     AnnotationFileStatus,
     AnnotationSource,
+    NormalizedAnnotation,
     SessionVideo,
     TrainingSession,
     User,
@@ -24,12 +25,20 @@ from app.schemas.annotation import (
     AnnotationFileArchiveResponse,
     AnnotationFileDetail,
     AnnotationFileListItem,
+    AnnotationIngestResponse,
 )
+from app.schemas.normalized_annotation import ParseAnnotationOptions
 from app.services.annotation_file_service import (
     create_annotation,
     detect_file_type,
     validate_annotation_file,
 )
+from app.services.annotation_ingestion_service import (
+    AnnotationIngestionError,
+    AnnotationIngestionResult,
+    ingest_annotation,
+)
+from app.services.annotation_quality.readiness import derive_analysis_readiness
 
 router = APIRouter()
 
@@ -130,8 +139,24 @@ def list_annotations(
 
     annotations = list_by_session_video(db, link.id)
 
-    return [
-        AnnotationFileListItem(
+    na_map: dict[int, NormalizedAnnotation] = {}
+    if annotations:
+        nas = db.scalars(
+            select(NormalizedAnnotation).where(
+                NormalizedAnnotation.annotation_file_id.in_([a.id for a in annotations])
+            )
+        ).all()
+        na_map = {na.annotation_file_id: na for na in nas}
+
+    result: list[AnnotationFileListItem] = []
+    for a in annotations:
+        na = na_map.get(a.id)
+        qual = na.quality if na else None
+        qual_status = qual.get("status") if qual else None
+        meta = na.annotation_metadata or {} if na else {}
+        parse_warnings = (meta.get("parse") or {}).get("warnings", []) if meta else []
+
+        result.append(AnnotationFileListItem(
             id=a.id,
             session_video_id=a.session_video_id,
             source=a.source,
@@ -142,9 +167,96 @@ def list_annotations(
             original_filename=a.original_filename,
             annotation_fps=float(a.annotation_fps) if a.annotation_fps else None,
             uploaded_at=a.uploaded_at,
+            normalized_annotation_id=na.id if na else None,
+            normalized_revision=na.revision if na else None,
+            quality_status=qual_status,
+            analysis_readiness=derive_analysis_readiness(qual) if qual else None,
+            parse_warnings=parse_warnings,
+            parse_error=a.parse_error,
+        ))
+    return result
+
+
+@router.post(
+    "/sessions/{session_id}/videos/{video_id}/annotations/ingest",
+    status_code=status.HTTP_201_CREATED,
+)
+async def ingest_annotation_endpoint(
+    session_id: int,
+    video_id: int,
+    file: UploadFile = File(...),
+    source: str = Form(default="kinovea"),
+    annotation_fps: float | None = Form(default=None),
+    metadata: str | None = Form(default=None),
+    parse_options: str | None = Form(default=None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    import json
+
+    _get_owned_session(db, session_id, current_user)
+    link = _find_session_video(db, session_id, video_id)
+
+    try:
+        source_enum = AnnotationSource(source)
+    except ValueError:
+        valid_sources = [s.value for s in AnnotationSource]
+        raise HTTPException(
+            status_code=400,
+            detail=f"不支持的标注来源，仅支持: {', '.join(valid_sources)}",
         )
-        for a in annotations
-    ]
+
+    meta_dict: dict = {}
+    if metadata:
+        try:
+            meta_dict = json.loads(metadata)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="metadata 不是合法的 JSON")
+
+    parse_opts: ParseAnnotationOptions | None = None
+    if parse_options:
+        try:
+            parse_opts = ParseAnnotationOptions.model_validate_json(parse_options)
+        except Exception:
+            raise HTTPException(status_code=422, detail={
+                "error": {
+                    "code": "ANNOTATION_INGEST_INVALID_PARSE_OPTIONS",
+                    "message": "parse_options 格式无效",
+                }
+            })
+
+    try:
+        result = await ingest_annotation(
+            db,
+            session_video_id=link.id,
+            file=file,
+            source=source_enum,
+            annotation_fps=annotation_fps,
+            metadata=meta_dict,
+            parse_options=parse_opts,
+            current_user_id=current_user.id,
+        )
+    except AnnotationIngestionError as exc:
+        raise HTTPException(status_code=422, detail={
+            "error": {
+                "code": exc.code,
+                "message": str(exc),
+                "annotation_file_id": exc.annotation_file_id,
+                "retryable": True,
+            }
+        })
+
+    if result.parse_result is None:
+        raise HTTPException(status_code=422, detail={
+            "error": {
+                "code": "ANNOTATION_INGEST_PARSE_FAILED",
+                "message": "文件已保存但解析失败",
+                "annotation_file_id": result.annotation_file.id,
+                "retryable": True,
+            }
+        })
+
+    return result.to_response(session_id=session_id, video_file_id=video_id)
 
 
 @router.get("/annotations/{annotation_file_id}")

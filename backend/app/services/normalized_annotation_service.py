@@ -326,6 +326,25 @@ def parse_annotation_file(
     )
     quality = quality_report.model_dump(mode="json")
 
+    # ── warnings persistence ──
+    from datetime import datetime, timezone
+
+    all_warnings = (
+        warnings
+        if source_value == AnnotationSource.CVAT.value
+        else (parsed.warnings if parsed is not None else [])
+    )
+    parse_meta = {
+        "warnings": all_warnings,
+        "parsed_at": datetime.now(timezone.utc).isoformat(),
+    }
+    if "parse" not in build_metadata:
+        build_metadata["parse"] = {}
+    build_metadata["parse"] = {
+        **build_metadata.get("parse", {}),
+        **parse_meta,
+    }
+
     # ── upsert ──
     metadata = build_metadata if build_metadata else {}
     existing = get_by_annotation_file(db, annotation_file_id)

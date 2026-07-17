@@ -10,16 +10,15 @@ from app.repositories.normalized_annotation_repository import (
     list_by_session_video,
 )
 from app.schemas.normalized_annotation import (
-    AnalysisReadiness,
     NormalizedAnnotationCreate,
     NormalizedAnnotationListItem,
     NormalizedAnnotationRead,
     ParseAnnotationOptions,
     ParseResponse,
-    ParseSummary,
 )
 from app.services.annotation_quality.legacy import normalize_quality_payload
 from app.services.annotation_quality.profile_resolver import resolve_quality_profile_id
+from app.services.annotation_quality.readiness import derive_analysis_readiness
 from app.services.annotation_quality.validator import AnnotationQualityValidator
 from app.services.annotation_quality.provider import YamlQualityProfileProvider
 from app.services.normalized_annotation_service import (
@@ -36,23 +35,6 @@ def _get_validator() -> AnnotationQualityValidator:
     profiles_dir = os.path.join(os.path.dirname(__file__), "..", "..", "services", "annotation_quality", "profiles")
     provider = YamlQualityProfileProvider(profiles_dir)
     return AnnotationQualityValidator(profile_provider=provider)
-
-
-def _derive_readiness(quality: dict) -> AnalysisReadiness | None:
-    if not quality:
-        return None
-    report = normalize_quality_payload(quality)
-    status = report.status
-    blocking_count = report.summary.blocking_count
-    affected = [
-        mk for mk, mr in report.module_readiness.items()
-        if mr.status in ("degraded", "blocked")
-    ]
-    if status == "valid":
-        return AnalysisReadiness(can_submit=True, requires_acknowledgement=False, blocking_issue_count=0, affected_modules=[])
-    if status == "warning":
-        return AnalysisReadiness(can_submit=True, requires_acknowledgement=True, blocking_issue_count=0, affected_modules=affected)
-    return AnalysisReadiness(can_submit=False, requires_acknowledgement=False, blocking_issue_count=blocking_count, affected_modules=affected)
 
 
 # ── Create from JSON ──
@@ -83,7 +65,7 @@ def create_normalized_annotation_endpoint(
         "source": ann.source,
         "revision": ann.revision,
         "quality": quality,
-        "analysis_readiness": _derive_readiness(quality),
+        "analysis_readiness": derive_analysis_readiness(quality),
     }
 
 
@@ -172,7 +154,7 @@ def parse_annotation_file_endpoint(
     result = parse_annotation_file(db, annotation_file_id, current_user_id=current_user.id, options=options)
     ann = result.annotation
     quality = normalize_quality_payload(ann.quality or {})
-    readiness = _derive_readiness(ann.quality or {})
+    readiness = derive_analysis_readiness(ann.quality or {})
     return ParseResponse(
         normalized_annotation_id=ann.id,
         annotation_file_id=annotation_file_id,
@@ -204,7 +186,6 @@ def revalidate_normalized_annotation(
     PROFILE_ID = resolve_quality_profile_id(ann.source)
     PROFILE_VERSION = "1.0.0"
 
-    # ── cache check ──
     if not force:
         cached_revision = current_quality.source_revision
         cached_validator = current_quality.validator_version
@@ -219,7 +200,7 @@ def revalidate_normalized_annotation(
                 "normalized_annotation_id": ann.id,
                 "revision": ann.revision,
                 "quality": current_quality.model_dump(mode="json"),
-                "analysis_readiness": _derive_readiness(ann.quality),
+                "analysis_readiness": derive_analysis_readiness(ann.quality),
                 "cached": True,
             }
 
@@ -244,6 +225,6 @@ def revalidate_normalized_annotation(
         "normalized_annotation_id": ann.id,
         "revision": ann.revision,
         "quality": report.model_dump(mode="json"),
-        "analysis_readiness": _derive_readiness(ann.quality),
+        "analysis_readiness": derive_analysis_readiness(ann.quality),
         "cached": False,
     }

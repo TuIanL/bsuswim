@@ -103,6 +103,7 @@
                 <el-option label="Dartfish" value="dartfish" />
                 <el-option label="Manual JSON" value="manual_json" />
                 <el-option label="AI Pose" value="ai_pose" />
+                <el-option label="CVAT Skeleton XML" value="cvat" />
               </el-select>
               <el-input-number
                 v-model="camera.annotationFps"
@@ -119,19 +120,50 @@
                 accept=".csv,.json,.xml,.txt,.kva"
                 :on-change="makeAnnotationFileHandler(camera.view)"
               >
-                <el-button size="small" type="primary" plain :loading="camera.annotationUploading" :disabled="!camera.annotationFile">
+                <el-button size="small" type="primary" plain :loading="camera.annotationStage === 'ingesting'" :disabled="!camera.annotationFile">
                   {{ camera.annotationFileName || '选择标注文件' }}
                 </el-button>
               </el-upload>
               <el-button
                 size="small"
                 type="primary"
-                :loading="camera.annotationUploading"
+                :loading="camera.annotationStage === 'ingesting'"
                 :disabled="!camera.annotationFile"
                 @click="uploadAnnotationFile(camera.view)"
               >
-                上传标注
+                上传并处理标注
               </el-button>
+            </div>
+
+            <!-- 标注处理状态 -->
+            <div v-if="camera.annotationStage === 'ingesting'" class="annotation-stage-info">
+              <el-icon class="is-loading"><svg viewBox="0 0 1024 1024"><path d="M512 1024C229.376 1024 0 794.624 0 512S229.376 0 512 0s512 229.376 512 512-229.376 512-512 512z m0-938.667C276.48 85.333 85.333 276.48 85.333 512S276.48 938.667 512 938.667 938.667 747.52 938.667 512 747.52 85.333 512 85.333z"/></svg></el-icon>
+              <span>正在上传并处理标注…</span>
+            </div>
+            <div v-else-if="camera.annotationStage === 'failed'" class="annotation-stage-info stage-failed">
+              <span>处理失败，请重试</span>
+            </div>
+
+            <!-- 已解析标注的选择 -->
+            <div v-if="camera.annotations.filter(a => a.status === 'parsed').length > 0" class="annotation-selection">
+              <h4>选择分析标注</h4>
+              <el-radio-group v-model="camera.selectedAnnotationId" class="annotation-radio-group">
+                <div v-for="ann in camera.annotations.filter(a => a.status === 'parsed')" :key="ann.id" class="annotation-radio-item">
+                  <el-radio
+                    :value="ann.normalized_annotation_id"
+                    :disabled="ann.quality_status === 'invalid'"
+                  >
+                    <span class="ann-filename">{{ ann.original_filename }}</span>
+                    <span class="ann-meta">
+                      {{ sourceLabel(ann.source) }} · v{{ ann.version }}
+                      <el-tag v-if="ann.quality_status" :type="qualityTagType(ann.quality_status)" size="small" effect="plain">
+                        {{ qualityLabel(ann.quality_status) }}
+                      </el-tag>
+                      <span v-if="ann.normalized_revision" class="revision-badge">rev{{ ann.normalized_revision }}</span>
+                    </span>
+                  </el-radio>
+                </div>
+              </el-radio-group>
             </div>
           </div>
         </div>
@@ -153,8 +185,8 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { UploadFile } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { archiveAnnotation, bindUploadedSessionVideo, downloadAnnotationUrl, getAthlete, getAnnotationDetail, getSession, listAnnotations, listSessionVideos, submitAnalysis as submitBackendAnalysis, uploadAnnotation, uploadVideo } from '../services/api'
-import type { AnalysisReadiness, AnnotationFileDetail, AnnotationFileListItem, Athlete, BackendSessionVideoView, QualityStatus, SessionVideoView, TrainingSession, UploadStatus } from '../types'
+import { archiveAnnotation, bindUploadedSessionVideo, downloadAnnotationUrl, getAthlete, getAnnotationDetail, getSession, ingestAnnotation, listAnnotations, listSessionVideos, submitAnalysis as submitBackendAnalysis, uploadVideo } from '../services/api'
+import type { AnalysisReadiness, AnnotationFileListItem, AnnotationIngestResponse, AnnotationWorkflowStage, Athlete, BackendSessionVideoView, QualityStatus, SessionVideoView, TrainingSession, UploadStatus } from '../types'
 
 type CameraState = {
   view: SessionVideoView
@@ -175,7 +207,8 @@ type CameraState = {
   annotationFileName: string
   annotationSource: string
   annotationFps: number | undefined
-  annotationUploading: boolean
+  annotationStage: AnnotationWorkflowStage
+  selectedAnnotationId: number | null
 }
 
 const props = defineProps<{ sessionId: string }>()
@@ -191,7 +224,8 @@ function makeCamera(view: SessionVideoView, backendView: BackendSessionVideoView
     syncOffsetMs: 0, fps: 60, resolution: '1920x1080',
     sessionVideoId: null, videoFileId: null,
     annotations: [],
-    annotationFile: null, annotationFileName: '', annotationSource: 'kinovea', annotationFps: 60, annotationUploading: false
+    annotationFile: null, annotationFileName: '', annotationSource: 'kinovea', annotationFps: 60,
+    annotationStage: 'idle', selectedAnnotationId: null,
   }
 }
 
@@ -281,24 +315,19 @@ async function loadAnnotations(view: SessionVideoView) {
   if (!camera || !session.value || !camera.videoFileId) return
   try {
     const annotations = await listAnnotations(session.value.id, camera.videoFileId)
-    for (const ann of annotations) {
-      if (ann.status === 'parsed') {
-        try {
-          const detail = await getAnnotationDetail(ann.id)
-          ann.quality_status = parseQualityLevel(detail)
-        } catch { /* ignore */ }
-      }
-    }
     camera.annotations = annotations
+
+    const submittable = annotations
+      .filter((a) => a.status === 'parsed' && a.quality_status !== 'invalid')
+      .sort((a, b) => {
+        const timeA = a.uploaded_at || ''
+        const timeB = b.uploaded_at || ''
+        return timeB.localeCompare(timeA) || b.id - a.id
+      })
+    camera.selectedAnnotationId = submittable.length > 0 ? submittable[0].normalized_annotation_id ?? null : null
   } catch {
     // 静默失败
   }
-}
-
-function parseQualityLevel(detail: AnnotationFileDetail): QualityStatus | undefined {
-  const q = (detail as any).quality
-  if (!q) return undefined
-  return q.status || (q.level === 'good' ? 'valid' : q.level === 'error' ? 'invalid' : q.level === 'warning' ? 'warning' : undefined)
 }
 
 function makeAnnotationFileHandler(view: SessionVideoView) {
@@ -307,30 +336,53 @@ function makeAnnotationFileHandler(view: SessionVideoView) {
     if (!camera) return
     camera.annotationFile = file.raw || null
     camera.annotationFileName = file.name
+    if (file.name?.endsWith('.xml')) {
+      camera.annotationSource = 'cvat'
+    }
   }
 }
 
 async function uploadAnnotationFile(view: SessionVideoView) {
   const camera = cameras.find((item) => item.view === view)
   if (!camera?.annotationFile || !session.value || !camera.videoFileId) return
-  camera.annotationUploading = true
+  camera.annotationStage = 'ingesting'
   try {
-    await uploadAnnotation(
+    const result = await ingestAnnotation(
       session.value.id,
       camera.videoFileId,
       camera.annotationFile,
       camera.annotationSource,
-      camera.annotationFps || null
+      camera.annotationFps || null,
     )
     camera.annotationFile = null
     camera.annotationFileName = ''
-    ElMessage.success('标注文件已上传')
+    camera.annotationStage = mapIngestQuality(result.quality?.status)
+    if (camera.annotationStage === 'failed') {
+      ElMessage.error('标注处理失败')
+    } else {
+      ElMessage.success('标注上传并处理完成')
+    }
     await loadAnnotations(view)
   } catch (error: any) {
-    ElMessage.error(error?.response?.data?.detail || error?.message || '标注上传失败')
-  } finally {
-    camera.annotationUploading = false
+    camera.annotationStage = 'failed'
+    const detail = error?.response?.data?.detail
+    if (detail?.error?.code?.startsWith('ANNOTATION_INGEST')) {
+      ElMessageBox.alert(
+        `${detail.error.message}${detail.error.annotation_file_id ? '\n文件已保存，可重新解析。' : ''}`,
+        '处理失败',
+        { type: 'error', confirmButtonText: detail.error.annotation_file_id ? '知道了' : '关闭' }
+      )
+    } else {
+      ElMessage.error(error?.response?.data?.detail || error?.message || '标注处理失败')
+    }
   }
+}
+
+function mapIngestQuality(status: string | undefined): AnnotationWorkflowStage {
+  if (status === 'valid') return 'ready'
+  if (status === 'warning') return 'warning'
+  if (status === 'invalid') return 'invalid'
+  return 'failed'
 }
 
 function downloadAnnotation(annotationId: number) {
@@ -358,24 +410,17 @@ async function submitAnalysis() {
   }
   if (!session.value) return
 
-  // 找到已解析的侧方位标注
   const sideCamera = cameras.find((c) => c.view === 'side' && c.status === 'success')
   let annotationId: number | undefined
   let qualityStatus: QualityStatus | undefined
   let affectedModules: string[] = []
-  if (sideCamera) {
-    const parsed = sideCamera.annotations.find((a) => a.status === 'parsed')
-    if (parsed) {
-      annotationId = parsed.id
-      qualityStatus = parsed.quality_status
-      if (qualityStatus === 'warning') {
-        try {
-          const detail = await getAnnotationDetail(parsed.id)
-          const ar: AnalysisReadiness | undefined = (detail as any).analysis_readiness
-          affectedModules = ar?.affected_modules || []
-        } catch { /* ignore */ }
-      }
-    }
+  if (sideCamera && sideCamera.selectedAnnotationId) {
+    const selected = sideCamera.annotations.find(
+      (a) => a.normalized_annotation_id === sideCamera.selectedAnnotationId
+    )
+    annotationId = selected?.normalized_annotation_id ?? undefined
+    qualityStatus = selected?.quality_status
+    affectedModules = selected?.analysis_readiness?.affected_modules || []
   }
 
   // invalid 直接阻断
@@ -398,7 +443,7 @@ async function submitAnalysis() {
       })
       acknowledge = true
     } catch {
-      return // 用户取消
+      return
     }
   }
 
@@ -418,6 +463,10 @@ async function submitAnalysis() {
         '无法开始分析',
         { type: 'error' }
       )
+    } else if (detail?.error?.code === 'ANNOTATION_SELECTION_REQUIRED') {
+      ElMessageBox.alert('请选择一个标注文件后再提交分析。', '需要选择标注', { type: 'warning' })
+    } else if (detail?.error?.code === 'ANNOTATION_INPUT_UNAVAILABLE') {
+      ElMessageBox.alert('当前没有可用的标注，请检查标注文件状态。', '标注不可用', { type: 'warning' })
     } else {
       ElMessage.error(detail || error?.message || '提交分析失败')
     }
@@ -466,3 +515,51 @@ function qualityLabel(value: QualityStatus) {
 
 onMounted(load)
 </script>
+
+<style scoped>
+.annotation-section {
+  margin-top: 12px;
+}
+.annotation-stage-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  color: #909399;
+  font-size: 13px;
+}
+.annotation-stage-info.stage-failed {
+  color: #f56c6c;
+}
+.annotation-selection {
+  margin-top: 12px;
+}
+.annotation-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.annotation-radio-item {
+  display: flex;
+  align-items: center;
+}
+.annotation-radio-item .ann-filename {
+  font-weight: 500;
+  margin-right: 8px;
+}
+.annotation-radio-item .ann-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #909399;
+  font-size: 12px;
+}
+.revision-badge {
+  background: #ecf5ff;
+  color: #409eff;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+</style>

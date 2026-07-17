@@ -215,9 +215,50 @@ export interface ReportData {
 
 // ---- annotation file types ----
 
-export type AnnotationSource = 'kinovea' | 'dartfish' | 'manual_json' | 'ai_pose' | 'unknown'
+export type AnnotationSource = 'kinovea' | 'dartfish' | 'manual_json' | 'ai_pose' | 'cvat' | 'unknown'
 
 export type AnnotationFileStatus = 'uploaded' | 'parsed' | 'parse_failed' | 'archived'
+
+export type AnnotationWorkflowStage =
+  | 'idle'
+  | 'selected'
+  | 'ingesting'
+  | 'ready'
+  | 'warning'
+  | 'invalid'
+  | 'failed'
+
+export interface AnalysisReadiness {
+  can_submit: boolean
+  requires_acknowledgement: boolean
+  blocking_issue_count: number
+  affected_modules: string[]
+}
+
+export interface ParseSummary {
+  events_count: number
+  keypoint_frames_count: number
+  trajectories_count: number
+  manual_tags_count: number
+}
+
+export interface AnnotationIngestResponse {
+  annotation_file_id: number
+  session_video_id: number
+  session_id: number
+  video_file_id: number
+  source: AnnotationSource
+  file_status: AnnotationFileStatus
+  file_version: number
+  original_filename: string
+  normalized_annotation_id: number
+  normalized_revision: number
+  schema_version: string
+  parse_summary: ParseSummary
+  quality: Record<string, any>
+  analysis_readiness: AnalysisReadiness
+  warnings: string[]
+}
 
 export interface AnnotationFileListItem {
   id: number
@@ -231,6 +272,11 @@ export interface AnnotationFileListItem {
   annotation_fps: number | null
   uploaded_at: string | null
   quality_status?: QualityStatus
+  normalized_annotation_id?: number | null
+  normalized_revision?: number | null
+  analysis_readiness?: AnalysisReadiness | null
+  parse_warnings?: string[]
+  parse_error?: string | null
 }
 
 export interface AnnotationFileDetail {

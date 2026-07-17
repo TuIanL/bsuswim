@@ -16,7 +16,8 @@ import type {
   TrainingSession,
   User,
   VideoFile,
-  WorkspaceData
+  WorkspaceData,
+  AnnotationIngestResponse
 } from '../types'
 import {
   bindDemoSessionVideo,
@@ -336,6 +337,28 @@ export async function uploadAnnotation(
   if (metadata) form.append('metadata', JSON.stringify(metadata))
   const response = await client.post<AnnotationUploadResponse>(
     `/sessions/${sessionId}/videos/${videoId}/annotations`,
+    form
+  )
+  return response.data
+}
+
+export async function ingestAnnotation(
+  sessionId: number,
+  videoId: number,
+  file: File,
+  source: string = 'kinovea',
+  annotationFps?: number | null,
+  metadata?: Record<string, any> | null,
+  parseOptions?: Record<string, any> | null
+): Promise<AnnotationIngestResponse> {
+  const form = new FormData()
+  form.append('file', file)
+  form.append('source', source)
+  if (annotationFps != null) form.append('annotation_fps', String(annotationFps))
+  if (metadata) form.append('metadata', JSON.stringify(metadata))
+  if (parseOptions) form.append('parse_options', JSON.stringify(parseOptions))
+  const response = await client.post<AnnotationIngestResponse>(
+    `/sessions/${sessionId}/videos/${videoId}/annotations/ingest`,
     form
   )
   return response.data
