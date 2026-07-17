@@ -14,6 +14,7 @@ from app.schemas.normalized_annotation import (
     NormalizedAnnotationCreate,
     ParseAnnotationOptions,
     ParseSummary,
+    build_contiguous_frame_ranges,
 )
 from app.services.annotation_derivation.builder import AnnotationDerivedDataBuilder
 from app.services.annotation_quality.legacy import normalize_quality_payload
@@ -144,17 +145,37 @@ def parse_annotation_file(
             cvat_parsed = parse_cvat_xml(ann_file.storage_path)
 
             session_video = ann_file.session_video
-            video_fps = float(session_video.fps) if session_video and hasattr(session_video, 'fps') and session_video.fps else None
             video_file = session_video.video_file if session_video and hasattr(session_video, 'video_file') else None
+            video_frame_count = int(video_file.frame_count) if video_file and hasattr(video_file, 'frame_count') and video_file.frame_count else None
+
+            fps_source: str | None = None
+            fps_verified = False
+            if session_video and hasattr(session_video, 'fps') and session_video.fps:
+                video_fps = float(session_video.fps)
+                fps_source = "session_video"
+                fps_verified = True
+            elif ann_file.annotation_fps and getattr(ann_file, 'metadata', {}).get('fps_source') == 'user_provided':
+                video_fps = float(ann_file.annotation_fps)
+                fps_source = "annotation_file"
+                fps_verified = True
+            elif ann_file.annotation_fps:
+                video_fps = float(ann_file.annotation_fps)
+                fps_source = "annotation_file_unverified"
+                fps_verified = False
+            else:
+                video_fps = None
+                fps_source = "compatibility_default"
+                fps_verified = False
 
             json_manifest = None
             if options and options.companion_annotation_file_id:
                 companion = db.get(AnnotationFile, options.companion_annotation_file_id)
                 if companion is None:
-                    raise CvatParseError(f"companion annotation file {options.companion_annotation_file_id} not found")
+                    raise CvatParseError("MISSING_COMPANION", f"companion annotation file {options.companion_annotation_file_id} not found")
                 if companion.session_video_id != ann_file.session_video_id:
                     raise CvatParseError(
-                        "companion JSON does not belong to the same session_video"
+                        "COMPANION_MISMATCH",
+                        "companion JSON does not belong to the same session_video",
                     )
                 try:
                     with open(companion.storage_path, "r", encoding="utf-8") as fh:
@@ -164,24 +185,26 @@ def parse_annotation_file(
                         {
                             "annotation_frame": i,
                             "image_name": img.get("file_name", ""),
-                            "source_video_frame": None,
-                            "timestamp_sec": None,
+                            "source_video_frame": img.get("source_video_frame") or img.get("frame_id"),
+                            "timestamp_sec": img.get("timestamp_sec"),
                         }
                         for i, img in enumerate(images)
                     ]
                 except (FileNotFoundError, json.JSONDecodeError) as exc:
-                    raise CvatParseError(f"failed to read companion JSON: {exc}")
+                    raise CvatParseError("MANIFEST_READ_ERROR", f"failed to read companion JSON: {exc}")
 
+            required_frames = {f.annotation_frame for f in cvat_parsed.raw_keypoint_frames}
             frame_mapping = FrameMappingResolver.resolve(
                 cvat_parsed.native_metadata,
                 video_fps=video_fps,
                 options=options,
                 json_manifest=json_manifest,
+                required_annotation_frames=required_frames,
             )
 
             normalizer = CvatAnnotationNormalizer()
             keypoint_frames = normalizer.normalize(
-                cvat_parsed.raw_keypoint_frames, frame_mapping
+                cvat_parsed.raw_keypoint_frames, frame_mapping, fps_verified=fps_verified,
             )
 
             derived = AnnotationDerivedDataBuilder.build(keypoint_frames)
@@ -198,9 +221,8 @@ def parse_annotation_file(
             scale = None
             coordinate_system = {"origin": "top_left", "x_axis": "right", "y_axis": "down", "unit": "pixel"}
             fps = float(video_fps) if video_fps else 60.0
-            frame_count = len(keypoint_frames)
+            frame_count = video_frame_count
             duration_sec = float(video_file.duration_sec) if video_file and hasattr(video_file, 'duration_sec') and video_file.duration_sec else None
-            video_frame_count = int(video_file.frame_count) if video_file and hasattr(video_file, 'frame_count') and video_file.frame_count else None
 
             annotation_sequence = {
                 "frame_count": cvat_parsed.native_metadata.get("meta", {}).get("size"),
@@ -211,16 +233,23 @@ def parse_annotation_file(
             analysis_ranges = []
             if options and options.analysis_ranges:
                 analysis_ranges = [r.model_dump() for r in options.analysis_ranges]
+
+            annotation_frames = [kf.annotation_frame for kf in keypoint_frames if kf.annotation_frame is not None]
+            if annotation_frames:
+                annotated_ranges = build_contiguous_frame_ranges(annotation_frames)
+            else:
+                annotated_ranges = []
+
             coverage = {
                 "annotated_frame_count": annotated_frame_count,
-                "annotated_ranges": analysis_ranges if analysis_ranges else (
-                    [{"start_frame": 0, "end_frame": annotated_frame_count - 1}] if annotated_frame_count > 0 else []
-                ),
+                "annotated_ranges": [r.model_dump() for r in annotated_ranges] if annotated_ranges else [],
             }
 
             build_metadata = {
                 "video": {
                     "fps": fps,
+                    "fps_source": fps_source or "compatibility_default",
+                    "fps_verified": fps_verified,
                     "frame_count": video_frame_count,
                     "duration_sec": duration_sec,
                 },
@@ -228,6 +257,13 @@ def parse_annotation_file(
                 "frame_mapping": frame_mapping.model_dump(),
                 "annotation_coverage": coverage,
                 "analysis_ranges": analysis_ranges,
+                "contract_version": "cvat-import-contract.v1.1",
+                "parser": {
+                    "name": "cvat_xml",
+                    "version": "1.1.0",
+                    "source_format": "cvat_task_xml",
+                    "source_format_version": "1.1",
+                },
                 "derived": {
                     "visibility_summary": derived.get("visibility_summary", {}),
                 },
@@ -261,6 +297,18 @@ def parse_annotation_file(
     profile_id = resolve_quality_profile_id(source_value)
 
     validator = _get_validator()
+    cvat_metadata_kwargs = {}
+    if source_value == AnnotationSource.CVAT.value:
+        cvat_metadata_kwargs = {
+            "frame_mapping": build_metadata.get("frame_mapping"),
+            "annotation_sequence": {
+                "frame_count": build_metadata.get("annotation_sequence", {}).get("frame_count"),
+                "annotated_frame_count": build_metadata.get("annotation_coverage", {}).get("annotated_frame_count"),
+            },
+            "analysis_ranges": build_metadata.get("analysis_ranges"),
+            "annotated_ranges": build_metadata.get("annotation_coverage", {}).get("annotated_ranges"),
+            "video_metadata": build_metadata.get("video"),
+        }
     quality_report = validator.validate(
         events=events,
         keypoint_frames=keypoint_frames,
@@ -274,12 +322,7 @@ def parse_annotation_file(
         video_height=video_height,
         view_type=str(session_video.view_type.value) if session_video and hasattr(session_video, 'view_type') else None,
         profile_id=profile_id,
-        frame_mapping=build_metadata.get("frame_mapping") if source_value == AnnotationSource.CVAT.value else None,
-        annotation_sequence={
-            "frame_count": build_metadata.get("annotation_sequence", {}).get("frame_count"),
-            "annotated_frame_count": build_metadata.get("annotation_coverage", {}).get("annotated_frame_count"),
-        } if source_value == AnnotationSource.CVAT.value else None,
-        analysis_ranges=build_metadata.get("analysis_ranges") if source_value == AnnotationSource.CVAT.value else None,
+        **cvat_metadata_kwargs,
     )
     quality = quality_report.model_dump(mode="json")
 

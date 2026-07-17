@@ -79,6 +79,7 @@ class KeypointFrame(BaseModel):
     source_video_frame: int | None = None
     timestamp_sec: float | None = None
     image_name: str | None = None
+    source_track_ids: list[str] = Field(default_factory=list)
 
 
 class Trajectory(BaseModel):
@@ -166,10 +167,48 @@ class ParseAnnotationOptions(BaseModel):
 # ── CVAT raw data schemas ──
 
 
+class AnnotationFrameRange(BaseModel):
+    start_annotation_frame: int
+    end_annotation_frame: int
+
+
+def build_contiguous_frame_ranges(frames: list[int]) -> list[AnnotationFrameRange]:
+    if not frames:
+        return []
+    sorted_frames = sorted(set(frames))
+    ranges: list[AnnotationFrameRange] = []
+    start = sorted_frames[0]
+    end = sorted_frames[0]
+    for f in sorted_frames[1:]:
+        if f == end + 1:
+            end = f
+        else:
+            ranges.append(AnnotationFrameRange(
+                start_annotation_frame=start,
+                end_annotation_frame=end,
+            ))
+            start = f
+            end = f
+    ranges.append(AnnotationFrameRange(
+        start_annotation_frame=start,
+        end_annotation_frame=end,
+    ))
+    return ranges
+
+
 class RawCvatPoint(BaseModel):
-    x: float
-    y: float
+    x: float | None = None
+    y: float | None = None
     visibility: Literal["visible", "occluded", "missing"]
+
+    @model_validator(mode="after")
+    def validate_visibility_coordinates(self):
+        if self.visibility == "missing":
+            if self.x is not None or self.y is not None:
+                raise ValueError("missing raw point must not contain coordinates")
+        elif self.x is None or self.y is None:
+            raise ValueError("visible or occluded raw point requires coordinates")
+        return self
 
 
 class RawCvatKeypointFrame(BaseModel):

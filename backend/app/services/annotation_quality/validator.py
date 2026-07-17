@@ -15,6 +15,7 @@ from app.services.annotation_quality.checks.coverage_checks import (
 )
 from app.services.annotation_quality.checks.cvat_checks import (
     check_frame_mapping,
+    check_fps_verified,
     check_sequence_coverage,
 )
 from app.services.annotation_quality.checks.geometry_checks import (
@@ -117,6 +118,8 @@ class AnnotationQualityValidator:
         frame_mapping: dict | None = None,
         annotation_sequence: dict | None = None,
         analysis_ranges: list | None = None,
+        annotated_ranges: list | None = None,
+        video_metadata: dict | None = None,
     ) -> AnnotationQualityReport:
         profile = self.profile_provider.get(profile_id)
         issues: list[QualityIssue] = []
@@ -146,11 +149,17 @@ class AnnotationQualityValidator:
 
         issues.extend(check_reference_elements(reference_lines, swim_direction, scale))
         issues.extend(check_cycle_completeness(events or []))
-        issues.extend(check_frame_mapping(frame_mapping))
+        if frame_mapping is not None:
+            issues.extend(check_frame_mapping(frame_mapping, required=True))
+        issues.extend(check_fps_verified(video_metadata))
         if annotation_sequence:
             seq_frame_count = annotation_sequence.get("frame_count")
             annotated_count = annotation_sequence.get("annotated_frame_count")
-            issues.extend(check_sequence_coverage(annotated_count, seq_frame_count, analysis_ranges))
+            issues.extend(check_sequence_coverage(
+                annotated_count, seq_frame_count,
+                annotated_ranges=annotated_ranges,
+                analysis_ranges=analysis_ranges,
+            ))
 
         module_readiness = compute_module_readiness(issues, profile)
         status = derive_global_status(issues, module_readiness, profile)

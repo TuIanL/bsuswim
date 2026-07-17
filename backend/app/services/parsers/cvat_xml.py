@@ -12,14 +12,24 @@ from app.schemas.normalized_annotation import (
 
 
 class CvatParseError(Exception):
-    """Raised when a CVAT XML annotation file cannot be parsed."""
+    def __init__(
+        self,
+        code: str,
+        message: str,
+        frame: int | None = None,
+        track_ids: list[str] | None = None,
+    ):
+        self.code = code
+        self.frame = frame
+        self.track_ids = track_ids
+        self.message = message
+        super().__init__(message)
 
 
-# ── Constants ──
-
-MAX_TRACK_COUNT = 200
-MAX_FRAME_COUNT = 10000
-MAX_POINTS_PER_FRAME = 150
+MAX_XML_FILE_SIZE_BYTES = 100 * 1024 * 1024
+MAX_SKELETON_RECORDS = 50000
+MAX_ACTIVE_FRAMES = 20000
+MAX_POINTS_PER_SKELETON = 150
 MAX_WARNINGS = 100
 
 COCO_SKELETON_KEYPOINTS: set[str] = {
@@ -55,11 +65,136 @@ def _has_dtd_or_entities(file_path: str) -> bool:
     return False
 
 
-def _extract_meta(root: ET.Element) -> dict[str, Any]:
+def parse_cvat_xml(file_path: str) -> ParsedCvatAnnotation:
+    file_size = os.path.getsize(file_path)
+    if file_size == 0:
+        raise CvatParseError("EMPTY_FILE", "Empty XML file")
+    if file_size > MAX_XML_FILE_SIZE_BYTES:
+        raise CvatParseError(
+            "FILE_TOO_LARGE",
+            f"XML file size ({file_size}) exceeds limit {MAX_XML_FILE_SIZE_BYTES}",
+        )
+    if _has_dtd_or_entities(file_path):
+        raise CvatParseError(
+            "SECURITY_REJECTED",
+            "XML contains DTD or entity declarations, rejected for security",
+        )
+
     meta: dict[str, Any] = {}
-    meta_el = root.find("meta")
-    if meta_el is None:
-        return meta
+    raw_tracks: list[dict[str, Any]] = []
+    warnings: list[str] = []
+    skeleton_count = 0
+    version = "unknown"
+
+    try:
+        for event, elem in ET.iterparse(file_path, events=("start", "end")):
+            tag = elem.tag
+
+            if event == "start" and tag == "annotations":
+                version = elem.get("version", "unknown")
+
+            if event == "end" and tag == "annotations":
+                version_el = elem.find("version")
+                if version_el is not None and version_el.text:
+                    version = version_el.text
+
+            if event == "end" and tag == "meta":
+                meta = _extract_meta_from_element(elem)
+
+            if event == "end" and tag == "track":
+                for skel in elem.findall("skeleton"):
+                    skeleton_count += 1
+                    if skeleton_count > MAX_SKELETON_RECORDS:
+                        warnings.append(
+                            f"skeleton record count exceeds limit {MAX_SKELETON_RECORDS}"
+                        )
+                        elem.clear()
+                        continue
+
+                    frame_str = skel.get("frame", "")
+                    try:
+                        frame = int(frame_str)
+                    except (ValueError, TypeError):
+                        continue
+
+                    label = elem.get("label", "")
+                    track_id = elem.get("id", "")
+                    source = elem.get("source", "manual")
+
+                    points_list: list[dict[str, Any]] = []
+                    for pt in skel.findall("points"):
+                        pt_label = pt.get("label", "")
+                        outside = pt.get("outside", "0")
+                        occluded = pt.get("occluded", "0")
+                        points_str = pt.get("points", "")
+                        points_list.append({
+                            "label": pt_label,
+                            "outside": outside,
+                            "occluded": occluded,
+                            "points": points_str,
+                        })
+
+                    raw_tracks.append({
+                        "track_id": track_id,
+                        "label": label,
+                        "source": source,
+                        "frame": frame,
+                        "points": points_list,
+                    })
+
+                elem.clear()
+
+    except ET.ParseError as exc:
+        raise CvatParseError("XML_PARSE_ERROR", f"XML parse error: {exc}")
+
+    if skeleton_count > MAX_SKELETON_RECORDS:
+        raise CvatParseError(
+            "SKELETON_LIMIT_EXCEEDED",
+            f"skeleton record count ({skeleton_count}) exceeds limit {MAX_SKELETON_RECORDS}",
+        )
+
+    keypoint_frames, agg_warnings = _aggregate_by_frame(raw_tracks)
+    all_warnings = warnings + agg_warnings
+
+    if len(keypoint_frames) > MAX_ACTIVE_FRAMES:
+        raise CvatParseError(
+            "ACTIVE_FRAME_LIMIT_EXCEEDED",
+            f"active frame count ({len(keypoint_frames)}) exceeds limit {MAX_ACTIVE_FRAMES}",
+        )
+
+    parsed_frames: list[RawCvatKeypointFrame] = []
+    for raw_skel in keypoint_frames:
+        kf = _skeleton_to_raw_frame(raw_skel)
+        if len(kf.points) > MAX_POINTS_PER_SKELETON:
+            raise CvatParseError(
+                "POINTS_LIMIT_EXCEEDED",
+                f"Frame {kf.annotation_frame} has {len(kf.points)} points, "
+                f"exceeds limit {MAX_POINTS_PER_SKELETON}",
+                frame=kf.annotation_frame,
+            )
+        if any(p.visibility != "missing" for p in kf.points.values()):
+            parsed_frames.append(kf)
+
+    if len(all_warnings) > MAX_WARNINGS:
+        all_warnings = all_warnings[:MAX_WARNINGS]
+        all_warnings.append("Warning count exceeded limit, truncated")
+
+    native_metadata = {
+        "version": version,
+        "meta": meta,
+        "parsed_track_count": len(raw_tracks),
+        "parsed_frame_count": len(parsed_frames),
+    }
+
+    return ParsedCvatAnnotation(
+        raw_keypoint_frames=parsed_frames,
+        native_metadata=native_metadata,
+        warnings=all_warnings,
+    )
+
+
+def _extract_meta_from_element(meta_el: ET.Element) -> dict[str, Any]:
+    meta: dict[str, Any] = {}
     job_el = meta_el.find("job")
     if job_el is not None:
         for field in ("id", "size", "start_frame", "stop_frame", "mode"):
@@ -88,56 +223,6 @@ def _extract_meta(root: ET.Element) -> dict[str, Any]:
     return meta
 
 
-def _extract_tracks(
-    file_path: str,
-) -> tuple[list[dict[str, Any]], list[str]]:
-    tracks: list[dict[str, Any]] = []
-    warnings: list[str] = []
-    track_count = 0
-
-    for event, elem in ET.iterparse(file_path, events=("end",)):
-        if event == "end" and elem.tag == "track":
-            track_count += 1
-            if track_count > MAX_TRACK_COUNT:
-                warnings.append(
-                    f"track count ({track_count}) exceeds limit {MAX_TRACK_COUNT}, "
-                    "remaining tracks ignored"
-                )
-                elem.clear()
-                continue
-            label = elem.get("label", "")
-            track_id = elem.get("id", "")
-            source = elem.get("source", "manual")
-            for skel in elem.findall("skeleton"):
-                frame_str = skel.get("frame", "")
-                try:
-                    frame = int(frame_str)
-                except (ValueError, TypeError):
-                    continue
-                points_list: list[dict[str, Any]] = []
-                for pt in skel.findall("points"):
-                    pt_label = pt.get("label", "")
-                    outside = pt.get("outside", "0")
-                    occluded = pt.get("occluded", "0")
-                    points_str = pt.get("points", "")
-                    pt_data = {
-                        "label": pt_label,
-                        "outside": outside,
-                        "occluded": occluded,
-                        "points": points_str,
-                    }
-                    points_list.append(pt_data)
-                tracks.append({
-                    "track_id": track_id,
-                    "label": label,
-                    "source": source,
-                    "frame": frame,
-                    "points": points_list,
-                })
-            elem.clear()
-    return tracks, warnings
-
-
 def _aggregate_by_frame(
     tracks: list[dict[str, Any]],
 ) -> tuple[list[dict[str, Any]], list[str]]:
@@ -146,9 +231,7 @@ def _aggregate_by_frame(
 
     for t in tracks:
         frame = t["frame"]
-        outside_all = all(
-            p["outside"] == "1" for p in t["points"]
-        )
+        outside_all = all(p["outside"] == "1" for p in t["points"])
         if outside_all:
             continue
         frames_map.setdefault(frame, []).append(t)
@@ -164,9 +247,12 @@ def _aggregate_by_frame(
         if len(active) > 1:
             track_ids = [a["track_id"] for a in active]
             raise CvatParseError(
-                f"MULTIPLE_ACTIVE_SKELETONS at frame {frame}: "
+                "MULTIPLE_ACTIVE_SKELETONS",
+                f"Multiple active skeletons at frame {frame}: "
                 f"tracks {', '.join(track_ids)}. "
-                "Multiple active skeletons in one frame are not supported."
+                "Multiple active skeletons in one frame are not supported.",
+                frame=frame,
+                track_ids=track_ids,
             )
         result.append(active[0])
     return result, warnings
@@ -187,14 +273,14 @@ def _skeleton_to_raw_frame(
 
         if outside == "1":
             points[norm_name] = RawCvatPoint(
-                x=0.0, y=0.0, visibility="missing"
+                x=None, y=None, visibility="missing"
             )
             continue
 
         points_str = pt.get("points", "")
         if not points_str:
             points[norm_name] = RawCvatPoint(
-                x=0.0, y=0.0, visibility="missing"
+                x=None, y=None, visibility="missing"
             )
             continue
 
@@ -204,8 +290,10 @@ def _skeleton_to_raw_frame(
         x_str, y_str = parts[0].strip(), parts[1].strip()
         if not _is_safe_coordinate(x_str) or not _is_safe_coordinate(y_str):
             raise CvatParseError(
+                "INVALID_COORDINATE",
                 f"Invalid coordinate at frame {frame}, "
-                f"point {raw_label}: ({x_str}, {y_str})"
+                f"point {raw_label}: ({x_str}, {y_str})",
+                frame=frame,
             )
         x, y = float(x_str), float(y_str)
 
@@ -220,68 +308,4 @@ def _skeleton_to_raw_frame(
         annotation_frame=frame,
         points=points,
         source_track_ids=source_track_ids,
-    )
-
-
-def parse_cvat_xml(file_path: str) -> ParsedCvatAnnotation:
-    file_size = os.path.getsize(file_path)
-    if file_size == 0:
-        raise CvatParseError("Empty XML file")
-    if _has_dtd_or_entities(file_path):
-        raise CvatParseError(
-            "XML contains DTD or entity declarations, rejected for security"
-        )
-
-    try:
-        tree = ET.parse(file_path)
-    except ET.ParseError as exc:
-        raise CvatParseError(f"XML parse error: {exc}")
-
-    root = tree.getroot()
-    if root.tag != "annotations":
-        raise CvatParseError(f"Unexpected root tag: {root.tag}, expected 'annotations'")
-
-    version_el = root.find("version")
-    version = version_el.text if version_el is not None and version_el.text else "unknown"
-
-    meta = _extract_meta(root)
-
-    tracks, track_warnings = _extract_tracks(file_path)
-    all_warnings: list[str] = track_warnings
-
-    raw_frames_list, agg_warnings = _aggregate_by_frame(tracks)
-    all_warnings.extend(agg_warnings)
-
-    if len(raw_frames_list) > MAX_FRAME_COUNT:
-        raw_frames_list = raw_frames_list[:MAX_FRAME_COUNT]
-        all_warnings.append(
-            f"Parsed frame count exceeds limit {MAX_FRAME_COUNT}, truncated"
-        )
-
-    keypoint_frames: list[RawCvatKeypointFrame] = []
-    for raw_skel in raw_frames_list:
-        kf = _skeleton_to_raw_frame(raw_skel)
-        if len(kf.points) > MAX_POINTS_PER_FRAME:
-            raise CvatParseError(
-                f"Frame {kf.annotation_frame} has {len(kf.points)} points, "
-                f"exceeds limit {MAX_POINTS_PER_FRAME}"
-            )
-        if any(p.visibility != "missing" for p in kf.points.values()):
-            keypoint_frames.append(kf)
-
-    if len(all_warnings) > MAX_WARNINGS:
-        all_warnings = all_warnings[:MAX_WARNINGS]
-        all_warnings.append("Warning count exceeded limit, truncated")
-
-    native_metadata = {
-        "version": version,
-        "meta": meta,
-        "parsed_track_count": len(tracks),
-        "parsed_frame_count": len(keypoint_frames),
-    }
-
-    return ParsedCvatAnnotation(
-        raw_keypoint_frames=keypoint_frames,
-        native_metadata=native_metadata,
-        warnings=all_warnings,
     )

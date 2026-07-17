@@ -15,6 +15,7 @@ class CvatAnnotationNormalizer:
     def normalize(
         raw_frames: list[RawCvatKeypointFrame],
         mapping: FrameMapping,
+        fps_verified: bool = False,
     ) -> list[KeypointFrame]:
         mapping_index: dict[int, FrameMappingEntry] = {}
         if mapping.entries:
@@ -31,19 +32,25 @@ class CvatAnnotationNormalizer:
             image_name: str | None = None
 
             if map_entry is not None:
-                source_video_frame = map_entry.source_video_frame
-                timestamp_sec = map_entry.timestamp_sec
                 image_name = map_entry.image_name
+                if map_entry.timestamp_sec is not None:
+                    source_video_frame = map_entry.source_video_frame
+                    timestamp_sec = map_entry.timestamp_sec
+                elif map_entry.source_video_frame is not None:
+                    source_video_frame = map_entry.source_video_frame
+                    if mapping.verified and fps_verified and mapping.video_fps:
+                        timestamp_sec = round(
+                            source_video_frame / mapping.video_fps, 4
+                        )
             elif mapping.mode == "affine" and mapping.verified:
                 offset = mapping.source_frame_offset or 0
                 stride = mapping.source_frame_stride or 1
-                fps = mapping.video_fps
                 source_video_frame = offset + af * stride
-                if fps:
-                    timestamp_sec = round(source_video_frame / fps, 4)
+                if fps_verified and mapping.video_fps:
+                    timestamp_sec = round(source_video_frame / mapping.video_fps, 4)
             elif mapping.mode == "identity" and mapping.verified:
                 source_video_frame = af
-                if mapping.video_fps:
+                if fps_verified and mapping.video_fps:
                     timestamp_sec = round(af / mapping.video_fps, 4)
 
             points: dict[str, KeypointPoint] = {}
@@ -69,6 +76,7 @@ class CvatAnnotationNormalizer:
                 timestamp_sec=timestamp_sec,
                 image_name=image_name,
                 points=points,
+                source_track_ids=raw.source_track_ids,
             )
             result.append(kf)
 

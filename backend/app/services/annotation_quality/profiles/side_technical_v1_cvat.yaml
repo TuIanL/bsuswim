@@ -39,12 +39,15 @@ modules:
     minimum_landmark_coverage: 0.80
     minimum_sample_frames: 3
 
-  efficiency:
+    efficiency:
     core: false
     required_references:
       - scale
     required_metrics:
       - stroke_rate_spm
       - stroke_length_m
+    required_gates:
+      - frame_mapping.verified
+      - video.fps_verified
 
 event_sequences: {}

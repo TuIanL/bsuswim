@@ -4,6 +4,14 @@ import os
 import tempfile
 import pytest
 
+from app.schemas.normalized_annotation import (
+    FrameMapping,
+    FrameMappingEntry,
+    RawCvatKeypointFrame,
+    RawCvatPoint,
+    build_contiguous_frame_ranges,
+)
+from app.services.parsers.cvat_normalizer import CvatAnnotationNormalizer
 from app.services.parsers.cvat_xml import (
     CvatParseError,
     _has_dtd_or_entities,
@@ -106,8 +114,11 @@ class TestParseCvatXml:
                     assert pt.y > 0
 
     def test_multi_skeleton_rejected(self):
-        with pytest.raises(CvatParseError, match="MULTIPLE_ACTIVE_SKELETONS"):
+        with pytest.raises(CvatParseError) as exc:
             parse_cvat_xml(_fixture_path("cvat_multi_skeleton.xml"))
+        assert exc.value.code == "MULTIPLE_ACTIVE_SKELETONS"
+        assert exc.value.frame is not None
+        assert len(exc.value.track_ids) > 1
 
     def test_dtd_rejected(self):
         with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
@@ -147,8 +158,8 @@ class TestParseCvatXml:
         for kf in result.raw_keypoint_frames:
             for pname, pt in kf.points.items():
                 if pt.visibility == "missing":
-                    assert pt.x == 0.0
-                    assert pt.y == 0.0
+                    assert pt.x is None
+                    assert pt.y is None
 
 
 class TestFrameMappingResolver:
@@ -209,7 +220,7 @@ class TestCvatAnnotationNormalizer:
         ]
         mapping = self.FrameMapping(mode="identity", verified=True, video_fps=60.0)
         normalizer = self.CvatAnnotationNormalizer()
-        result = normalizer.normalize(raw, mapping)
+        result = normalizer.normalize(raw, mapping, fps_verified=True)
         assert len(result) == 1
         kf = result[0]
         assert kf.annotation_frame == 0
@@ -217,6 +228,24 @@ class TestCvatAnnotationNormalizer:
         assert kf.source_video_frame == 0
         assert kf.timestamp_sec == 0.0
         assert "left_shoulder" in kf.points
+
+    def test_normalize_without_fps_verified_no_timestamp(self):
+        from app.schemas.normalized_annotation import RawCvatKeypointFrame, RawCvatPoint
+        raw = [
+            RawCvatKeypointFrame(
+                annotation_frame=0,
+                points={
+                    "left_shoulder": RawCvatPoint(x=100, y=200, visibility="visible"),
+                },
+                source_track_ids=["0"],
+            )
+        ]
+        mapping = self.FrameMapping(mode="identity", verified=True, video_fps=60.0)
+        normalizer = self.CvatAnnotationNormalizer()
+        result = normalizer.normalize(raw, mapping, fps_verified=False)
+        kf = result[0]
+        assert kf.source_video_frame == 0
+        assert kf.timestamp_sec is None
 
     def test_normalize_affine_with_offset(self):
         from app.schemas.normalized_annotation import RawCvatKeypointFrame, RawCvatPoint
@@ -235,7 +264,7 @@ class TestCvatAnnotationNormalizer:
             video_fps=60.0,
         )
         normalizer = self.CvatAnnotationNormalizer()
-        result = normalizer.normalize(raw, mapping)
+        result = normalizer.normalize(raw, mapping, fps_verified=True)
         kf = result[0]
         assert kf.source_video_frame == 34
         assert kf.timestamp_sec == pytest.approx(34 / 60.0, rel=1e-3)
@@ -610,3 +639,191 @@ class Test56FrameRealMode:
         result = parse_cvat_xml(fifty_six_frame_xml)
         for kf in result.raw_keypoint_frames:
             assert set(kf.points.keys()) == expected
+
+
+class TestFrameMappingResolverAdvanced:
+    from app.services.parsers.frame_mapping import FrameMappingResolver
+    from app.schemas.normalized_annotation import FrameMapping
+
+    def test_manifest_partial_time_evidence(self):
+        manifest = [
+            {"annotation_frame": 0, "source_video_frame": 100, "timestamp_sec": None, "image_name": "img_a.jpg"},
+            {"annotation_frame": 1, "source_video_frame": None, "timestamp_sec": None, "image_name": "img_b.jpg"},
+        ]
+        mapping = self.FrameMappingResolver._resolve_explicit(manifest, None, {0, 1})
+        assert mapping.mode == "explicit"
+        assert mapping.verified is False
+        assert mapping.verification_reason == "partial_extraction_manifest"
+
+    def test_manifest_incomplete_coverage(self):
+        manifest = [
+            {"annotation_frame": 0, "source_video_frame": 100, "timestamp_sec": None, "image_name": "f0.jpg"},
+            {"annotation_frame": 2, "source_video_frame": 102, "timestamp_sec": None, "image_name": "f2.jpg"},
+        ]
+        mapping = self.FrameMappingResolver._resolve_explicit(manifest, None, {0, 1, 2})
+        assert mapping.verified is False
+        assert mapping.verification_reason == "incomplete_manifest_coverage"
+
+    def test_manifest_all_evidence_verified(self):
+        manifest = [
+            {"annotation_frame": 0, "source_video_frame": 100, "timestamp_sec": None, "image_name": "f0.jpg"},
+            {"annotation_frame": 1, "source_video_frame": 101, "timestamp_sec": None, "image_name": "f1.jpg"},
+        ]
+        mapping = self.FrameMappingResolver._resolve_explicit(manifest, None, {0, 1})
+        assert mapping.mode == "explicit"
+        assert mapping.verified is True
+        assert mapping.verification_reason == "extraction_manifest"
+
+    def test_manifest_direct_timestamp_preserved(self):
+        manifest = [
+            {"annotation_frame": 0, "source_video_frame": None, "timestamp_sec": 1.25, "image_name": "f0.jpg"},
+        ]
+        raw = [type("Raw", (), {"annotation_frame": 0})()]
+        raw[0].annotation_frame = 0
+        required = {0}
+        mapping = self.FrameMappingResolver._resolve_explicit(manifest, None, required)
+        assert mapping.verified is True
+        assert mapping.entries[0].timestamp_sec == 1.25
+
+    def test_filename_affine_inferred(self):
+        manifest = [
+            {"annotation_frame": 0, "source_video_frame": None, "timestamp_sec": None, "image_name": "scene00032.jpg"},
+            {"annotation_frame": 1, "source_video_frame": None, "timestamp_sec": None, "image_name": "scene00033.jpg"},
+        ]
+        mapping = self.FrameMappingResolver._resolve_explicit(manifest, None)
+        assert mapping.mode == "affine"
+        assert mapping.verified is False
+        assert mapping.source_frame_offset == 32
+        assert mapping.source_frame_stride == 1
+        assert mapping.verification_reason == "inferred_from_filename_sequence"
+
+    def test_filename_non_constant_stride_rejected(self):
+        manifest = [
+            {"annotation_frame": 0, "source_video_frame": None, "timestamp_sec": None, "image_name": "scene00032.jpg"},
+            {"annotation_frame": 1, "source_video_frame": None, "timestamp_sec": None, "image_name": "scene00033.jpg"},
+            {"annotation_frame": 2, "source_video_frame": None, "timestamp_sec": None, "image_name": "scene00035.jpg"},
+        ]
+        mapping = self.FrameMappingResolver._resolve_explicit(manifest, None)
+        assert mapping.mode == "explicit"
+        assert mapping.verified is False
+        assert mapping.verification_reason == "partial_extraction_manifest"
+
+    def test_duplicate_annotation_frame_rejected(self):
+        manifest = [
+            {"annotation_frame": 0, "source_video_frame": 100, "timestamp_sec": None, "image_name": "f0.jpg"},
+            {"annotation_frame": 0, "source_video_frame": 101, "timestamp_sec": None, "image_name": "f1.jpg"},
+        ]
+        mapping = self.FrameMappingResolver._resolve_explicit(manifest, None)
+        assert mapping.verified is False
+        assert mapping.verification_reason == "duplicate_annotation_frame"
+
+    def test_explicit_unverified_via_checker(self):
+        from app.services.annotation_quality.checks.cvat_checks import check_frame_mapping
+        issues = check_frame_mapping({"mode": "explicit", "verified": False})
+        assert len(issues) == 1
+        assert issues[0].code == "TIME_MAPPING_UNVERIFIED"
+
+    def test_direct_timestamp_preserved_in_normalizer(self):
+        raw = [
+            RawCvatKeypointFrame(
+                annotation_frame=0,
+                points={"nose": RawCvatPoint(x=500, y=300, visibility="visible")},
+                source_track_ids=["0"],
+            )
+        ]
+        mapping = FrameMapping(
+            mode="explicit", verified=True, video_fps=60.0,
+            entries=[
+                FrameMappingEntry(
+                    annotation_frame=0, source_video_frame=None,
+                    timestamp_sec=1.25, image_name="f0.jpg",
+                )
+            ],
+        )
+        result = CvatAnnotationNormalizer.normalize(raw, mapping, fps_verified=False)
+        assert result[0].timestamp_sec == 1.25
+
+
+class TestCvatParserCapacity:
+    def test_200_tracks_no_truncation(self, tmp_path):
+        points = '<points label="nose" outside="0" occluded="0" points="100,200"/>'
+        lines = ['<?xml version="1.0"?><annotations><version>1.1</version><meta><job><size>250</size></job></meta>']
+        for i in range(220):
+            lines.append(f'<track id="{i}" label="x" source="manual">')
+            lines.append(f'<skeleton frame="{i}">{points}</skeleton>')
+            lines.append('</track>')
+        lines.append('</annotations>')
+        path = tmp_path / "over200.xml"
+        path.write_text("\n".join(lines), encoding="utf-8")
+        result = parse_cvat_xml(str(path))
+        assert len(result.raw_keypoint_frames) == 220
+
+    def test_file_too_large_rejected(self, tmp_path):
+        path = tmp_path / "huge.xml"
+        with open(path, "wb") as f:
+            f.write(b"<annotations></annotations>" * (1024 * 1024 // 28 + 1))
+        import os
+        size = os.path.getsize(path)
+        if size > 100 * 1024 * 1024:
+            with pytest.raises(CvatParseError) as exc:
+                parse_cvat_xml(str(path))
+            assert exc.value.code == "FILE_TOO_LARGE"
+
+
+class TestRawCvatPointValidator:
+    from app.schemas.normalized_annotation import RawCvatPoint
+
+    def test_outside_one_has_null_coords(self):
+        pt = self.RawCvatPoint(visibility="missing")
+        assert pt.x is None
+        assert pt.y is None
+
+    def test_visible_has_coords(self):
+        pt = self.RawCvatPoint(x=100, y=200, visibility="visible")
+        assert pt.x == 100
+        assert pt.y == 200
+
+    def test_missing_with_coords_raises(self):
+        import pydantic
+        with pytest.raises((ValueError, pydantic.ValidationError)):
+            self.RawCvatPoint(x=10, y=20, visibility="missing")
+
+
+class TestBuildContiguousFrameRanges:
+
+    def test_contiguous_single_range(self):
+        result = build_contiguous_frame_ranges([0, 1, 2, 3, 4, 5])
+        assert len(result) == 1
+        assert result[0].start_annotation_frame == 0
+        assert result[0].end_annotation_frame == 5
+
+    def test_sparse_multi_range(self):
+        result = build_contiguous_frame_ranges([0, 1, 5, 6, 10])
+        assert len(result) == 3
+        assert result[0].start_annotation_frame == 0
+        assert result[0].end_annotation_frame == 1
+        assert result[1].start_annotation_frame == 5
+        assert result[1].end_annotation_frame == 6
+        assert result[2].start_annotation_frame == 10
+        assert result[2].end_annotation_frame == 10
+
+    def test_single_frame(self):
+        result = build_contiguous_frame_ranges([42])
+        assert len(result) == 1
+        assert result[0].start_annotation_frame == 42
+        assert result[0].end_annotation_frame == 42
+
+    def test_non_zero_start(self):
+        result = build_contiguous_frame_ranges([32, 33, 34])
+        assert len(result) == 1
+        assert result[0].start_annotation_frame == 32
+        assert result[0].end_annotation_frame == 34
+
+
+class TestCvatParseErrorStructured:
+    def test_multi_skeleton_code_and_frame(self):
+        with pytest.raises(CvatParseError) as exc:
+            parse_cvat_xml(_fixture_path("cvat_multi_skeleton.xml"))
+        assert exc.value.code == "MULTIPLE_ACTIVE_SKELETONS"
+        assert exc.value.frame == 0
+        assert exc.value.track_ids == ["0", "1"]
