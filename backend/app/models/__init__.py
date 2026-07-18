@@ -2,6 +2,7 @@ from app.models.analysis import AnalysisResult, AnalysisTask, AnalysisTaskStatus
 from app.models.annotation import AnnotationFile, AnnotationFileStatus, AnnotationSource
 from app.models.annotation_metric import AnnotationMetric
 from app.models.kinematic_artifact import KinematicArtifact, KinematicArtifactSet
+from app.models.kinematic_review_finding import KinematicReviewFindingSet
 from app.models.athlete import Athlete
 from app.models.normalized_annotation import NormalizedAnnotation
 from app.models.report import ReportMetadata
@@ -19,6 +20,7 @@ __all__ = [
     "AnnotationSource",
     "AnnotationMetric",
     "KinematicArtifact",
+    "KinematicReviewFindingSet",
     "KinematicArtifactSet",
     "Athlete",
     "NormalizedAnnotation",

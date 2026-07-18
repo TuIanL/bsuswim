@@ -1,0 +1,397 @@
+schema_version: swim-review-rules.v1
+rule_set: side_2d_kinematics_v1
+output_kind: review_finding
+
+source:
+  calculator: side_2d_kinematics
+  metric_schema: swim-side-kinematics.v1
+
+threshold_basis:
+  id: project_heuristic_v1
+  validated: false
+  description: >
+    基于当前项目样本设定的第一版复核触发值，仅用于筛选需要教练查看的片段，
+    不代表运动科学常模。
+
+# ──────────────────────────────────────────────────────────────────────────
+# 复核发现规则集说明
+# - status: active | dormant。dormant 永远跳过。
+# - required_metrics：任一缺失 → 跳过（reason=missing_metric:<keys>）。
+#   任一 unavailable → 跳过（reason=unavailable_metric:<keys>）。
+# - condition / attention_level 仅结构化 all/any + metric 子句，不支持字符串表达式。
+# - 所有 finding status 恒为 review_required；不输出确定性技术诊断。
+# - evidence_frame_strategy.resolver 必须为注册表允许的显式枚举。
+# - limitations / review_question 必须存在（R7 护栏依赖）。
+# - title 必须以"疑似"或"可能"开头（R7 硬校验）。
+# ──────────────────────────────────────────────────────────────────────────
+
+rules:
+  - id: KRF001
+    code: body_axis_variation_review
+    title: 疑似身体轴角波动较大
+    category: body_posture
+    status: active
+    enabled: true
+
+    required_metrics: [body_angle_std_deg]
+
+    condition:
+      all:
+        - metric: body_angle_std_deg
+          op: ">="
+          value: 3.5
+
+    attention_level:
+      high:
+        all:
+          - metric: body_angle_std_deg
+            op: ">="
+            value: 5.0
+      medium:
+        all:
+          - metric: body_angle_std_deg
+            op: ">="
+            value: 3.5
+
+    priority_base: 70
+
+    evidence_metric_keys: [body_angle_std_deg, posture_stability_cv]
+    evidence_frame_strategy:
+      resolver: body_axis_max_deviation
+      limit: 2
+
+    limitations:
+      - 当前结果来自侧面二维投影
+      - 未识别具体泳姿阶段
+      - 身体轴角可能受身体转动和遮挡影响
+
+    review_question: >
+      请结合原视频确认身体轴角波动是否由核心稳定不足或划水节奏不稳引起。
+
+  - id: KRF002
+    code: hip_vertical_variation_review
+    title: 疑似髋部垂直波动较大
+    category: body_posture
+    status: active
+    enabled: true
+
+    required_metrics: [hip_vertical_range_ratio]
+
+    condition:
+      all:
+        - metric: hip_vertical_range_ratio
+          op: ">="
+          value: 0.06
+
+    attention_level:
+      high:
+        all:
+          - metric: hip_vertical_range_ratio
+            op: ">="
+            value: 0.10
+      medium:
+        all:
+          - metric: hip_vertical_range_ratio
+            op: ">="
+            value: 0.06
+
+    priority_base: 65
+
+    evidence_metric_keys: [hip_vertical_range_ratio]
+    evidence_frame_strategy:
+      resolver: hip_high_low
+      limit: 2
+
+    limitations:
+      - 当前结果来自侧面二维投影
+      - 髋部垂直波动已按参考体长归一化
+      - 未识别具体打腿动作阶段
+
+    review_question: >
+      请结合原视频确认髋部上下波动是否由打腿幅度过大或身体升降引起。
+
+  - id: KRF003
+    code: elbow_rom_outlier_review
+    title: 疑似肘关节活动范围异常
+    category: upper_limb
+    status: active
+    enabled: true
+
+    required_metrics: [elbow_rom_combined_deg]
+
+    condition:
+      any:
+        - metric: elbow_rom_combined_deg
+          op: "<"
+          value: 35
+        - metric: elbow_rom_combined_deg
+          op: ">"
+          value: 120
+
+    attention_level:
+      high:
+        any:
+          - metric: elbow_rom_combined_deg
+            op: "<"
+            value: 25
+          - metric: elbow_rom_combined_deg
+            op: ">"
+            value: 140
+      medium:
+        any:
+          - metric: elbow_rom_combined_deg
+            op: "<"
+            value: 35
+          - metric: elbow_rom_combined_deg
+            op: ">"
+            value: 120
+
+    priority_base: 68
+
+    evidence_metric_keys: [elbow_rom_combined_deg, elbow_rom_left_deg, elbow_rom_right_deg]
+    evidence_frame_strategy:
+      resolver: elbow_min_max_triggering_side
+      limit: 2
+
+    limitations:
+      - 当前结果来自侧面二维投影
+      - 关节角度可能受身体转动和遮挡影响
+      - 未识别具体划水阶段
+
+    review_question: >
+      请结合原视频确认肘部活动范围异常是否由划水轨迹或入水角度偏差引起。
+
+  - id: KRF004
+    code: elbow_rom_asymmetry_review
+    title: 疑似左右肘运动范围差异较大
+    category: upper_limb
+    status: active
+    enabled: true
+
+    required_metrics: [elbow_rom_asymmetry_deg, elbow_rom_asymmetry_ratio]
+
+    condition:
+      all:
+        - metric: elbow_rom_asymmetry_deg
+          op: ">="
+          value: 20
+        - metric: elbow_rom_asymmetry_ratio
+          op: ">="
+          value: 0.25
+
+    attention_level:
+      high:
+        all:
+          - metric: elbow_rom_asymmetry_deg
+            op: ">="
+            value: 30
+      medium:
+        all:
+          - metric: elbow_rom_asymmetry_deg
+            op: ">="
+            value: 20
+
+    priority_base: 66
+
+    evidence_metric_keys: [elbow_rom_asymmetry_deg, elbow_rom_asymmetry_ratio, elbow_rom_left_deg, elbow_rom_right_deg]
+    evidence_frame_strategy:
+      resolver: elbow_asymmetry_bounds
+      limit: 2
+
+    limitations:
+      - 当前结果来自侧面二维投影
+      - 左右侧可能采用不同划水节奏
+      - 未结合动作阶段判断
+
+    review_question: >
+      请结合原视频确认左右肘活动范围差异是否由单侧划水不充分引起。
+
+  - id: KRF005
+    code: large_knee_flexion_review
+    title: 疑似膝关节屈曲幅度较大
+    category: lower_limb
+    status: active
+    enabled: true
+
+    required_metrics: [minimum_knee_p05_deg]
+
+    condition:
+      all:
+        - metric: minimum_knee_p05_deg
+          op: "<="
+          value: 120
+
+    attention_level:
+      high:
+        all:
+          - metric: minimum_knee_p05_deg
+            op: "<="
+            value: 105
+      medium:
+        all:
+          - metric: minimum_knee_p05_deg
+            op: "<="
+            value: 120
+
+    priority_base: 70
+
+    evidence_metric_keys: [minimum_knee_p05_deg, left_knee_p05_deg, right_knee_p05_deg, knee_rom_left_deg, knee_rom_right_deg]
+    evidence_frame_strategy:
+      resolver: knee_minimum_triggering_side
+      limit: 1
+
+    limitations:
+      - 当前结果来自侧面二维投影
+      - 未识别具体打腿动作阶段
+      - 关节角度可能受身体转动和遮挡影响
+
+    review_question: >
+      请结合原视频确认是否存在以膝关节屈伸为主、而不是以髋部带动为主的打腿模式。
+
+  - id: KRF006
+    code: weak_ankle_periodicity_review
+    title: 疑似踝部摆动规律性不足
+    category: lower_limb
+    status: active
+    enabled: true
+
+    required_metrics: [kick_periodicity_evaluable]
+
+    condition:
+      any:
+        - all:
+            - metric: kick_periodicity_evaluable
+              op: "=="
+              value: 1
+            - metric: kick_periodicity_peak_detected
+              op: "=="
+              value: 0
+        - metric: kick_periodicity_score
+          op: "<"
+          value: 0.45
+
+    attention_level:
+      high:
+        all:
+          - metric: kick_periodicity_score
+            op: "<"
+            value: 0.35
+      medium:
+        all:
+          - metric: kick_periodicity_score
+            op: "<"
+            value: 0.45
+
+    priority_base: 64
+
+    evidence_metric_keys: [kick_periodicity_score, kick_periodicity_evaluable, kick_periodicity_peak_detected, kick_period_frames]
+    evidence_frame_strategy:
+      resolver: ankle_peak_trough
+      limit: 2
+
+    limitations:
+      - 当前结果来自侧面二维投影
+      - 踝部相对轨迹已按帧序列分析
+      - 未识别具体打腿动作阶段
+
+    review_question: >
+      请结合原视频确认踝部摆动是否缺乏稳定节奏，并排除样本不足导致的误判。
+
+  - id: KRF007
+    code: head_motion_spike_review
+    title: 疑似头部出现明显位置突变
+    category: head_trunk
+    status: active
+    enabled: true
+
+    required_metrics: [head_motion_spike_count, head_motion_spike_rate]
+
+    condition:
+      any:
+        - metric: head_motion_spike_count
+          op: ">="
+          value: 2
+        - metric: head_motion_spike_rate
+          op: ">="
+          value: 0.05
+
+    attention_level:
+      high:
+        all:
+          - metric: head_motion_spike_count
+            op: ">="
+            value: 4
+      medium:
+        any:
+          - metric: head_motion_spike_count
+            op: ">="
+            value: 2
+          - metric: head_motion_spike_rate
+            op: ">="
+            value: 0.05
+
+    priority_base: 60
+
+    evidence_metric_keys: [head_motion_spike_count, head_motion_spike_rate]
+    evidence_frame_strategy:
+      resolver: head_spike_first_n
+      limit: 3
+
+    limitations:
+      - 当前结果来自侧面二维投影
+      - 尖峰可能由头部短暂遮挡或标注抖动引起
+      - 未结合动作阶段判断
+
+    review_question: >
+      请结合原视频确认头部位置突变是否由换气动作过猛或身体失衡引起。
+
+  - id: KRF008
+    code: head_trunk_sync_review
+    title: 可能存在头部与躯干同步波动
+    category: head_trunk
+    status: active
+    enabled: true
+
+    required_metrics: [head_body_synchrony, head_vertical_range_ratio]
+
+    condition:
+      all:
+        - metric: head_body_synchrony
+          op: ">="
+          value: 0.65
+        - metric: head_vertical_range_ratio
+          op: ">="
+          value: 0.04
+
+    attention_level:
+      high:
+        all:
+          - metric: head_body_synchrony
+            op: ">="
+            value: 0.80
+          - metric: head_vertical_range_ratio
+            op: ">="
+            value: 0.06
+      medium:
+        all:
+          - metric: head_body_synchrony
+            op: ">="
+            value: 0.65
+          - metric: head_vertical_range_ratio
+            op: ">="
+            value: 0.04
+
+    priority_base: 62
+
+    evidence_metric_keys: [head_body_synchrony, head_vertical_range_ratio]
+    evidence_frame_strategy:
+      resolver: head_trunk_sync_max
+      limit: 1
+
+    limitations:
+      - 当前结果来自侧面二维投影
+      - 相关性不表示因果关系
+      - 未结合动作阶段判断
+
+    review_question: >
+      请结合原视频确认头部与躯干是否呈现不必要的同步上下波动。
