@@ -15,3 +15,7 @@ uploads/*
 !uploads/.gitkeep
 backend/.env
 model_service/.env.web-dev.log
+.web-dev.log
+.workbuddy/
+frontend/node_modules/
+frontend/dist/

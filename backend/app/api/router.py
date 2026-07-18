@@ -5,6 +5,7 @@ from app.api.routes import (
     annotations,
     athletes,
     auth,
+    kinematic_artifacts,
     metrics,
     normalized_annotations,
     report_exports,
@@ -27,3 +28,4 @@ api_router.include_router(report_exports.internal_router)
 api_router.include_router(annotations.router, tags=["annotations"])
 api_router.include_router(normalized_annotations.router, tags=["normalized-annotations"])
 api_router.include_router(metrics.router, tags=["metrics"])
+api_router.include_router(kinematic_artifacts.router, tags=["kinematic-artifacts"])
