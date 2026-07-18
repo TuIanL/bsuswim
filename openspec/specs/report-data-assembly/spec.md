@@ -75,35 +75,93 @@ TBD - created by change assemble-swim-report-data. Update Purpose after archive.
 
 ## ADDED Requirements
 
+### Requirement: Five-page kinematics report profile is supported
+
+The system SHALL support report profile `side_2d_kinematics_5page_v1` in addition
+to the existing `side_technical` profile.
+
+The `side_2d_kinematics_5page_v1` profile SHALL assemble exactly five pages from
+`AnnotationMetric(swim-side-kinematics.v1)`, the current
+`KinematicArtifactSet`, and the current `KinematicReviewFindingSet`, without
+depending on `AnalysisResult.diagnostics`.
+
+#### Scenario: Five-page profile uses its own page types
+
+- **WHEN** report profile `side_2d_kinematics_5page_v1` is assembled
+- **THEN** sections SHALL use page types
+  `overview` / `body_posture_control` / `upper_limb_kinematics` /
+  `lower_limb_kinematics` / `review_and_retest`
+- **AND** the legacy `side_technical` section keys SHALL NOT be used
+
+### Requirement: Report-page module keys are profile-specific
+
+For `side_2d_kinematics_5page_v1`, `section.module_key` SHALL identify the
+report-page aggregation module and SHALL NOT be interpreted as an artifact
+`module_key` or a legacy `side_technical` section key.
+
+#### Scenario: Page module key differs from artifact module key
+
+- **WHEN** page 2 of the five-page profile is assembled
+- **THEN** `section.module_key` SHALL be `body_posture_head_trunk`
+- **AND** each asset within the section SHALL retain its artifact `module_key`
+- **AND** `section.source_module_keys` SHALL list the fact source modules
+
+### Requirement: Report assembly status is distinct from upstream status
+
+For `side_2d_kinematics_5page_v1`, the top-level report SHALL expose
+`assembly_status` (`ready` / `partial`), separate from the upstream
+`artifact_set.status` and `finding_set.status` namespaces.
+
+#### Scenario: Legacy path is unchanged
+
+- **WHEN** the legacy `build_swim_report_data()` path is used
+- **THEN** its existing behavior and `status` semantics SHALL remain unchanged
+- **AND** the new `assembly_status` field applies only to the five-page profile
+
 ### Requirement: Report sections include availability status
-`ReportData.sections[]` SHALL 新增 `availability`（ready/degraded/blocked）、`data_confidence`（high/medium/low/null）和 `quality_notes`（string 数组）字段，表示数据可用性而非技术诊断状态。
+
+`ReportData.sections[]` SHALL include `availability`
+(ready/degraded/blocked), `data_confidence` (high/medium/low/null) and
+`quality_notes` (string array) fields, representing data availability rather than
+technical diagnostic status.
+
+This requirement applies to the legacy `side_technical` profile and its
+`build_swim_report_data()` path. The new `side_2d_kinematics_5page_v1` profile
+uses `section.status` (ready/partial/unavailable) and `assembly_status` instead,
+as defined in the `five-page-kinematics-report` capability. The two profiles
+remain independent.
 
 #### Scenario: Blocked section with no findings
-- **WHEN** `catch_pull` 模块 availability = `blocked`
-- **THEN** 该 section MUST 包含 `availability: "blocked"`，`metrics: []`、`findings: []`，`quality_notes` 说明阻断原因
+
+- **WHEN** `catch_pull` module availability = `blocked`
+- **THEN** the section MUST contain `availability: "blocked"`, `metrics: []`,
+  `findings: []`, `quality_notes` explaining the block reason
 
 #### Scenario: Degraded section reports limited data
-- **WHEN** `catch_pull` 模块 availability = `degraded` 且诊断有发现
-- **THEN** `status`（技术诊断）仍可设为 `has_issues`，`availability` 保持 `degraded`，`quality_notes` 说明哪些数据缺失
 
-#### Scenario: Section without issues is not blocked
-- **WHEN** 模块 availability = `degraded` 但无诊断命中
-- **THEN** `status` 仍为 `ok`，`availability` 为 `degraded`，`quality_notes` 说明数据限制
+- **WHEN** `catch_pull` module availability = `degraded` and diagnostics have findings
+- **THEN** `status` (technical diagnostic) MAY still be `has_issues`,
+  `availability` stays `degraded`, `quality_notes` explains missing data
 
 ### Requirement: ReportData.quality carries aggregated quality
+
 `ReportData.quality` SHALL 包含 `AnalysisResult.quality_summary` 的报告呈现版本（annotation quality summary、metrics quality summary、decision）。
 
 #### Scenario: Quality section in report data
+
 - **WHEN** `build_swim_report_data` 消费 `AnalysisResult.quality_summary`
 - **THEN** `report_data.quality` MUST 包含 `annotation`、`metrics`、`decision` 三个命名空间
 
 ### Requirement: PDF omits blocked sections
+
 PDF 渲染 SHALL 根据 `section.availability` 决定是否包含该模块。`blocked` 模块默认省略并在数据质量说明中列出；`degraded` 模块正常渲染但附带质量说明。
 
 #### Scenario: Blocked section omitted from PDF
+
 - **WHEN** section.availability = `blocked`
 - **THEN** PDF 渲染器 MUST 跳过该 section，并在报告的数据质量说明中提及
 
 #### Scenario: Degraded section included with note
+
 - **WHEN** section.availability = `degraded`
 - **THEN** PDF 渲染器 MUST 包含该 section，并在 section 内展示 `quality_notes`

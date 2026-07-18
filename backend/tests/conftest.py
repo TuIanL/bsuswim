@@ -142,3 +142,7 @@ def test_normalized_annotation(db_session: Session, test_session_video: SessionV
     db_session.add(record)
     db_session.flush()
     return record
+
+
+def pytest_configure(config):
+    config.addinivalue_line("markers", "integration: mark test as requiring a real database")

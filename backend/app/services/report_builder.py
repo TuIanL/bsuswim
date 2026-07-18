@@ -12,6 +12,9 @@ from app.services.reporting.score_builder import build_diagnostic_load_summary
 from app.services.reporting.section_builder import build_sections
 from app.services.reporting.summary_builder import build_overview_section, build_summary
 
+# Re-export five-page kinematics report assembler for Change 7
+from app.services.reporting.kinematics_report.assembler import build_five_page_kinematics_report  # noqa: F401
+
 
 def build_report_data(task: AnalysisTask, result: AnalysisResult | None = None) -> dict:
     result = result or task.result
