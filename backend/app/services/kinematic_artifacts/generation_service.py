@@ -4,6 +4,7 @@ Orchestrates: preflight → plan → select keyframes → extract video frames �
 render PNG/SVG → persist ArtifactSet + Artifact rows → build immutable manifest.
 """
 
+import asyncio
 import hashlib
 import json
 import uuid
@@ -245,7 +246,7 @@ def _render_all(db, artifact_set, metric, annotation, session_video, video_file,
 
 def _store(storage: StorageService, base_dir: str, key: str, ext: str, data: bytes, mime: str) -> dict:
     rel = f"{base_dir}/{key}.{ext}"
-    return storage.save_bytes(data, rel, content_type=mime)
+    return asyncio.run(storage.save_bytes(data, rel, content_type=mime))
 
 
 def _render_keyframe(storage, base_dir, key, module_key, selected_by_key, canonical, extracted, ref_px):

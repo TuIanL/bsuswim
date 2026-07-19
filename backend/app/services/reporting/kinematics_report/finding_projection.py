@@ -14,7 +14,21 @@ from app.schemas.kinematics_report import (
 from .constants import ATTENTION_RANK
 
 
-def _project_evidence_metric(em: FindingEvidenceMetric) -> ReportFindingEvidenceMetric:
+def _project_evidence_metric(em: FindingEvidenceMetric | dict) -> ReportFindingEvidenceMetric:
+    if isinstance(em, dict):
+        return ReportFindingEvidenceMetric(
+            key=em.get("key"),
+            source_metric_keys=list(em.get("source_metric_keys") or []),
+            derivation=em.get("derivation"),
+            label=em.get("label"),
+            value=em.get("value"),
+            unit=em.get("unit"),
+            availability=em.get("availability"),
+            confidence=em.get("confidence"),
+            comparison=em.get("comparison"),
+            threshold=em.get("threshold"),
+            reference_basis=em.get("reference_basis"),
+        )
     return ReportFindingEvidenceMetric(
         key=em.key,
         source_metric_keys=list(em.source_metric_keys),
@@ -30,7 +44,18 @@ def _project_evidence_metric(em: FindingEvidenceMetric) -> ReportFindingEvidence
     )
 
 
-def _project_evidence_frame(ef: FindingEvidenceFrame) -> ReportFindingEvidenceFrame:
+def _project_evidence_frame(ef: FindingEvidenceFrame | dict) -> ReportFindingEvidenceFrame:
+    if isinstance(ef, dict):
+        return ReportFindingEvidenceFrame(
+            metric_key=ef.get("metric_key"),
+            annotation_frame=ef.get("annotation_frame"),
+            source_video_frame=ef.get("source_video_frame"),
+            time_sec=ef.get("time_sec"),
+            role=ef.get("role"),
+            value=ef.get("value"),
+            extractable=ef.get("extractable"),
+            mapping_status=ef.get("mapping_status"),
+        )
     return ReportFindingEvidenceFrame(
         metric_key=ef.metric_key,
         annotation_frame=ef.annotation_frame,
@@ -43,23 +68,34 @@ def _project_evidence_frame(ef: FindingEvidenceFrame) -> ReportFindingEvidenceFr
     )
 
 
-def project_finding(f: KinematicReviewFinding) -> ReportFinding:
+def project_finding(f: KinematicReviewFinding | dict) -> ReportFinding:
+    if isinstance(f, dict):
+        def _get(attr):
+            return f.get(attr)
+        evidence_metrics_raw = f.get("evidence_metrics") or []
+        evidence_frames_raw = f.get("evidence_frames") or []
+    else:
+        def _get(attr):
+            return getattr(f, attr, None)
+        evidence_metrics_raw = f.evidence_metrics
+        evidence_frames_raw = f.evidence_frames
+
     return ReportFinding(
-        code=f.code,
-        rule_id=f.rule_id,
-        title=f.title,
-        category=f.category,  # type: ignore[arg-type]
-        status=f.status,
-        attention_level=f.attention_level,
-        priority=f.priority,
-        priority_score=f.priority_score,
-        evidence_metrics=[_project_evidence_metric(em) for em in f.evidence_metrics],
-        evidence_frames=[_project_evidence_frame(ef) for ef in f.evidence_frames],
-        confidence=f.confidence,
-        confidence_level=f.confidence_level,
-        limitations=list(f.limitations),
-        review_question=f.review_question,
-        threshold_basis=f.threshold_basis,
+        code=_get("code"),
+        rule_id=_get("rule_id"),
+        title=_get("title"),
+        category=_get("category"),  # type: ignore[arg-type]
+        status=_get("status"),
+        attention_level=_get("attention_level"),
+        priority=_get("priority"),
+        priority_score=_get("priority_score"),
+        evidence_metrics=[_project_evidence_metric(em) for em in evidence_metrics_raw],
+        evidence_frames=[_project_evidence_frame(ef) for ef in evidence_frames_raw],
+        confidence=_get("confidence"),
+        confidence_level=_get("confidence_level"),
+        limitations=list(_get("limitations") or []),
+        review_question=_get("review_question"),
+        threshold_basis=_get("threshold_basis"),
     )
 
 

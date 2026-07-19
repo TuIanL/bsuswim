@@ -20,6 +20,7 @@ from app.services.analysis_service import (
     AnnotationQualityBlockedError,
     AnnotationSelectionRequiredError,
     create_analysis_task,
+    retry_analysis_task,
     run_analysis_task,
     save_analysis_result,
     task_actions,
@@ -168,6 +169,22 @@ def get_workspace(
         videos=[_read_video(link.video_file) for link in session_videos if link.video_file],
         session_videos=[_read_session_video(link) for link in session_videos if link.video_file],
     )
+
+
+@router.post("/{task_id}/retry", response_model=AnalysisTaskRead)
+def retry_analysis(
+    task_id: int,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> AnalysisTaskRead:
+    task = _get_owned_task(db, task_id, current_user)
+    try:
+        task = retry_analysis_task(db, task)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    background_tasks.add_task(run_analysis_task, task.id)
+    return _read_task(task)
 
 
 @router.post("/{task_id}/result", response_model=AnalysisResultRead)

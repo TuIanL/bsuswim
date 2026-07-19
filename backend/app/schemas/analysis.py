@@ -6,11 +6,31 @@ from pydantic import BaseModel, ConfigDict
 from app.models import AnalysisTaskStatus, StrokeType
 from app.schemas.video import SessionVideoRead, VideoFileRead
 
+PIPELINE_TYPE_ANNOTATION = "annotation_kinematics"
+PIPELINE_TYPE_MODEL = "model_service"
+PIPELINE_TYPE_HYBRID = "hybrid"
+
+ANNOTATION_PIPELINE_VERSION = "side_2d_v1"
+MODEL_PIPELINE_VERSION = "model_service_v1"
+
+SUPPORTED_PIPELINE_VERSIONS: dict[str, set[str]] = {
+    PIPELINE_TYPE_MODEL: {MODEL_PIPELINE_VERSION},
+    PIPELINE_TYPE_ANNOTATION: {ANNOTATION_PIPELINE_VERSION},
+}
+
 
 class AnalysisSubmit(BaseModel):
     session_id: int
     normalized_annotation_id: int | None = None
     acknowledge_quality_warnings: bool = False
+
+    pipeline_type: Literal[
+        "model_service",
+        "annotation_kinematics",
+        "hybrid",
+    ] | None = None
+
+    pipeline_version: str | None = None
 
 
 class AnalysisTaskRead(BaseModel):
@@ -23,6 +43,11 @@ class AnalysisTaskRead(BaseModel):
     stage: str
     request_payload: dict[str, Any]
     error_message: str | None
+    pipeline_type: str = PIPELINE_TYPE_MODEL
+    pipeline_version: str = MODEL_PIPELINE_VERSION
+    attempt_count: int = 0
+    failed_stage: str | None = None
+    error_code: str | None = None
     created_at: datetime
     updated_at: datetime
     completed_at: datetime | None
@@ -36,6 +61,11 @@ class AnalysisStatusRead(BaseModel):
     progress: int
     stage: str
     error_message: str | None
+    pipeline_type: str = PIPELINE_TYPE_MODEL
+    pipeline_version: str = MODEL_PIPELINE_VERSION
+    attempt_count: int = 0
+    failed_stage: str | None = None
+    error_code: str | None = None
     created_at: datetime
     updated_at: datetime
     completed_at: datetime | None

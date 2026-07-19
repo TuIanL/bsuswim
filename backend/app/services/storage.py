@@ -56,7 +56,7 @@ class StorageService:
         }
 
 
-    def save_bytes(
+    async def save_bytes(
         self,
         data: bytes,
         relative_path: str,

@@ -20,7 +20,7 @@ from app.services.annotation_quality.legacy import normalize_quality_payload
 from app.services.annotation_quality.models import AnalysisQualitySummary
 from app.services.annotation_quality.validator import AnnotationQualityValidator
 from app.services.annotation_quality.provider import YamlQualityProfileProvider
-from app.services.model_client import ModelServiceClient, ModelServiceError
+from app.services.model_client import ModelServiceError
 from app.services.report_builder import build_report_data
 from app.services.storage import playback_url
 
@@ -92,8 +92,45 @@ def task_actions(task: AnalysisTask) -> list[str]:
     if task.status == AnalysisTaskStatus.COMPLETED:
         return ["workspace", "report"]
     if task.status == AnalysisTaskStatus.FAILED:
-        return ["retry", "details"]
+        # retry 仅对 annotation_kinematics 开放（design §17）
+        if task.pipeline_type == "annotation_kinematics":
+            return ["retry", "details"]
+        return ["details"]
     return ["details"]
+
+
+def _resolve_pipeline_type(payload: AnalysisSubmit) -> tuple[str, str]:
+    """按 design §4 规则解析 pipeline_type / pipeline_version。"""
+    from app.schemas.analysis import (
+        ANNOTATION_PIPELINE_VERSION,
+        MODEL_PIPELINE_VERSION,
+        SUPPORTED_PIPELINE_VERSIONS,
+    )
+
+    if payload.pipeline_type == "hybrid":
+        raise ValueError("PIPELINE_NOT_IMPLEMENTED:hybrid 尚未实现")
+
+    if payload.pipeline_type:
+        ptype = payload.pipeline_type
+    elif payload.normalized_annotation_id:
+        ptype = "annotation_kinematics"
+    else:
+        ptype = "model_service"
+
+    if ptype == "annotation_kinematics" and payload.normalized_annotation_id is None:
+        raise ValueError("annotation_kinematics 必须提供 normalized_annotation_id")
+
+    if payload.pipeline_version:
+        pversion = payload.pipeline_version
+    elif ptype == "annotation_kinematics":
+        pversion = ANNOTATION_PIPELINE_VERSION
+    else:
+        pversion = MODEL_PIPELINE_VERSION
+
+    if pversion not in SUPPORTED_PIPELINE_VERSIONS.get(ptype, set()):
+        raise ValueError(f"UNSUPPORTED_PIPELINE_VERSION:{ptype}+{pversion}")
+
+    return ptype, pversion
 
 
 def create_analysis_task(db: Session, payload: AnalysisSubmit) -> AnalysisTask:
@@ -101,12 +138,18 @@ def create_analysis_task(db: Session, payload: AnalysisSubmit) -> AnalysisTask:
     if not session:
         raise ValueError("训练记录不存在")
 
+    # ── resolve pipeline type / version ──
+    pipeline_type, pipeline_version = _resolve_pipeline_type(payload)
+
     # ── resolve annotation ──
     annotation: NormalizedAnnotation | None = None
     if payload.normalized_annotation_id:
         annotation = db.get(NormalizedAnnotation, payload.normalized_annotation_id)
         if not annotation or annotation.session_video.session_id != payload.session_id:
             raise ValueError("指定的标准化标注不存在或不属于当前训练记录")
+    elif pipeline_type == "annotation_kinematics":
+        # annotation_kinematics 必须有 annotation
+        raise ValueError("annotation_kinematics 必须提供 normalized_annotation_id")
     else:
         all_side = db.scalars(
             select(NormalizedAnnotation)
@@ -149,15 +192,32 @@ def create_analysis_task(db: Session, payload: AnalysisSubmit) -> AnalysisTask:
         status=AnalysisTaskStatus.QUEUED,
         progress=5,
         stage="queued",
+        pipeline_type=pipeline_type,
+        pipeline_version=pipeline_version,
+        execution_state={
+            "schema_version": "analysis-execution.v1",
+            "pipeline": {"type": pipeline_type, "version": pipeline_version},
+            "steps": {},
+            "warnings": [],
+        },
     )
     db.add(task)
     db.flush()
     request_payload["task_id"] = task.id
+    session_video_id = annotation.session_video_id if annotation and annotation.session_video_id else None
+    video_file_id = (
+        annotation.session_video.video_file_id
+        if annotation and annotation.session_video
+        else None
+    )
     request_payload["analysis_input"] = {
         "type": "normalized_annotation",
         "annotation_id": annotation.id if annotation else None,
         "annotation_revision": annotation.revision if annotation else None,
+        "session_video_id": session_video_id,
+        "video_file_id": video_file_id,
         "annotation_quality_snapshot": quality_snapshot,
+        "quality_warning_acknowledged": payload.acknowledge_quality_warnings,
     }
     if quality_snapshot:
         report = normalize_quality_payload(quality_snapshot)
@@ -238,18 +298,10 @@ async def run_analysis_task(task_id: int) -> None:
         if not task:
             return
 
-        _set_task_state(db, task, AnalysisTaskStatus.PROCESSING, "model_inference", 35)
-        client = ModelServiceClient()
-        request_payload = dict(task.request_payload)
-        request_payload["task_id"] = task.id
-        request_payload["callback_url"] = f"/api/v1/analysis/{task.id}/result"
-        result = await client.analyze(ModelAnalysisRequest.model_validate(request_payload))
+        from app.services.analysis_pipelines.registry import resolve
 
-        save_analysis_result(db, task, result)
-    except ModelServiceError as exc:
-        _mark_failed(db, task_id, str(exc))
-    except Exception as exc:
-        _mark_failed(db, task_id, f"分析任务执行失败: {exc}")
+        pipeline = resolve(task.pipeline_type)
+        await pipeline.run(task.id, task.pipeline_version)
     finally:
         db.close()
 
@@ -350,3 +402,33 @@ def _mark_failed(db: Session, task_id: int, message: str) -> None:
         db.add(task.session)
     db.add(task)
     db.commit()
+
+
+def retry_analysis_task(db: Session, task: AnalysisTask) -> AnalysisTask:
+    """仅 annotation_kinematics 失败任务可重试（design §17）。"""
+    if task.pipeline_type != "annotation_kinematics":
+        raise ValueError("RETRY_NOT_SUPPORTED: 仅 annotation_kinematics 支持重试")
+    if task.status != AnalysisTaskStatus.FAILED:
+        raise ValueError("RETRY_ONLY_FAILED: 仅失败任务可重试")
+
+    # 保留 previous failure 到 execution_state
+    state = dict(task.execution_state or {})
+    state["previous_failure"] = {
+        "stage": task.failed_stage,
+        "code": task.error_code,
+        "message": task.error_message,
+    }
+    task.execution_state = state
+    task.status = AnalysisTaskStatus.QUEUED
+    task.stage = "queued"
+    task.progress = 5
+    task.error_code = None
+    task.error_message = None
+    task.failed_stage = None
+    if task.session:
+        task.session.status = TrainingSessionStatus.ANALYZING
+        db.add(task.session)
+    db.add(task)
+    db.commit()
+    db.refresh(task)
+    return task

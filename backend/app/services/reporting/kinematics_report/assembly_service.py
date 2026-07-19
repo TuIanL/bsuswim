@@ -109,10 +109,19 @@ def assemble_five_page_kinematics_report(
     )
 
     # 6. Resolve review finding set (via existing resolver)
+    # 仅 review_findings_not_generated 允许降级为 partial 报告；
+    # invalid_rule_set / rule_output_kind_mismatch / metric_revision_stale 等结构性
+    # 错误必须正常向上抛出，不得静默降级（design §12.2-12.4）。
+    from app.services.diagnostics.review_findings.generation_service import (
+        ReviewFindingsGenerationError,
+    )
+
     finding_set = None
     try:
         finding_set = get_current_review_findings(db, annotation_metric_id, current_user)
-    except Exception:
+    except ReviewFindingsGenerationError as exc:
+        if exc.code != "review_findings_not_generated":
+            raise
         finding_set = None
 
     # 7. Assemble

@@ -28,6 +28,14 @@ class AnalysisTask(Base):
     stage: Mapped[str] = mapped_column(String(80), default="queued", nullable=False)
     request_payload: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     error_message: Mapped[str | None] = mapped_column(Text)
+
+    pipeline_type: Mapped[str] = mapped_column(String(40), default="model_service", nullable=False)
+    pipeline_version: Mapped[str] = mapped_column(String(50), default="model_service_v1", nullable=False)
+    execution_state: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    attempt_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    failed_stage: Mapped[str | None] = mapped_column(String(80))
+    error_code: Mapped[str | None] = mapped_column(String(100))
+
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()

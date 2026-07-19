@@ -28,7 +28,11 @@ def project_to_report_assets_extended(artifact_set) -> list[ReportAsset]:
         artifact_type = getattr(art, "artifact_type", "")
         report_type = "annotated_frame" if artifact_type == "annotated_keyframe" else "image"
 
-        meta = getattr(art, "metadata", None) or {}
+        meta = getattr(art, "artifact_metadata", None)
+        if meta is None:
+            meta = getattr(art, "metadata", None)
+        if meta is None:
+            meta = {}
         if hasattr(meta, "model_dump"):
             meta = meta.model_dump(mode="json")
 
