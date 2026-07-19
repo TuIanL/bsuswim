@@ -205,14 +205,24 @@ export async function submitAnalysis(
   options?: {
     normalized_annotation_id?: number
     acknowledge_quality_warnings?: boolean
+    pipeline_type?: string
+    pipeline_version?: string
   }
 ): Promise<AnalysisTask> {
   if (demoMode) return submitDemoAnalysis(sessionId)
   const response = await client.post<AnalysisTask>('/analysis/submit', {
     session_id: sessionId,
     normalized_annotation_id: options?.normalized_annotation_id,
-    acknowledge_quality_warnings: options?.acknowledge_quality_warnings ?? false
+    acknowledge_quality_warnings: options?.acknowledge_quality_warnings ?? false,
+    pipeline_type: options?.pipeline_type,
+    pipeline_version: options?.pipeline_version
   })
+  return response.data
+}
+
+export async function retryAnalysisTask(taskId: number): Promise<AnalysisTask> {
+  if (demoMode) return submitDemoAnalysis(taskId)
+  const response = await client.post<AnalysisTask>(`/analysis/${taskId}/retry`)
   return response.data
 }
 
@@ -221,9 +231,17 @@ export async function createAnalysisTask(_videoId?: number, _metadata?: unknown)
   throw new Error('真实后端模式请先创建训练记录、绑定视频，再调用 submitAnalysis(sessionId)')
 }
 
-export async function listTasks(): Promise<AnalysisTask[]> {
+export async function listTasks(params?: {
+  session_id?: number
+  pipeline_type?: string
+  limit?: number
+}): Promise<AnalysisTask[]> {
   if (demoMode) return getDemoTasks()
-  const response = await client.get<AnalysisTask[]>('/analysis')
+  const query: Record<string, any> = {}
+  if (params?.session_id != null) query.session_id = params.session_id
+  if (params?.pipeline_type != null) query.pipeline_type = params.pipeline_type
+  if (params?.limit != null) query.limit = params.limit
+  const response = await client.get<AnalysisTask[]>('/analysis', { params: query })
   return response.data
 }
 
@@ -243,6 +261,13 @@ export async function getAnalysisStatus(taskId: number): Promise<AnalysisStatus>
       progress: task.progress,
       stage: task.stage,
       error_message: task.error_message,
+      pipeline_type: task.pipeline_type,
+      pipeline_version: task.pipeline_version,
+      attempt_count: task.attempt_count,
+      failed_stage: task.failed_stage,
+      error_code: task.error_code,
+      pipeline_progress: task.pipeline_progress ?? undefined,
+      actions: task.actions,
       created_at: task.created_at,
       updated_at: task.updated_at,
       completed_at: task.completed_at
@@ -390,6 +415,17 @@ export async function archiveAnnotation(
 ): Promise<{ id: number; status: string }> {
   const response = await client.post<{ id: number; status: string }>(
     `/annotations/${annotationId}/archive`
+  )
+  return response.data
+}
+
+export async function reparseAnnotation(
+  annotationFileId: number,
+  options?: Record<string, any> | null
+): Promise<AnnotationIngestResponse> {
+  const response = await client.post<AnnotationIngestResponse>(
+    `/annotations/${annotationFileId}/parse`,
+    options ?? {}
   )
   return response.data
 }

@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.models import AnalysisTaskStatus, StrokeType
 from app.schemas.video import SessionVideoRead, VideoFileRead
@@ -33,6 +33,26 @@ class AnalysisSubmit(BaseModel):
     pipeline_version: str | None = None
 
 
+class PipelineStepRead(BaseModel):
+    key: str
+    status: Literal["pending", "running", "completed", "failed"]
+    progress: int
+    details: dict[str, Any] = Field(default_factory=dict)
+    error_code: str | None = None
+    error_message: str | None = None
+
+
+class PipelineProgressRead(BaseModel):
+    pipeline_type: str
+    pipeline_version: str
+    attempt_count: int
+    current_stage: str
+    failed_stage: str | None = None
+    error_code: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+    steps: list[PipelineStepRead] = Field(default_factory=list)
+
+
 class AnalysisTaskRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -51,6 +71,7 @@ class AnalysisTaskRead(BaseModel):
     created_at: datetime
     updated_at: datetime
     completed_at: datetime | None
+    pipeline_progress: "PipelineProgressRead"
     actions: list[str] = []
 
 
@@ -69,6 +90,8 @@ class AnalysisStatusRead(BaseModel):
     created_at: datetime
     updated_at: datetime
     completed_at: datetime | None
+    pipeline_progress: "PipelineProgressRead"
+    actions: list[str] = []
 
 
 class ModelVideoInput(BaseModel):

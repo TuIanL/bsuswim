@@ -165,13 +165,39 @@ export interface AnalysisTask {
   stage: string
   request_payload?: Record<string, any>
   error_message?: string | null
+  pipeline_type: string
+  pipeline_version: string
+  attempt_count: number
+  failed_stage?: string | null
+  error_code?: string | null
   created_at: string
   updated_at: string
   completed_at?: string | null
+  pipeline_progress?: PipelineProgress
   actions: string[]
   video_id?: number
   session_metadata?: TrainingMetadata
   video?: VideoFile
+}
+
+export interface PipelineStep {
+  key: string
+  status: 'pending' | 'running' | 'completed' | 'failed'
+  progress: number
+  details?: Record<string, any>
+  error_code?: string | null
+  error_message?: string | null
+}
+
+export interface PipelineProgress {
+  pipeline_type: string
+  pipeline_version: string
+  attempt_count: number
+  current_stage: string
+  failed_stage?: string | null
+  error_code?: string | null
+  warnings: string[]
+  steps: PipelineStep[]
 }
 
 export interface AnalysisStatus {
@@ -181,6 +207,13 @@ export interface AnalysisStatus {
   progress: number
   stage: string
   error_message?: string | null
+  pipeline_type: string
+  pipeline_version: string
+  attempt_count: number
+  failed_stage?: string | null
+  error_code?: string | null
+  pipeline_progress?: PipelineProgress
+  actions: string[]
   created_at: string
   updated_at: string
   completed_at?: string | null
@@ -260,6 +293,59 @@ export interface AnnotationIngestResponse {
   warnings: string[]
 }
 
+export interface QualityIssue {
+  code: string
+  category?: string
+  severity?: string
+  blocking?: boolean
+  status?: string
+  message?: string
+  user_message?: string
+  suggested_action?: {
+    label?: string
+    kind?: string
+  } | null
+}
+
+export interface ModuleReadiness {
+  status: 'ready' | 'degraded' | 'blocked'
+  blocking_issues?: string[]
+  warnings?: string[]
+}
+
+export interface AnnotationQualityReport {
+  schema_version?: string
+  status: QualityStatus
+  score?: number
+  source_revision?: number
+  summary?: {
+    blocking_count?: number
+    error_count?: number
+    warning_count?: number
+    info_count?: number
+  }
+  issues?: QualityIssue[]
+  module_readiness?: Record<string, ModuleReadiness>
+}
+
+export type ModuleReadinessStatus = 'ready' | 'degraded' | 'blocked'
+
+export type KinematicsModuleKey = 'body_posture' | 'upper_limb' | 'lower_limb' | 'head_trunk'
+
+export type KinematicsModuleReadiness = Record<KinematicsModuleKey, ModuleReadinessStatus>
+
+export type ReportFreshness = 'none' | 'current' | 'stale'
+
+export type WorkflowPhase =
+  | 'video_required'
+  | 'annotation_required'
+  | 'annotation_processing'
+  | 'annotation_review'
+  | 'ready_to_analyze'
+  | 'analysis_running'
+  | 'analysis_failed'
+  | 'report_ready'
+
 export interface AnnotationFileListItem {
   id: number
   session_video_id: number
@@ -275,6 +361,9 @@ export interface AnnotationFileListItem {
   normalized_annotation_id?: number | null
   normalized_revision?: number | null
   analysis_readiness?: AnalysisReadiness | null
+  parse_summary?: ParseSummary | null
+  quality?: AnnotationQualityReport | null
+  kinematics_module_readiness?: Partial<KinematicsModuleReadiness>
   parse_warnings?: string[]
   parse_error?: string | null
 }

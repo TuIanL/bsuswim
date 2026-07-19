@@ -31,3 +31,40 @@ ERROR_UNSUPPORTED_PIPELINE_VERSION = "UNSUPPORTED_PIPELINE_VERSION"
 ERROR_ARTIFACT_GENERATION_FAILED = "ARTIFACT_GENERATION_FAILED"
 ERROR_REVIEW_FINDINGS_GENERATION_FAILED = "REVIEW_FINDINGS_GENERATION_FAILED"
 ERROR_QUALITY_BLOCKED = "QUALITY_BLOCKED"
+
+# 失败恢复策略注册表（design Decision 22）
+# resubmit → 新建任务，后端锁定当前 annotation revision
+# retry    → 重跑原任务（沿用锁定 revision）
+# details  → 非用户可恢复，仅展示详情
+ERROR_RECOVERY_POLICY: dict[str, str] = {
+    # 输入/版本类
+    "INVALID_INPUT": "resubmit",
+    "ANNOTATION_NOT_FOUND": "resubmit",
+    "ANNOTATION_REVISION_DRIFT": "resubmit",
+    "SESSION_MISMATCH": "resubmit",
+    "UNSUPPORTED_VIEW": "resubmit",
+    "NO_KEYPOINT_FRAMES": "resubmit",
+    # 执行阶段类
+    "METRIC_PERSIST_FAILED": "retry",
+    "METRIC_REVISION_MISMATCH": "retry",
+    "ARTIFACT_GENERATION_FAILED": "retry",
+    "REVIEW_FINDINGS_GENERATION_FAILED": "retry",
+    "REPORT_ASSEMBLY_FAILED": "retry",
+    "PIPELINE_INTERNAL_ERROR": "retry",
+    # 非用户可恢复
+    "UNSUPPORTED_PIPELINE_VERSION": "details",
+    "TASK_OWNER_UNAVAILABLE": "details",
+    "QUALITY_BLOCKED": "details",
+    # 报告元数据缺失（completed 但无报告实体，design Decision 20/21）：用当前标注重新生成
+    "REPORT_METADATA_MISSING": "resubmit",
+}
+
+RECOVERY_RESUBMIT = "resubmit"
+RECOVERY_RETRY = "retry"
+RECOVERY_DETAILS = "details"
+
+
+def recovery_policy_for(error_code: str | None) -> str:
+    if not error_code:
+        return RECOVERY_DETAILS
+    return ERROR_RECOVERY_POLICY.get(error_code, RECOVERY_DETAILS)

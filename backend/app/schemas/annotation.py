@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from app.models import AnnotationFileStatus, AnnotationSource, ViewType
 from app.schemas.normalized_annotation import (
     AnalysisReadiness,
+    AnnotationQualityReport,
     ParseSummary,
 )
 
@@ -62,6 +63,9 @@ class AnnotationFileListItem(BaseModel):
     normalized_revision: int | None = None
     quality_status: QualityStatus | None = None
     analysis_readiness: AnalysisReadiness | None = None
+    parse_summary: ParseSummary | None = None
+    quality: AnnotationQualityReport | None = None
+    kinematics_module_readiness: dict[str, str] = Field(default_factory=dict)
     parse_warnings: list[str] = Field(default_factory=list)
     parse_error: str | None = None
 

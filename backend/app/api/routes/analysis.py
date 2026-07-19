@@ -16,10 +16,13 @@ from app.schemas import (
     WorkspaceData,
 )
 from app.services.analysis_service import (
+    AnalysisTaskAlreadyActiveError,
     AnnotationInputUnavailableError,
     AnnotationQualityBlockedError,
     AnnotationSelectionRequiredError,
     create_analysis_task,
+    read_analysis_status,
+    read_analysis_task,
     retry_analysis_task,
     run_analysis_task,
     save_analysis_result,
@@ -81,25 +84,46 @@ async def submit_analysis(
                 }
             },
         )
+    except AnalysisTaskAlreadyActiveError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={
+                "error": {
+                    "code": "ANALYSIS_TASK_ALREADY_ACTIVE",
+                    "message": str(exc),
+                    "existing_task_id": exc.existing_task_id,
+                }
+            },
+        )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     background_tasks.add_task(run_analysis_task, task.id)
-    return _read_task(task)
+    return read_analysis_task(task)
 
 
 @router.get("", response_model=list[AnalysisTaskRead])
 def list_analysis_tasks(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
+    session_id: int | None = None,
+    pipeline_type: str | None = None,
+    limit: int | None = None,
 ) -> list[AnalysisTaskRead]:
-    tasks = db.scalars(
+    query = (
         select(AnalysisTask)
         .join(AnalysisTask.session)
         .where(TrainingSession.coach_id == current_user.id)
-        .order_by(AnalysisTask.updated_at.desc())
-    ).all()
-    return [_read_task(task) for task in tasks]
+    )
+    if session_id is not None:
+        query = query.where(AnalysisTask.session_id == session_id)
+    if pipeline_type is not None:
+        query = query.where(AnalysisTask.pipeline_type == pipeline_type)
+    query = query.order_by(AnalysisTask.updated_at.desc())
+    if limit is not None:
+        query = query.limit(limit)
+    tasks = db.scalars(query).all()
+    return [read_analysis_task(task, db) for task in tasks]
 
 
 @router.get("/{task_id}", response_model=AnalysisTaskRead)
@@ -109,7 +133,7 @@ def get_analysis_task(
     current_user: User = Depends(get_current_user),
 ) -> AnalysisTaskRead:
     task = _get_owned_task(db, task_id, current_user)
-    return _read_task(task)
+    return read_analysis_task(task, db)
 
 
 @router.get("/{task_id}/status", response_model=AnalysisStatusRead)
@@ -119,17 +143,7 @@ def get_analysis_status(
     current_user: User = Depends(get_current_user),
 ) -> AnalysisStatusRead:
     task = _get_owned_task(db, task_id, current_user)
-    return AnalysisStatusRead(
-        task_id=task.id,
-        session_id=task.session_id,
-        status=task.status,
-        progress=task.progress,
-        stage=task.stage,
-        error_message=task.error_message,
-        created_at=task.created_at,
-        updated_at=task.updated_at,
-        completed_at=task.completed_at,
-    )
+    return read_analysis_status(task, db)
 
 
 @router.get("/{task_id}/result", response_model=AnalysisResultRead)
@@ -164,7 +178,7 @@ def get_workspace(
     )
     session_videos = sorted(task.session.videos if task.session else [], key=lambda item: item.created_at)
     return WorkspaceData(
-        task=_read_task(task),
+        task=read_analysis_task(task, db),
         result=AnalysisResultRead.model_validate(task.result) if task.result else None,
         videos=[_read_video(link.video_file) for link in session_videos if link.video_file],
         session_videos=[_read_session_video(link) for link in session_videos if link.video_file],
@@ -184,7 +198,7 @@ def retry_analysis(
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     background_tasks.add_task(run_analysis_task, task.id)
-    return _read_task(task)
+    return read_analysis_task(task)
 
 
 @router.post("/{task_id}/result", response_model=AnalysisResultRead)
@@ -217,10 +231,6 @@ def _get_owned_task(
     if not task or not task.session or task.session.coach_id != current_user.id:
         raise HTTPException(status_code=404, detail="任务不存在")
     return task
-
-
-def _read_task(task: AnalysisTask) -> AnalysisTaskRead:
-    return AnalysisTaskRead.model_validate({**task.__dict__, "actions": task_actions(task)})
 
 
 # 挂载诊断子路由（前缀继承 /analysis）：/api/v1/analysis/analysis-results/{id}/diagnostics[/run]

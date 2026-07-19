@@ -190,6 +190,11 @@ export const demoTask: AnalysisTask = {
   status: 'completed',
   progress: 100,
   stage: 'completed',
+  pipeline_type: 'model_service',
+  pipeline_version: 'model_service_v1',
+  attempt_count: 1,
+  failed_stage: null,
+  error_code: null,
   session_metadata: {
     session_title: '自由泳侧拍技术评估',
     venue: '训练馆 50m 池',

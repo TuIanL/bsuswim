@@ -49,7 +49,13 @@ class AnnotationFile(Base):
     )
 
     source: Mapped[AnnotationSource] = mapped_column(
-        SQLEnum(AnnotationSource), default=AnnotationSource.KINOVEA, nullable=False, index=True
+        SQLEnum(
+            AnnotationSource,
+            values_callable=lambda enum: [e.value for e in enum],
+        ),
+        default=AnnotationSource.KINOVEA,
+        nullable=False,
+        index=True,
     )
 
     original_filename: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -67,7 +73,13 @@ class AnnotationFile(Base):
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
 
     status: Mapped[AnnotationFileStatus] = mapped_column(
-        SQLEnum(AnnotationFileStatus), default=AnnotationFileStatus.UPLOADED, nullable=False, index=True
+        SQLEnum(
+            AnnotationFileStatus,
+            values_callable=lambda enum: [e.value for e in enum],
+        ),
+        default=AnnotationFileStatus.UPLOADED,
+        nullable=False,
+        index=True,
     )
     parse_error: Mapped[str | None] = mapped_column(Text)
 

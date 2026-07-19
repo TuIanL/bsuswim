@@ -170,8 +170,19 @@ Vue 报告页 SHALL 对真实后端报告未生成或不可用状态提供稳定
 #### Scenario: Sections array is rendered in order
 - **WHEN** `report_data.sections` 包含多个 section 对象
 - **THEN** 前端 MUST 按数组顺序渲染每个 section，每个 section 使用其对应的 renderer 组件
-
 #### Scenario: Unknown section key does not break page
+
 - **WHEN** section 包含不在渲染映射表中的 key
 - **THEN** 前端 MUST 使用 GenericSection 渲染，不引发页面崩溃或白屏
+
+### Requirement: Guided workflow provides report entry after completion
+
+引导工作流 SHALL 在 annotation_kinematics 任务完成后提供 HTML 报告与 PDF 操作入口。
+
+#### Scenario: Completed annotation pipeline task
+
+- **WHEN** 最新 annotation_kinematics 任务状态为 completed
+- **THEN** 引导工作流 MUST 提供"查看 HTML 报告"入口（复用 `/reports/:sessionId`）
+- **AND** MUST 提供导出/下载 PDF 入口（复用现有 PDF API）
+- **AND** MUST NOT 在工作流页内复制报告 section renderer 或五页报告结构
 

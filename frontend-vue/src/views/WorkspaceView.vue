@@ -20,7 +20,11 @@
             @error="videoError = true"
           />
           <div v-else class="placeholder-water">Demo 可视化画布</div>
-          <OverlayCanvas :result="supportedResult ? data.result || undefined : undefined" :video="videoRef" />
+          <OverlayCanvas
+            v-if="overlayResult"
+            :result="overlayResult"
+            :video="videoRef"
+          />
         </div>
         <el-alert v-if="!supportedResult" class="mt" title="当前结果不可用或 schema 不兼容" type="warning" :closable="false" />
         <el-alert v-if="videoError" class="mt" title="视频资源无法加载，但任务元数据仍可查看" type="error" :closable="false" />
@@ -65,7 +69,16 @@ const videoRef = ref<HTMLVideoElement | null>(null)
 const videoError = ref(false)
 let timer = 0
 
-const supportedResult = computed(() => data.value?.result?.schema_version === 'swim-analysis.v1')
+const SUPPORTED_SCHEMA_VERSIONS = ['swim-analysis.v1', 'swim-analysis.annotation-kinematics.v1']
+const supportedResult = computed(() =>
+  !!data.value?.result?.schema_version && SUPPORTED_SCHEMA_VERSIONS.includes(data.value.result.schema_version)
+)
+// 仅对 legacy model-service 结果启用 OverlayCanvas；annotation pipeline 的 keypoint_frames 为空，证据图在报告 artifacts 中
+const overlayResult = computed(() =>
+  supportedResult.value && data.value?.task.pipeline_type !== 'annotation_kinematics'
+    ? data.value?.result || undefined
+    : undefined
+)
 const workspaceTitle = computed(() => {
   const payloadTitle = data.value?.task.request_payload?.session?.title
   return payloadTitle || data.value?.task.session_metadata?.session_title || '加载分析任务'

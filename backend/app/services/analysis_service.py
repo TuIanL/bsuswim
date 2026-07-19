@@ -50,6 +50,14 @@ class AnnotationInputUnavailableError(Exception):
         super().__init__("没有可用的标准化标注")
 
 
+class AnalysisTaskAlreadyActiveError(Exception):
+    """同一训练记录已有活跃的 annotation_kinematics 任务（design Decision 17）。"""
+
+    def __init__(self, existing_task_id: int):
+        self.existing_task_id = existing_task_id
+        super().__init__("当前训练记录已有二维运动学分析任务正在执行")
+
+
 def _get_validator() -> AnnotationQualityValidator:
     profiles_dir = os.path.join(os.path.dirname(__file__), "annotation_quality", "profiles")
     provider = YamlQualityProfileProvider(profiles_dir)
@@ -88,12 +96,18 @@ def _ensure_quality_gate(
     return report.model_dump(mode="json")
 
 
-def task_actions(task: AnalysisTask) -> list[str]:
-    if task.status == AnalysisTaskStatus.COMPLETED:
+def task_actions(task: AnalysisTask, error_code: str | None = None) -> list[str]:
+    from app.services.analysis_pipelines.errors import recovery_policy_for
+
+    effective_error = error_code if error_code is not None else task.error_code
+    # completed 但合成出错误码（如 REPORT_METADATA_MISSING）视为可恢复失败
+    if task.status == AnalysisTaskStatus.COMPLETED and not effective_error:
         return ["workspace", "report"]
-    if task.status == AnalysisTaskStatus.FAILED:
-        # retry 仅对 annotation_kinematics 开放（design §17）
-        if task.pipeline_type == "annotation_kinematics":
+    if task.status in (AnalysisTaskStatus.FAILED,) or effective_error:
+        policy = recovery_policy_for(effective_error)
+        if policy == "resubmit" and task.pipeline_type == "annotation_kinematics":
+            return ["resubmit", "details"]
+        if policy == "retry":
             return ["retry", "details"]
         return ["details"]
     return ["details"]
@@ -134,9 +148,32 @@ def _resolve_pipeline_type(payload: AnalysisSubmit) -> tuple[str, str]:
 
 
 def create_analysis_task(db: Session, payload: AnalysisSubmit) -> AnalysisTask:
-    session = db.get(TrainingSession, payload.session_id)
+    # 锁定 TrainingSession 行，避免并发提交穿透活跃任务检查（design Decision 17）
+    session = db.scalar(
+        select(TrainingSession)
+        .where(TrainingSession.id == payload.session_id)
+        .with_for_update()
+    )
     if not session:
         raise ValueError("训练记录不存在")
+
+    # ── 活跃任务防重（仅限制 annotation_kinematics）──
+    if payload.pipeline_type in (None, "annotation_kinematics") or _resolve_pipeline_type(payload)[0] == "annotation_kinematics":
+        active = db.scalar(
+            select(AnalysisTask)
+            .where(
+                AnalysisTask.session_id == payload.session_id,
+                AnalysisTask.pipeline_type == "annotation_kinematics",
+                AnalysisTask.status.in_([
+                    AnalysisTaskStatus.QUEUED,
+                    AnalysisTaskStatus.PROCESSING,
+                    AnalysisTaskStatus.RESULT_SAVING,
+                ]),
+            )
+            .with_for_update()
+        )
+        if active:
+            raise AnalysisTaskAlreadyActiveError(active.id)
 
     # ── resolve pipeline type / version ──
     pipeline_type, pipeline_version = _resolve_pipeline_type(payload)
@@ -432,3 +469,217 @@ def retry_analysis_task(db: Session, task: AnalysisTask) -> AnalysisTask:
     db.commit()
     db.refresh(task)
     return task
+
+
+# ── 流水线进度统一投影（design Decision 18/19/24）──
+
+# annotation_kinematics 规范有序阶段（与 checkpoints.STAGE_PROGRESS 对齐）
+ANNOTATION_KINEMATICS_STAGE_ORDER = [
+    "validating_input",
+    "calculating_metrics",
+    "generating_artifacts",
+    "running_findings",
+    "saving_result",
+    "assembling_report",
+    "completed",
+]
+
+# model_service 规范阶段（与 model_service pipeline 实际 stage 对齐）
+MODEL_SERVICE_STAGE_ORDER = [
+    "model_inference",
+    "completed",
+]
+
+PIPELINE_STAGE_SPECS: dict[str, list[str]] = {
+    "annotation_kinematics": ANNOTATION_KINEMATICS_STAGE_ORDER,
+    "model_service": MODEL_SERVICE_STAGE_ORDER,
+}
+
+# 规范阶段对应的展示进度百分比（未知阶段默认 0）
+_STAGE_PROGRESS = {
+    "validating_input": 10,
+    "calculating_metrics": 25,
+    "generating_artifacts": 45,
+    "running_findings": 65,
+    "saving_result": 78,
+    "assembling_report": 88,
+    "completed": 100,
+    "model_inference": 50,
+}
+
+
+def build_pipeline_progress(task: AnalysisTask) -> "PipelineProgressRead":
+    """将任务投影为前端使用的有序流水线进度（design Decision 18）。"""
+    from app.schemas.analysis import PipelineProgressRead, PipelineStepRead
+
+    stage_order = PIPELINE_STAGE_SPECS.get(task.pipeline_type)
+    state = task.execution_state or {}
+    persisted_steps: dict = state.get("steps", {}) or {}
+    warnings: list = state.get("warnings", []) or []
+
+    progress = PipelineProgressRead(
+        pipeline_type=task.pipeline_type,
+        pipeline_version=task.pipeline_version,
+        attempt_count=task.attempt_count or 0,
+        current_stage=task.stage,
+        failed_stage=task.failed_stage,
+        error_code=task.error_code,
+        warnings=warnings,
+        steps=[],
+    )
+
+    # 未命中规范（legacy / 未知 pipeline）：仅返回原始 stage 作为单个 step
+    if not stage_order:
+        progress.steps = [
+            PipelineStepRead(
+                key=task.stage,
+                status=_step_status_for(task),
+                progress=_STAGE_PROGRESS.get(task.stage, 0),
+                error_code=task.error_code if task.status == AnalysisTaskStatus.FAILED else None,
+                error_message=task.error_message if task.status == AnalysisTaskStatus.FAILED else None,
+            )
+        ]
+        return progress
+
+    current_idx = stage_order.index(task.stage) if task.stage in stage_order else len(stage_order)
+    failed_idx = (
+        stage_order.index(task.failed_stage)
+        if task.failed_stage in stage_order
+        else -1
+    )
+
+    for idx, key in enumerate(stage_order):
+        # 优先使用持久化的真实状态
+        if key in persisted_steps:
+            ps = persisted_steps[key]
+            status = ps.get("status", "completed") if isinstance(ps, dict) else "completed"
+            progress.steps.append(
+                PipelineStepRead(
+                    key=key,
+                    status=status,
+                    progress=_STAGE_PROGRESS.get(key, 0),
+                    details=ps.get("details", {}) if isinstance(ps, dict) else {},
+                    error_code=ps.get("error_code") if isinstance(ps, dict) else None,
+                    error_message=ps.get("error_message") if isinstance(ps, dict) else None,
+                )
+            )
+            continue
+
+        # 否则按 task 整体状态推导
+        if task.status == AnalysisTaskStatus.COMPLETED:
+            status = "completed"
+        elif task.status == AnalysisTaskStatus.FAILED:
+            if failed_idx == -1:
+                status = "pending"
+            elif idx < failed_idx:
+                status = "completed"
+            elif idx == failed_idx:
+                status = "failed"
+            else:
+                status = "pending"
+        elif task.status == AnalysisTaskStatus.PROCESSING:
+            if idx < current_idx:
+                status = "completed"
+            elif idx == current_idx:
+                status = "running"
+            else:
+                status = "pending"
+        else:
+            status = "pending"
+
+        progress.steps.append(
+            PipelineStepRead(
+                key=key,
+                status=status,
+                progress=_STAGE_PROGRESS.get(key, 0),
+                error_code=task.error_code if status == "failed" else None,
+                error_message=task.error_message if status == "failed" else None,
+            )
+        )
+
+    return progress
+
+
+def _step_status_for(task: AnalysisTask) -> str:
+    if task.status == AnalysisTaskStatus.COMPLETED:
+        return "completed"
+    if task.status == AnalysisTaskStatus.FAILED:
+        return "failed"
+    if task.status == AnalysisTaskStatus.PROCESSING:
+        return "running"
+    return "pending"
+
+
+def _report_exists_for_task(db, task: AnalysisTask) -> bool:
+    """判断是否存在指向该任务的报告实体（design Decision 20/21）。"""
+    if db is None:
+        return True
+    return db.scalar(
+        select(ReportMetadata.id).where(ReportMetadata.task_id == task.id).limit(1)
+    ) is not None
+
+
+def build_analysis_common_payload(task: AnalysisTask, db=None) -> dict:
+    """列表/详情/status 三条路由共享的字段（design Decision 24）。
+
+    对于 annotation_kinematics 流水线，任务 completed 但缺少报告实体时，
+    合成 REPORT_METADATA_MISSING 失败（design Decision 20/21）：前端据此复用
+    analysis_failed 的失败恢复 UI，而非错误地展示报告可用。
+    """
+    failed_stage = task.failed_stage
+    error_code = task.error_code
+
+    if (
+        task.status == AnalysisTaskStatus.COMPLETED
+        and task.pipeline_type == "annotation_kinematics"
+        and not _report_exists_for_task(db, task)
+    ):
+        failed_stage = failed_stage or "assembling_report"
+        error_code = error_code or "REPORT_METADATA_MISSING"
+
+    return {
+        "pipeline_type": task.pipeline_type,
+        "pipeline_version": task.pipeline_version,
+        "attempt_count": task.attempt_count or 0,
+        "failed_stage": failed_stage,
+        "error_code": error_code,
+        "pipeline_progress": build_pipeline_progress(task),
+        "actions": task_actions(task, error_code),
+    }
+
+
+def read_analysis_task(task: AnalysisTask, db=None) -> "AnalysisTaskRead":
+    from app.schemas.analysis import AnalysisTaskRead
+
+    data = {
+        "id": task.id,
+        "session_id": task.session_id,
+        "status": task.status,
+        "progress": task.progress,
+        "stage": task.stage,
+        "request_payload": task.request_payload or {},
+        "error_message": task.error_message,
+        "created_at": task.created_at,
+        "updated_at": task.updated_at,
+        "completed_at": task.completed_at,
+    }
+    data.update(build_analysis_common_payload(task, db))
+    return AnalysisTaskRead(**data)
+
+
+def read_analysis_status(task: AnalysisTask, db=None) -> "AnalysisStatusRead":
+    from app.schemas.analysis import AnalysisStatusRead
+
+    data = {
+        "task_id": task.id,
+        "session_id": task.session_id,
+        "status": task.status,
+        "progress": task.progress,
+        "stage": task.stage,
+        "error_message": task.error_message,
+        "created_at": task.created_at,
+        "updated_at": task.updated_at,
+        "completed_at": task.completed_at,
+    }
+    data.update(build_analysis_common_payload(task, db))
+    return AnalysisStatusRead(**data)

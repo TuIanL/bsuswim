@@ -27,7 +27,11 @@ from app.schemas.annotation import (
     AnnotationFileListItem,
     AnnotationIngestResponse,
 )
-from app.schemas.normalized_annotation import ParseAnnotationOptions
+from app.schemas.normalized_annotation import (
+    AnnotationQualityReport,
+    ParseAnnotationOptions,
+    ParseSummary,
+)
 from app.services.annotation_file_service import (
     create_annotation,
     detect_file_type,
@@ -41,6 +45,51 @@ from app.services.annotation_ingestion_service import (
 from app.services.annotation_quality.readiness import derive_analysis_readiness
 
 router = APIRouter()
+
+
+# 四模块预分析就绪度映射（design Decision 25）
+# 质量系统模块键：body_position / arm_entry / catch_pull / leg_kick / efficiency
+_MODULE_ORDER = {"ready": 0, "degraded": 1, "blocked": 2}
+
+
+def _worse(a: str, b: str) -> str:
+    return a if _MODULE_ORDER[a] >= _MODULE_ORDER[b] else b
+
+
+def derive_kinematics_module_readiness(quality: dict | None) -> dict[str, str]:
+    """由标注质量 module_readiness 推导四类运动学模块预分析就绪度。
+
+    这是分析前就绪状态，非最终报告可用性。head_trunk 无直接质量键，
+    默认 degraded（禁止无说明默认 ready）。
+    """
+    if not quality:
+        return {
+            "body_posture": "blocked",
+            "upper_limb": "blocked",
+            "lower_limb": "blocked",
+            "head_trunk": "degraded",
+        }
+    mr = quality.get("module_readiness", {}) or {}
+    body = mr.get("body_position", {}).get("status", "degraded") if isinstance(mr.get("body_position"), dict) else mr.get("body_position", "degraded")
+    arm = mr.get("arm_entry", {}).get("status", "degraded") if isinstance(mr.get("arm_entry"), dict) else mr.get("arm_entry", "degraded")
+    pull = mr.get("catch_pull", {}).get("status", "degraded") if isinstance(mr.get("catch_pull"), dict) else mr.get("catch_pull", "degraded")
+    leg = mr.get("leg_kick", {}).get("status", "degraded") if isinstance(mr.get("leg_kick"), dict) else mr.get("leg_kick", "degraded")
+    eff = mr.get("efficiency", {}).get("status", "degraded") if isinstance(mr.get("efficiency"), dict) else mr.get("efficiency", "degraded")
+    return {
+        "body_posture": body,
+        "upper_limb": _worse(arm, pull),
+        "lower_limb": _worse(leg, eff),
+        "head_trunk": "degraded",
+    }
+
+
+def _build_parse_summary(na: NormalizedAnnotation) -> ParseSummary:
+    return ParseSummary(
+        events_count=len(na.events or []),
+        keypoint_frames_count=len(na.keypoint_frames or []),
+        trajectories_count=len(na.trajectories or []),
+        manual_tags_count=len(na.manual_tags or []),
+    )
 
 
 def _get_owned_session(db: Session, session_id: int, current_user: User) -> TrainingSession:
@@ -156,6 +205,12 @@ def list_annotations(
         meta = na.annotation_metadata or {} if na else {}
         parse_warnings = (meta.get("parse") or {}).get("warnings", []) if meta else []
 
+        parse_summary = _build_parse_summary(na) if na else None
+        quality_report = (
+            AnnotationQualityReport(**qual) if qual else None
+        )
+        module_readiness = derive_kinematics_module_readiness(qual)
+
         result.append(AnnotationFileListItem(
             id=a.id,
             session_video_id=a.session_video_id,
@@ -171,6 +226,9 @@ def list_annotations(
             normalized_revision=na.revision if na else None,
             quality_status=qual_status,
             analysis_readiness=derive_analysis_readiness(qual) if qual else None,
+            parse_summary=parse_summary,
+            quality=quality_report,
+            kinematics_module_readiness=module_readiness,
             parse_warnings=parse_warnings,
             parse_error=a.parse_error,
         ))
