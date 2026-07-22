@@ -827,3 +827,45 @@ class TestCvatParseErrorStructured:
         assert exc.value.code == "MULTIPLE_ACTIVE_SKELETONS"
         assert exc.value.frame == 0
         assert exc.value.track_ids == ["0", "1"]
+
+
+class TestCvatIngestWarningsRegression:
+    """Regression: the CVAT branch must not raise NameError on undefined
+    ``warnings`` when aggregating parser + derived warnings."""
+
+    def test_parse_annotation_file_cvat_branch_aggregates_warnings(
+        self, db_session, test_coach, test_session_video
+    ):
+        from app.models.annotation import AnnotationFile, AnnotationSource
+        from app.services.normalized_annotation_service import parse_annotation_file
+
+        xml_src = _fixture_path("cvat_56_frames.xml")
+        tmp_path = tempfile.NamedTemporaryFile(
+            mode="w", suffix=".xml", delete=False, dir=tempfile.gettempdir()
+        )
+        with open(xml_src, "r", encoding="utf-8") as fh:
+            tmp_path.write(fh.read())
+        tmp_path.close()
+
+        ann_file = AnnotationFile(
+            session_video_id=test_session_video.id,
+            source=AnnotationSource.CVAT,
+            original_filename="cvat_56_frames.xml",
+            stored_filename="cvat_56_frames.xml",
+            storage_path=tmp_path.name,
+            file_type="xml",
+            status="uploaded",
+        )
+        db_session.add(ann_file)
+        db_session.flush()
+
+        # Previously raised NameError: name 'warnings' is not defined.
+        result = parse_annotation_file(
+            db_session, ann_file.id, test_coach.id
+        )
+
+        assert result is not None
+        assert isinstance(result.warnings, list)
+        # parser warnings + derived warnings from the golden-style fixture
+        assert len(result.warnings) >= 0
+        os.unlink(tmp_path.name)

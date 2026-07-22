@@ -21,6 +21,10 @@ class VideoFileRead(BaseModel):
 
 class VideoUploadResponse(BaseModel):
     video: VideoFileRead
+    probed_fps: float | None = None
+    resolution: str | None = Field(default=None, max_length=40)
+    metadata_source: str | None = None
+    fps_verified: bool = False
 
 
 class SessionVideoCreate(BaseModel):

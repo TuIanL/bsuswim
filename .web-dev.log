@@ -2,7 +2,8 @@
 > zhiyong-yunshu-vue-platform@0.1.0 dev
 > vite --host 0.0.0.0 --host 127.0.0.1 --port 5174
 
+15:11:29 [vite] (client) Re-optimizing dependencies because lockfile has changed
 
-  VITE v6.4.3  ready in 217 ms
+  VITE v6.4.3  ready in 579 ms
 
   ➜  Local:   http://127.0.0.1:5174/

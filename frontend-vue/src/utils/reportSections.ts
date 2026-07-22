@@ -27,11 +27,25 @@ const TREND_KEYS = new Set([
 ])
 
 export function resolveSectionKind(section: NormalizedSection): SectionKind {
+  // Check for 5-page kinematics report section types
+  if (section.page_type) {
+    if (section.page_type === 'body_posture_head_trunk' || 
+        section.page_type === 'upper_limb' || 
+        section.page_type === 'lower_limb') {
+      return 'kinematics_metrics'
+    }
+    if (section.page_type === 'review_summary') {
+      return 'kinematics_artifacts'
+    }
+  }
+
   if (section.type) {
     if (section.type === 'overview') return 'overview'
     if (section.type === 'trend_charts') return 'trend'
     if (section.type === 'recommendation') return 'recommendation'
     if (section.type === 'evidence_frames' || section.type === 'module') return 'module'
+    if (section.type === 'kinematics_metrics') return 'kinematics_metrics'
+    if (section.type === 'kinematics_artifacts') return 'kinematics_artifacts'
   }
 
   if (TECHNICAL_MODULE_KEYS.has(section.key)) return 'module'

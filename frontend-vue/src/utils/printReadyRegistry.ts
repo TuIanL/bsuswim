@@ -2,6 +2,8 @@ export class PrintReadyRegistry {
   private pending = 0
   private resolved = 0
   private done = false
+  private completeHandler: (() => void) | null = null
+  private timeoutHandler: (() => void) | null = null
 
   addTask(label?: string): () => void {
     this.pending += 1
@@ -26,13 +28,23 @@ export class PrintReadyRegistry {
     if (this.done) return
     this.done = true
     ;(window as any).__REPORT_PRINT_READY__ = true
+    if (this.completeHandler) this.completeHandler()
+  }
+
+  onComplete(handler: () => void) {
+    this.completeHandler = handler
+    if (this.done) handler()
+  }
+
+  onTimeout(handler: () => void) {
+    this.timeoutHandler = handler
   }
 
   startTimeout(ms = 30000) {
     window.setTimeout(() => {
       if (!this.done) {
-        console.warn('[PrintReadyRegistry] Timeout reached, forcing ready')
-        this.markReady()
+        // Do NOT force ready on timeout. Signal failure so export is blocked.
+        if (this.timeoutHandler) this.timeoutHandler()
       }
     }, ms)
   }

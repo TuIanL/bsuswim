@@ -5,6 +5,62 @@ Test patterns:
 - Integration tests: exercise assembly_service with real DB fixtures (requires PostgreSQL)
 """
 
+
+class TestVideoContextProvenance:
+    """Video FPS/resolution MUST come from SessionVideo, not VideoFile."""
+
+    def test_build_video_context_reads_session_video(self):
+        from app.services.reporting.kinematics_report.page_builders import (
+            _build_video_context,
+        )
+
+        class Fake:
+            pass
+
+        vf = Fake()
+        vf.id = 30
+        vf.original_filename = "test.mp4"
+        # VideoFile deliberately has NO fps/width/height columns.
+        vf.fps = 60.0  # legacy stub that MUST be ignored
+        vf.width = 1920
+        vf.height = 1080
+
+        sv = Fake()
+        sv.id = 20
+        sv.view_type = "side"
+        sv.fps = 59.94
+        sv.resolution = "3840x2176"
+
+        ctx = Fake()
+        ctx.session_video = sv
+        ctx.video_file = vf
+
+        result = _build_video_context(ctx)
+
+        assert result["fps"] == 59.94
+        assert result["resolution"] == "3840x2176"
+        assert result["session_video_id"] == 20
+        assert result["video_file_id"] == 30
+        assert result["original_filename"] == "test.mp4"
+        assert result["duration_sec"] is None
+
+    def test_build_video_context_handles_missing_session_video_fps(self):
+        from app.services.reporting.kinematics_report.page_builders import (
+            _build_video_context,
+        )
+
+        class Fake:
+            pass
+
+        ctx = Fake()
+        ctx.session_video = None
+        ctx.video_file = None
+
+        result = _build_video_context(ctx)
+        assert result["fps"] is None
+        assert result["resolution"] is None
+
+
 import copy
 import json
 import os
@@ -508,11 +564,14 @@ class TestSkippedArtifactNotes:
 
     def test_skipped_artifacts_generate_notes(self):
         class FakeArtifact:
-            def __init__(self, key, status, skip_reason=None, status_detail=None):
+            def __init__(self, key, status, skip_reason=None, status_detail=None,
+                         module_key=None, metric_keys=None):
                 self.artifact_key = key
                 self.status = status
                 self.skip_reason = skip_reason
                 self.status_detail = status_detail
+                self.module_key = module_key
+                self.metric_keys = metric_keys or []
 
         class FakeSet:
             artifacts = []
@@ -520,8 +579,10 @@ class TestSkippedArtifactNotes:
         fake_set = FakeSet()
         fake_set.artifacts = [
             FakeArtifact("test.keyframe.1", "ready"),
-            FakeArtifact("test.keyframe.2", "skipped", "metric_unavailable"),
-            FakeArtifact("test.keyframe.3", "failed", "render_failed", "GPU not available"),
+            FakeArtifact("test.keyframe.2", "skipped", "metric_unavailable",
+                         module_key="body_posture_head_trunk", metric_keys=["elbow_angle"]),
+            FakeArtifact("test.keyframe.3", "failed", "render_failed", "GPU not available",
+                         module_key="upper_limb", metric_keys=["wrist_path"]),
         ]
 
         from app.services.reporting.kinematics_report.artifact_projection import (
@@ -531,6 +592,36 @@ class TestSkippedArtifactNotes:
         assert len(notes) == 2
         assert notes[0]["code"] == "metric_unavailable"
         assert notes[1]["code"] == "render_failed"
+        # 14.1: attribution fields populated
+        assert notes[0]["module_key"] == "body_posture_head_trunk"
+        assert notes[0]["artifact_key"] == "test.keyframe.2"
+        assert notes[0]["metric_keys"] == ["elbow_angle"]
+        assert notes[0]["artifact_status"] == "skipped"
+        assert notes[1]["module_key"] == "upper_limb"
+        assert notes[1]["artifact_status"] == "failed"
+
+
+class TestNoteModuleScoping:
+    """14.2: artifact quality notes scoped to the page's source modules."""
+
+    def test_filter_keeps_only_matching_module(self):
+        from app.services.reporting.kinematics_report.page_builders import (
+            _filter_notes_by_modules,
+        )
+        notes = [
+            {"module_key": "upper_limb", "code": "a"},
+            {"module_key": "lower_limb", "code": "b"},
+            {"module_key": None, "code": "c"},
+        ]
+        out = _filter_notes_by_modules(notes, ["upper_limb"])
+        assert [n["code"] for n in out] == ["a"]
+
+    def test_filter_empty_source_keys_drops_all(self):
+        from app.services.reporting.kinematics_report.page_builders import (
+            _filter_notes_by_modules,
+        )
+        notes = [{"module_key": "upper_limb", "code": "a"}]
+        assert _filter_notes_by_modules(notes, []) == []
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -805,6 +896,57 @@ class TestGoldenSnapshot:
         for s in data["sections"]:
             assert "page_number" in s
             assert s["page_number"] in (1, 2, 3, 4, 5)
+
+
+class TestGoldenContractHelpers:
+    """2.1–2.9: golden dataset contract assertion helpers.
+
+    Exercises the contract helpers against a synthetic report assembled from
+    the existing fixture factory. The real-video golden E2E (blocked on P0
+    fixture publish model) will reuse the same helpers.
+    """
+
+    def _assemble_synthetic_report(self):
+        from app.services.reporting.kinematics_report.assembler import (
+            build_five_page_kinematics_report,
+        )
+        payload = _make_synthetic_metric_payload()
+        ctx = _make_assembly_context_from_metric(payload)
+        return build_five_page_kinematics_report(ctx).model_dump(mode="json")
+
+    def test_finite_numbers(self):
+        from fixtures.golden_contract import assert_finite_numbers
+        report = self._assemble_synthetic_report()
+        assert_finite_numbers(report)  # must not raise
+
+    def test_canonical_metric_keys(self):
+        from app.services.metrics.kinematics.calculator import CANONICAL_KEYS
+        from fixtures.golden_contract import assert_canonical_metric_keys
+
+        report = self._assemble_synthetic_report()
+        all_metrics = []
+        for s in report["sections"]:
+            all_metrics.extend(s.get("metrics", []))
+        assert_canonical_metric_keys(all_metrics, CANONICAL_KEYS.keys())
+
+    def test_five_page_contract(self):
+        from fixtures.golden_contract import assert_five_page_contract
+        report = self._assemble_synthetic_report()
+        assert_five_page_contract(report)
+
+    def test_no_unsupported_claims(self):
+        from fixtures.golden_contract import assert_no_unsupported_claims
+        report = self._assemble_synthetic_report()
+        assert_no_unsupported_claims(report)
+
+    def test_artifact_integrity(self):
+        from fixtures.golden_contract import assert_artifact_integrity
+        report = self._assemble_synthetic_report()
+        all_assets = []
+        for s in report["sections"]:
+            all_assets.extend(s.get("assets", []))
+        # helper must not raise on the synthetic report's asset set
+        assert_artifact_integrity(all_assets)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -1191,11 +1333,13 @@ class TestPersistedFixture:
             data["source_trace"]["annotation_metric"]["id"] = "<METRIC_ID>"
             data["source_trace"]["artifact_set"]["id"] = "<ARTIFACT_SET_ID>"
 
-            # Save golden snapshot
+            # Save synthetic structure contract snapshot (DEMOTED: 15.x —
+            # this is a controlled synthetic structure contract, NOT the
+            # real-video golden baseline which is owned by the golden E2E gate).
             import os as _os
             snap_dir = _os.path.join(_os.path.dirname(__file__), "fixtures")
             _os.makedirs(snap_dir, exist_ok=True)
-            snap_path = _os.path.join(snap_dir, "golden_five_page_report.json")
+            snap_path = _os.path.join(snap_dir, "synthetic_five_page_report_contract.json")
             with open(snap_path, "w", encoding="utf-8") as f:
                 _json = __import__("json")
                 _json.dump(data, f, ensure_ascii=False, indent=2)
@@ -1204,12 +1348,19 @@ class TestPersistedFixture:
         finally:
             app.dependency_overrides.pop(get_current_user, None)
 
-    def test_golden_snapshot_matches_fixture(self, db_session, test_coach, auth_headers):
-        """13.2-13.4: Regenerate and compare against golden snapshot (normalized)."""
+    def test_synthetic_structure_contract_matches_fixture(self, db_session, test_coach, auth_headers):
+        """15.x (DEMOTED): Synthetic structure contract, not real-golden baseline.
+
+        Only asserts schema_version, report_profile, section count, page_number
+        and page_type — deliberately NOT a full normalized-equality comparison,
+        to avoid coupling the synthetic fixture to the approved golden baseline.
+        """
         import os as _os
-        snap_path = _os.path.join(_os.path.dirname(__file__), "fixtures", "golden_five_page_report.json")
+        snap_path = _os.path.join(_os.path.dirname(__file__), "fixtures",
+                                   "synthetic_five_page_report_contract.json")
         if not _os.path.exists(snap_path):
-            pytest.skip("Golden snapshot not yet generated. Run test_golden_report_snapshot first.")
+            pytest.skip("Synthetic structure contract not yet generated. "
+                        "Run test_golden_report_snapshot first.")
 
         fixture = build_persisted_kinematics_report_fixture(db_session)
 

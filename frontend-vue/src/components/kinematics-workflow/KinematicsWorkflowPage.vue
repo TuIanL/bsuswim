@@ -93,7 +93,25 @@
         />
       </div>
 
-      <!-- 步骤 6：报告 -->
+      <!-- 运动学结果展示 -->
+      <template v-if="completedTask && normalizedAnnotationId">
+        <div class="section card">
+          <h3>④ 运动学指标</h3>
+          <KinematicsMetricsPanel :normalized-annotation-id="normalizedAnnotationId" />
+        </div>
+
+        <div class="section card">
+          <h3>⑤ 可视化分析</h3>
+          <KinematicsArtifactsPanel :annotation-metric-id="annotationMetricId" />
+        </div>
+
+        <div class="section card">
+          <h3>⑥ 诊断建议</h3>
+          <KinematicsReviewPanel :annotation-metric-id="annotationMetricId" />
+        </div>
+      </template>
+
+      <!-- 步骤 7：报告 -->
       <div v-if="completedTask" class="section card">
         <h3>④ 报告</h3>
         <ReportReadyPanel
@@ -128,6 +146,9 @@ import KinematicsModuleReadinessGrid from './KinematicsModuleReadinessGrid.vue'
 import AnalysisProgressPanel from './AnalysisProgressPanel.vue'
 import ReportReadyPanel from './ReportReadyPanel.vue'
 import FutureCameraViewsPanel from './FutureCameraViewsPanel.vue'
+import KinematicsMetricsPanel from './KinematicsMetricsPanel.vue'
+import KinematicsArtifactsPanel from './KinematicsArtifactsPanel.vue'
+import KinematicsReviewPanel from './KinematicsReviewPanel.vue'
 
 const props = defineProps<{ sessionId: string }>()
 const router = useRouter()
@@ -152,6 +173,18 @@ const {
 const reportTaskRevision = computed(() =>
   (latestTask.value?.request_payload as any)?.analysis_input?.annotation_revision ?? null
 )
+
+const normalizedAnnotationId = computed(() => {
+  if (!selectedAnnotation.value) return null
+  return selectedAnnotation.value.normalized_annotation_id ?? null
+})
+
+const annotationMetricId = computed(() => {
+  // This will be populated after metrics calculation
+  // For now, we'll use a placeholder - in real implementation,
+  // this would come from the metrics panel or be fetched separately
+  return 1
+})
 
 function strokeLabel(v: string) {
   return ({ freestyle: '自由泳', breaststroke: '蛙泳', backstroke: '仰泳', butterfly: '蝶泳', mixed: '混合' } as any)[v] || v

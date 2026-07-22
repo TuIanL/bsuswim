@@ -63,7 +63,12 @@ def project_to_report_assets_extended(artifact_set) -> list[ReportAsset]:
 
 
 def collect_skipped_artifact_quality_notes(artifact_set) -> list[dict]:
-    """Convert skipped/failed artifacts into quality notes."""
+    """Convert skipped/failed artifacts into quality notes.
+
+    Each note carries the artifact's module/metric attribution so report
+    page builders can scope notes to the page's source modules instead of
+    leaking a cross-module degradation onto unrelated pages.
+    """
     notes = []
     artifacts = getattr(artifact_set, "artifacts", [])
     for art in artifacts:
@@ -80,6 +85,10 @@ def collect_skipped_artifact_quality_notes(artifact_set) -> list[dict]:
                 "code": skip_reason or f"artifact_{status}",
                 "level": "warning",
                 "message": msg,
+                "artifact_key": getattr(art, "artifact_key", None),
+                "module_key": getattr(art, "module_key", None),
+                "metric_keys": list(getattr(art, "metric_keys", []) or []),
+                "artifact_status": status,
             })
     return notes
 

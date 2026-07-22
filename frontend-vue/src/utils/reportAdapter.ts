@@ -83,6 +83,9 @@ function normalizeSwimReportV1(report: Record<string, any>): NormalizedReportVie
     key: s.key,
     type: s.type,
     title: s.title ?? '',
+    page_number: s.page_number,
+    page_type: s.page_type,
+    module_key: s.module_key,
     subtitle: s.subtitle,
     summary: s.summary,
     metrics: (s.metrics ?? []).map((m: any) => ({
@@ -119,6 +122,7 @@ function normalizeSwimReportV1(report: Record<string, any>): NormalizedReportVie
 
   return {
     title: report.summary?.title ?? report.title ?? '游泳专项技术分析报告',
+    generation_signature: report.generation_signature,
     summary: {
       overallScore: report.summary?.overall_score ?? undefined,
       overallLevel: report.summary?.overall_level,

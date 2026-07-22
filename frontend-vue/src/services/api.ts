@@ -16,8 +16,16 @@ import type {
   TrainingSession,
   User,
   VideoFile,
+  VideoUploadResponse,
   WorkspaceData,
-  AnnotationIngestResponse
+  AnnotationIngestResponse,
+  AnnotationMetricRead,
+  CalculateMetricsResponse,
+  KinematicArtifactSetRead,
+  GenerateResponse,
+  ReviewFindingsReadResponse,
+  ReviewFindingsGenerateResponse,
+  FivePageKinematicsReport
 } from '../types'
 import {
   bindDemoSessionVideo,
@@ -121,7 +129,22 @@ export async function listAthleteSessions(athleteId: number): Promise<TrainingSe
 
 export async function getAthleteTrend(athleteId: number): Promise<AthleteTrendPoint[]> {
   if (demoMode) return getDemoAthleteTrend(athleteId)
-  return []
+  try {
+    const sessions = await listAthleteSessions(athleteId)
+    return sessions
+      .filter(s => s.status === 'completed')
+      .sort((a, b) => new Date(a.session_date || a.created_at).getTime() - new Date(b.session_date || b.created_at).getTime())
+      .map(s => ({
+        date: (s.session_date || s.created_at || '').slice(0, 10),
+        score: (s as any).technical_score ?? 0,
+        body_line: (s as any).body_line_score ?? 0,
+        stroke_rate: (s as any).stroke_rate ?? 0,
+        stroke_length: (s as any).stroke_length ?? 0,
+        swolf: (s as any).swolf ?? 0
+      }))
+  } catch {
+    return []
+  }
 }
 
 export async function createSession(input: CreateSessionForm): Promise<TrainingSession> {
@@ -155,15 +178,16 @@ export async function getSession(sessionId: number): Promise<TrainingSession | n
   return response.data
 }
 
-export async function uploadVideo(file: File): Promise<VideoFile> {
+export async function uploadVideo(file: File): Promise<VideoUploadResponse> {
   if (demoMode) {
-    return createDemoVideo(file)
+    const video = createDemoVideo(file)
+    return { video, probed_fps: null, resolution: null, metadata_source: null, fps_verified: false }
   }
 
   const form = new FormData()
   form.append('file', file)
-  const response = await client.post<{ video: VideoFile }>('/videos/upload', form)
-  return response.data.video
+  const response = await client.post<VideoUploadResponse>('/videos/upload', form)
+  return response.data
 }
 
 export async function bindSessionVideo(sessionId: number, input: SessionVideoCreateInput): Promise<SessionVideo> {
@@ -187,11 +211,13 @@ export async function bindSessionVideo(sessionId: number, input: SessionVideoCre
 
 export async function bindUploadedSessionVideo(
   sessionId: number,
-  video: VideoFile,
+  video: VideoUploadResponse,
   input: Omit<SessionVideoCreateInput, 'video_file_id'>
 ): Promise<SessionVideo> {
-  if (demoMode) return bindDemoSessionVideo(sessionId, video, { ...input, view_type: input.view_type })
-  return bindSessionVideo(sessionId, { ...input, video_file_id: video.id })
+  const fps = input.fps ?? video.probed_fps ?? null
+  const resolution = input.resolution ?? video.resolution ?? null
+  if (demoMode) return bindDemoSessionVideo(sessionId, video.video, { ...input, view_type: input.view_type, fps, resolution })
+  return bindSessionVideo(sessionId, { ...input, video_file_id: video.video.id, fps, resolution })
 }
 
 export async function listSessionVideos(sessionId: number): Promise<SessionVideo[]> {
@@ -224,11 +250,6 @@ export async function retryAnalysisTask(taskId: number): Promise<AnalysisTask> {
   if (demoMode) return submitDemoAnalysis(taskId)
   const response = await client.post<AnalysisTask>(`/analysis/${taskId}/retry`)
   return response.data
-}
-
-export async function createAnalysisTask(_videoId?: number, _metadata?: unknown): Promise<AnalysisTask> {
-  if (demoMode) return submitDemoAnalysis(201)
-  throw new Error('真实后端模式请先创建训练记录、绑定视频，再调用 submitAnalysis(sessionId)')
 }
 
 export async function listTasks(params?: {
@@ -434,4 +455,143 @@ export function resolveMediaUrl(path?: string): string {
   if (!path) return ''
   if (path.startsWith('http')) return path
   return `${apiBaseUrl}${path}`
+}
+
+// ---- Kinematics Metrics APIs ----
+
+export async function getAnnotationMetrics(normalizedAnnotationId: number): Promise<AnnotationMetricRead> {
+  if (demoMode) {
+    return {
+      id: 1,
+      normalized_annotation_id: normalizedAnnotationId,
+      calculator: 'side_view_metrics',
+      calculator_version: '1.0.0',
+      schema_version: 'swim-side-kinematics.v1',
+      metrics: {},
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  }
+  const response = await client.get<AnnotationMetricRead>(
+    `/normalized-annotations/${normalizedAnnotationId}/metrics`
+  )
+  return response.data
+}
+
+export async function calculateMetrics(
+  normalizedAnnotationId: number,
+  persist: boolean = false,
+  calculator: string = 'side_view_metrics'
+): Promise<CalculateMetricsResponse> {
+  if (demoMode) {
+    return {
+      annotation_metric_id: 1,
+      persisted: persist,
+      metrics: {}
+    }
+  }
+  const response = await client.post<CalculateMetricsResponse>(
+    `/normalized-annotations/${normalizedAnnotationId}/calculate-metrics`,
+    null,
+    { params: { persist, calculator } }
+  )
+  return response.data
+}
+
+// ---- Kinematic Artifacts APIs ----
+
+export async function getKinematicArtifacts(annotationMetricId: number): Promise<KinematicArtifactSetRead> {
+  if (demoMode) {
+    return {
+      id: 1,
+      annotation_metric_id: annotationMetricId,
+      artifacts: [],
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  }
+  const response = await client.get<KinematicArtifactSetRead>(
+    `/annotation-metrics/${annotationMetricId}/artifacts`
+  )
+  return response.data
+}
+
+export async function generateKinematicArtifacts(
+  annotationMetricId: number,
+  force: boolean = false
+): Promise<GenerateResponse> {
+  if (demoMode) {
+    return {
+      artifact_set_id: 1,
+      status: 'ready'
+    }
+  }
+  const response = await client.post<GenerateResponse>(
+    `/annotation-metrics/${annotationMetricId}/artifacts/generate`,
+    null,
+    { params: { force } }
+  )
+  return response.data
+}
+
+// ---- Review Findings APIs ----
+
+export async function getReviewFindings(
+  annotationMetricId: number,
+  ruleSet: string = 'side_2d_kinematics_v1'
+): Promise<ReviewFindingsReadResponse> {
+  if (demoMode) {
+    return {
+      id: 1,
+      annotation_metric_id: annotationMetricId,
+      rule_set: ruleSet,
+      findings: [],
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  }
+  const response = await client.get<ReviewFindingsReadResponse>(
+    `/annotation-metrics/${annotationMetricId}/review-findings`,
+    { params: { rule_set: ruleSet } }
+  )
+  return response.data
+}
+
+export async function generateReviewFindings(
+  annotationMetricId: number,
+  ruleSet: string = 'side_2d_kinematics_v1',
+  force: boolean = false
+): Promise<ReviewFindingsGenerateResponse> {
+  if (demoMode) {
+    return {
+      finding_set_id: 1,
+      status: 'ready'
+    }
+  }
+  const response = await client.post<ReviewFindingsGenerateResponse>(
+    `/annotation-metrics/${annotationMetricId}/review-findings/generate`,
+    null,
+    { params: { rule_set: ruleSet, force } }
+  )
+  return response.data
+}
+
+// ---- Five-Page Report API ----
+
+export async function assembleFivePageReport(annotationMetricId: number): Promise<FivePageKinematicsReport> {
+  if (demoMode) {
+    return {
+      schema_version: 'swim-report.v1',
+      report_profile: 'side_2d_kinematics_5page_v1',
+      generation_signature: 'demo',
+      sections: [],
+      summary: {
+        title: '游泳专项技术分析报告'
+      }
+    }
+  }
+  const response = await client.post<FivePageKinematicsReport>(
+    `/annotation-metrics/${annotationMetricId}/reports/five-page/assemble`
+  )
+  return response.data
 }

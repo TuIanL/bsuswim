@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models import VideoFile
 from app.schemas import VideoFileRead, VideoUploadResponse
+from app.services.media_probe import probe_video_metadata
 from app.services.storage import StorageService, playback_url
 
 router = APIRouter()
@@ -19,7 +20,15 @@ async def upload_video(file: UploadFile = File(...), db: Session = Depends(get_d
     db.add(video)
     db.commit()
     db.refresh(video)
-    return VideoUploadResponse(video=_read_video(video))
+
+    probe = probe_video_metadata(video.storage_path)
+    return VideoUploadResponse(
+        video=_read_video(video),
+        probed_fps=probe["fps"],
+        resolution=probe["resolution"],
+        metadata_source="ffprobe" if probe["verified"] else None,
+        fps_verified=probe["verified"],
+    )
 
 
 @router.get("/{video_id}", response_model=VideoFileRead)

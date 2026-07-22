@@ -68,17 +68,33 @@ def _build_session_context(ctx) -> dict:
     }
 
 
+def _filter_notes_by_modules(
+    notes: list[dict], source_module_keys: list[str]
+) -> list[dict]:
+    """Keep only artifact quality notes whose module_key is in the page's
+    source modules, so a degradation in one module does not leak onto an
+    unrelated page."""
+    if not source_module_keys:
+        return []
+    return [n for n in notes if n.get("module_key") in source_module_keys]
+
+
 def _build_video_context(ctx) -> dict:
     sv = ctx.session_video
     vf = ctx.video_file
+    # FPS and resolution are authoritative on SessionVideo. VideoFile has no
+    # fps/width/height/duration_sec columns; reading them would always be None
+    # (or raise on stricter access). File identity comes from VideoFile only.
+    fps = getattr(sv, "fps", None) if sv else None
+    resolution = getattr(sv, "resolution", None) if sv else None
     return {
         "session_video_id": getattr(sv, "id", None) if sv else None,
         "video_file_id": getattr(vf, "id", None) if vf else None,
         "original_filename": getattr(vf, "original_filename", None) if vf else None,
         "view_type": getattr(sv, "view_type", None) if sv else None,
-        "fps": getattr(vf, "fps", None) if vf else None,
-        "resolution": f"{getattr(vf, 'width', '?')}x{getattr(vf, 'height', '?')}" if vf else None,
-        "duration_sec": getattr(vf, "duration_sec", None) if vf else None,
+        "fps": float(fps) if fps is not None else None,
+        "resolution": resolution,
+        "duration_sec": None,
     }
 
 
@@ -217,7 +233,7 @@ def build_body_posture_control_page(
     page_findings = sort_findings(page_findings)[:PAGE_FINDINGS_LIMIT]
 
     quality_notes: list[ReportQualityNote] = []
-    for n in artifact_quality_notes:
+    for n in _filter_notes_by_modules(artifact_quality_notes, source_keys):
         quality_notes.append(ReportQualityNote(**n))
 
     unavailable_metrics = [m for m in page_metrics if m.availability == "unavailable"]
@@ -285,7 +301,7 @@ def build_upper_limb_page(
     page_findings = sort_findings(page_findings)[:PAGE_FINDINGS_LIMIT]
 
     quality_notes: list[ReportQualityNote] = []
-    for n in artifact_quality_notes:
+    for n in _filter_notes_by_modules(artifact_quality_notes, source_keys):
         quality_notes.append(ReportQualityNote(**n))
 
     unavailable_metrics = [m for m in page_metrics if m.availability == "unavailable"]
@@ -353,7 +369,7 @@ def build_lower_limb_page(
     page_findings = sort_findings(page_findings)[:PAGE_FINDINGS_LIMIT]
 
     quality_notes: list[ReportQualityNote] = []
-    for n in artifact_quality_notes:
+    for n in _filter_notes_by_modules(artifact_quality_notes, source_keys):
         quality_notes.append(ReportQualityNote(**n))
 
     unavailable_metrics = [m for m in page_metrics if m.availability == "unavailable"]

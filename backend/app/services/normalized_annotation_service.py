@@ -291,8 +291,17 @@ def parse_annotation_file(
     # ── quality v2 ──
     session_video = ann_file.session_video
     video_fps = float(session_video.fps) if session_video and hasattr(session_video, 'fps') and session_video.fps else None
-    video_width = session_video.video_file.width if session_video and hasattr(session_video, 'video_file') and session_video.video_file else None
-    video_height = session_video.video_file.height if session_video and hasattr(session_video, 'video_file') and session_video.video_file else None
+    # Resolution is authoritative on SessionVideo, not on VideoFile (VideoFile
+    # has no width/height columns). Parse "WxH" defensively; fall back to None.
+    video_width = None
+    video_height = None
+    if session_video and getattr(session_video, "resolution", None):
+        _res = str(session_video.resolution)
+        if "x" in _res:
+            try:
+                video_width, video_height = (int(v) for v in _res.split("x", 1))
+            except ValueError:
+                video_width = video_height = None
 
     profile_id = resolve_quality_profile_id(source_value)
 
@@ -330,7 +339,7 @@ def parse_annotation_file(
     from datetime import datetime, timezone
 
     all_warnings = (
-        warnings
+        cvat_parsed.warnings + derived_warnings
         if source_value == AnnotationSource.CVAT.value
         else (parsed.warnings if parsed is not None else [])
     )
@@ -357,7 +366,7 @@ def parse_annotation_file(
         existing.scale = scale
         existing.coordinate_system = coordinate_system
         existing.events = events
-        existing.keypoint_frames = keypoint_frames
+        existing.keypoint_frames = kf_dicts
         existing.trajectories = trajectories
         existing.manual_tags = manual_tags
         existing.reference_lines = raw_json.get("reference_lines") if raw_json else None
@@ -378,7 +387,7 @@ def parse_annotation_file(
             scale=scale,
             coordinate_system=coordinate_system,
             events=events,
-            keypoint_frames=keypoint_frames,
+            keypoint_frames=kf_dicts,
             trajectories=trajectories,
             manual_tags=manual_tags,
             quality=quality,

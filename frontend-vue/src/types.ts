@@ -113,6 +113,14 @@ export interface SessionVideoCreateInput {
   sync_offset_ms: number
 }
 
+export interface VideoUploadResponse {
+  video: VideoFile
+  probed_fps?: number | null
+  resolution?: string | null
+  metadata_source?: string | null
+  fps_verified?: boolean
+}
+
 export interface SessionVideo {
   id: number
   session_id: number
@@ -414,4 +422,110 @@ export interface AnnotationUploadResponse {
   status: AnnotationFileStatus
   original_filename: string
   uploaded_at: string | null
+}
+
+// Kinematics Metrics Types
+export interface MetricValue {
+  name: string
+  value: number | null
+  unit: string
+  availability: 'available' | 'unavailable' | 'partial'
+  confidence?: number
+}
+
+export interface AnnotationMetricRead {
+  id: number
+  normalized_annotation_id: number
+  calculator: string
+  calculator_version: string
+  schema_version: string
+  metrics: Record<string, MetricValue>
+  created_at: string
+  updated_at: string
+}
+
+export interface CalculateMetricsResponse {
+  annotation_metric_id: number
+  persisted: boolean
+  metrics: Record<string, MetricValue>
+}
+
+// Kinematic Artifacts Types
+export interface KinematicArtifact {
+  artifact_key: string
+  module_key: string
+  metric_keys: string[]
+  status: 'ready' | 'skipped' | 'failed'
+  skip_reason?: string
+  status_detail?: string
+  asset_url?: string
+  asset_type?: string
+}
+
+export interface KinematicArtifactSetRead {
+  id: number
+  annotation_metric_id: number
+  artifacts: KinematicArtifact[]
+  created_at: string
+  updated_at: string
+}
+
+export interface GenerateResponse {
+  artifact_set_id: number
+  status: 'generating' | 'ready' | 'failed'
+}
+
+// Review Findings Types
+export interface ReviewFinding {
+  finding_key: string
+  severity: 'warning' | 'info' | 'suggestion'
+  title: string
+  description: string
+  metric_keys: string[]
+  recommendation?: string
+}
+
+export interface ReviewFindingsReadResponse {
+  id: number
+  annotation_metric_id: number
+  rule_set: string
+  findings: ReviewFinding[]
+  created_at: string
+  updated_at: string
+}
+
+export interface ReviewFindingsGenerateResponse {
+  finding_set_id: number
+  status: 'generating' | 'ready' | 'failed'
+}
+
+// Five-Page Report Types
+export interface FivePageReportSection {
+  page_number: number
+  page_type: string
+  module_key: string
+  source_module_keys: string[]
+  title: string
+  subtitle?: string
+  status: 'ready' | 'unavailable'
+  metrics: MetricValue[]
+  findings: ReviewFinding[]
+  assets: KinematicArtifact[]
+  quality_notes: Array<{
+    code: string
+    level: string
+    message: string
+  }>
+}
+
+export interface FivePageKinematicsReport {
+  schema_version: string
+  report_profile: string
+  generation_signature: string
+  sections: FivePageReportSection[]
+  summary?: {
+    title: string
+    overall_score?: number
+    overall_level?: string
+  }
 }

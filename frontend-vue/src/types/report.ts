@@ -2,6 +2,7 @@ export interface NormalizedReportViewModel {
   title: string
   summary?: ReportSummaryViewModel
   sections: NormalizedSection[]
+  generation_signature?: string
   provenance?: Record<string, any>
   legacy?: boolean
 }
@@ -22,6 +23,9 @@ export interface NormalizedSection {
   title: string
   subtitle?: string
   summary?: string
+  page_number?: number
+  page_type?: string
+  module_key?: string
   metrics?: ReportMetric[]
   findings?: ReportFinding[]
   recommendations?: ReportRecommendation[]
@@ -88,7 +92,7 @@ export interface ReportTable {
   rows: Array<Record<string, string | number>>
 }
 
-export type SectionKind = 'overview' | 'module' | 'trend' | 'recommendation' | 'generic'
+export type SectionKind = 'overview' | 'module' | 'trend' | 'recommendation' | 'generic' | 'kinematics_metrics' | 'kinematics_artifacts'
 
 export type ModuleLayoutKind =
   | 'frame_grid_3'

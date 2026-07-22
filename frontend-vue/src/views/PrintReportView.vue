@@ -1,18 +1,24 @@
 <template>
-  <div class="print-report" :class="{ 'print-report--ready': ready }">
+  <div
+    class="print-report"
+    :class="{ 'print-report--ready': ready }"
+    :data-report-generation-signature="generationSignature"
+  >
     <div v-if="loading" class="print-state">报告加载中...</div>
     <div v-else-if="error" class="print-state print-state--error">{{ error }}</div>
 
     <template v-else-if="viewModel">
-      <section class="print-page cover-page">
-        <ReportSummaryPanel v-if="viewModel.summary" :summary="viewModel.summary" />
-      </section>
-
       <section
         v-for="section in viewModel.sections"
         :key="section.key"
-        class="print-page module-page"
+        class="print-page"
+        :data-page-number="section.page_number"
+        :data-page-type="section.page_type"
+        :data-module-key="section.module_key"
       >
+        <span class="print-page-marker" aria-hidden="true">
+          P{{ section.page_number }} | {{ section.page_type }}
+        </span>
         <ReportSectionRenderer :section="section" />
       </section>
 
@@ -28,7 +34,6 @@ import { normalizeReportData } from '../utils/reportAdapter'
 import { PrintReadyRegistry } from '../utils/printReadyRegistry'
 import type { NormalizedReportViewModel } from '../types/report'
 import ReportSectionRenderer from '../components/report/ReportSectionRenderer.vue'
-import ReportSummaryPanel from '../components/report/ReportSummaryPanel.vue'
 
 const route = useRoute()
 const sessionId = computed(() => route.params.sessionId as string)
@@ -38,6 +43,12 @@ const loading = ref(true)
 const error = ref('')
 const viewModel = ref<NormalizedReportViewModel | null>(null)
 const ready = ref(false)
+const generationSignature = ref('')
+
+function fail(code: string, message: string) {
+  error.value = message
+  ;(window as any).__REPORT_PRINT_ERROR__ = { code, message }
+}
 
 onMounted(async () => {
   const registry = new PrintReadyRegistry()
@@ -50,9 +61,26 @@ onMounted(async () => {
     )
     if (!resp.ok) throw new Error('打印数据加载失败')
     const data = await resp.json()
-    viewModel.value = normalizeReportData(data.report_data)
+    const vm = normalizeReportData(data.report_data)
+    generationSignature.value = vm.generation_signature || ''
+    viewModel.value = vm
 
     await nextTick()
+
+    // Layout overflow pre-check: a page whose content exceeds its box must
+    // block export rather than be silently truncated.
+    const pages = Array.from(
+      document.querySelectorAll<HTMLElement>('.print-report .print-page')
+    )
+    for (const page of pages) {
+      if (page.scrollHeight > page.clientHeight + 2) {
+        fail(
+          'PRINT_LAYOUT_OVERFLOW',
+          `报告第 ${page.dataset.pageNumber} 页内容溢出，无法导出为固定五页 PDF`
+        )
+        return
+      }
+    }
 
     const images = document.querySelectorAll<HTMLImageElement>('.print-report img')
     images.forEach((img) => {
@@ -73,12 +101,20 @@ onMounted(async () => {
     if (images.length === 0) {
       registry.addTask('immediate')()
     }
+
+    // ready is set only by the registry (all images/fonts/charts done),
+    // never unconditionally in a finally block.
+    registry.onComplete(() => {
+      ready.value = true
+      ;(window as any).__REPORT_PRINT_READY__ = true
+    })
+    registry.onTimeout(() => {
+      fail('PRINT_READY_TIMEOUT', '报告资源加载超时，无法导出 PDF')
+    })
   } catch (err) {
-    error.value = err instanceof Error ? err.message : '打印页面加载失败'
+    fail('PRINT_DATA_LOAD_FAILED', err instanceof Error ? err.message : '打印页面加载失败')
   } finally {
     loading.value = false
-    ready.value = true
-    ;(window as any).__REPORT_PRINT_READY__ = true
   }
 })
 </script>
@@ -100,11 +136,25 @@ onMounted(async () => {
 .print-page {
   width: 277mm;
   min-height: 190mm;
-  page-break-after: always;
+  break-after: page;
   padding: 10mm;
   margin: 0 auto;
   box-sizing: border-box;
   background: #ffffff;
+  position: relative;
+}
+
+.print-page:last-child {
+  break-after: auto;
+}
+
+.print-page-marker {
+  position: absolute;
+  bottom: 4mm;
+  right: 6mm;
+  font-size: 9px;
+  color: #9aa7b4;
+  letter-spacing: 0.5px;
 }
 
 .print-state {
@@ -125,8 +175,11 @@ onMounted(async () => {
     width: 100%;
   }
   .print-page {
-    page-break-after: always;
-    page-break-inside: avoid;
+    break-after: page;
+    break-inside: avoid;
+  }
+  .print-page:last-child {
+    break-after: auto;
   }
 }
 </style>

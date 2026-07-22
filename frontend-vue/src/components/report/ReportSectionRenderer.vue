@@ -5,6 +5,8 @@ import { resolveSectionKind } from '../../utils/reportSections'
 
 import ModuleSection from './sections/ModuleSection.vue'
 import GenericSection from './sections/GenericSection.vue'
+import KinematicsMetricsSection from './sections/KinematicsMetricsSection.vue'
+import KinematicsArtifactsSection from './sections/KinematicsArtifactsSection.vue'
 
 const props = defineProps<{
   section: NormalizedSection
@@ -16,6 +18,10 @@ const component = computed(() => {
   switch (kind) {
     case 'module':
       return ModuleSection
+    case 'kinematics_metrics':
+      return KinematicsMetricsSection
+    case 'kinematics_artifacts':
+      return KinematicsArtifactsSection
     default:
       return GenericSection
   }
