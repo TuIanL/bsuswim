@@ -153,6 +153,7 @@ class AnalysisResultRead(BaseModel):
     metrics: dict[str, Any]
     diagnostics: list[dict[str, Any]]
     quality_summary: dict[str, Any] = {}
+    raw_result: dict[str, Any] = {}
     created_at: datetime
 
 

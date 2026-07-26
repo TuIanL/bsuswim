@@ -25,7 +25,10 @@ import type {
   GenerateResponse,
   ReviewFindingsReadResponse,
   ReviewFindingsGenerateResponse,
-  FivePageKinematicsReport
+  FivePageKinematicsReport,
+  NormalizedAnnotationDetail,
+  QualityRepairPayload,
+  QualityRepairResponse
 } from '../types'
 import {
   bindDemoSessionVideo,
@@ -350,6 +353,16 @@ export async function getReportPdfUrl(sessionId: number): Promise<string> {
   return `/api/v1/sessions/${sessionId}/report/pdf`
 }
 
+export async function downloadReportPdf(sessionId: number): Promise<Blob> {
+  if (demoMode) {
+    return new Blob(['demo pdf'], { type: 'application/pdf' })
+  }
+  const response = await client.get(`/sessions/${sessionId}/report/pdf`, {
+    responseType: 'blob'
+  })
+  return response.data
+}
+
 export async function getReportPdfStatus(
   sessionId: number
 ): Promise<{ pdf_status: string; pdf_exported_at?: string; pdf_error?: string }> {
@@ -424,6 +437,26 @@ export async function getAnnotationDetail(
   annotationId: number
 ): Promise<AnnotationFileDetail> {
   const response = await client.get<AnnotationFileDetail>(`/annotations/${annotationId}`)
+  return response.data
+}
+
+export async function getNormalizedAnnotation(
+  normalizedAnnotationId: number
+): Promise<NormalizedAnnotationDetail> {
+  const response = await client.get<NormalizedAnnotationDetail>(
+    `/normalized-annotations/${normalizedAnnotationId}`
+  )
+  return response.data
+}
+
+export async function repairAnnotationQuality(
+  normalizedAnnotationId: number,
+  payload: QualityRepairPayload
+): Promise<QualityRepairResponse> {
+  const response = await client.post<QualityRepairResponse>(
+    `/normalized-annotations/${normalizedAnnotationId}/quality-repair`,
+    payload
+  )
   return response.data
 }
 

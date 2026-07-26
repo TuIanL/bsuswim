@@ -5,6 +5,7 @@ from typing import Optional
 
 from app.schemas.kinematic_artifact import KinematicArtifactRead, KinematicArtifactSetRead
 from app.schemas.kinematics_report import ReportAsset
+from app.services.kinematic_artifacts.presentation import keyframe_presentation
 
 
 def project_to_report_assets_extended(artifact_set) -> list[ReportAsset]:
@@ -37,6 +38,17 @@ def project_to_report_assets_extended(artifact_set) -> list[ReportAsset]:
             meta = meta.model_dump(mode="json")
 
         pres = getattr(art, "presentation", None)
+        if pres is None and artifact_type == "annotated_keyframe":
+            p = keyframe_presentation(getattr(art, "artifact_key", ""))
+            pres = type("Presentation", (), {
+                "title": meta.get("title") or p.title,
+                "label": meta.get("label") or p.label,
+                "value": meta.get("value"),
+                "caption": meta.get("caption") or p.caption,
+                "metric_label": meta.get("metric_label") or p.metric_label,
+                "unit": meta.get("unit") or p.unit,
+                "selection_reason": meta.get("selection_reason") or p.selection_reason,
+            })()
 
         results.append(ReportAsset(
             key=getattr(art, "artifact_key", ""),
@@ -55,6 +67,9 @@ def project_to_report_assets_extended(artifact_set) -> list[ReportAsset]:
             label=pres.label if pres else getattr(art, "artifact_key", ""),
             value=pres.value if pres else None,
             caption=pres.caption if pres else None,
+            metric_label=pres.metric_label if pres else None,
+            unit=pres.unit if pres else None,
+            selection_reason=pres.selection_reason if pres else None,
             source_annotation_revision=getattr(art, "source_annotation_revision", None),
             generator_version=getattr(art, "generator_version", None),
             metadata=meta,

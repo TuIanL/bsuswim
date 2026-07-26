@@ -19,14 +19,14 @@
   },
   "context": {
     "athlete": {
-      "id": 8,
+      "id": 298,
       "name": "Fixture Athlete",
       "gender": null,
       "level": "一级运动员",
       "stroke_specialty": "200米自由泳"
     },
     "session": {
-      "id": 8,
+      "id": 298,
       "title": "Fixture Session",
       "session_date": null,
       "venue": null,
@@ -35,8 +35,8 @@
       "pool_length_m": 25.0
     },
     "video": {
-      "session_video_id": 8,
-      "video_file_id": 8,
+      "session_video_id": 296,
+      "video_file_id": 305,
       "original_filename": "fixture.mp4",
       "view_type": "side",
       "fps": 60.0,
@@ -44,7 +44,7 @@
       "duration_sec": null
     },
     "annotation": {
-      "normalized_annotation_id": 8,
+      "normalized_annotation_id": 296,
       "source": "cvat_coco17",
       "revision": 3,
       "frame_count": 50,
@@ -75,14 +75,14 @@
       ],
       "content": {
         "athlete": {
-          "id": 8,
+          "id": 298,
           "name": "Fixture Athlete",
           "gender": null,
           "level": "一级运动员",
           "stroke_specialty": "200米自由泳"
         },
         "session": {
-          "id": 8,
+          "id": 298,
           "title": "Fixture Session",
           "session_date": null,
           "venue": null,
@@ -91,8 +91,8 @@
           "pool_length_m": 25.0
         },
         "video": {
-          "session_video_id": 8,
-          "video_file_id": 8,
+          "session_video_id": 296,
+          "video_file_id": 305,
           "original_filename": "fixture.mp4",
           "view_type": "side",
           "fps": 60.0,
@@ -100,7 +100,7 @@
           "duration_sec": null
         },
         "annotation": {
-          "normalized_annotation_id": 8,
+          "normalized_annotation_id": 296,
           "source": "cvat_coco17",
           "revision": 3,
           "frame_count": 50,
@@ -1197,7 +1197,7 @@
       "calculator_version": "1.0.0",
       "source_revision": 3,
       "revision_status": "current",
-      "payload_hash": "ef298c1102d6c8c2d763fb1323ec93fc2053fe0f87494fe684ae586052e3f8b1"
+      "payload_hash": "a2eec87b230d8768e4d4282b9d156fbac77b459f47ec8ff3699707a1dededde7"
     },
     "artifact_set": {
       "id": "<ARTIFACT_SET_ID>",

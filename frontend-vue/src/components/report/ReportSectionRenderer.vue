@@ -7,9 +7,11 @@ import ModuleSection from './sections/ModuleSection.vue'
 import GenericSection from './sections/GenericSection.vue'
 import KinematicsMetricsSection from './sections/KinematicsMetricsSection.vue'
 import KinematicsArtifactsSection from './sections/KinematicsArtifactsSection.vue'
+import type { ReportVideoContext } from '../../types/report'
 
 const props = defineProps<{
   section: NormalizedSection
+  video?: ReportVideoContext
 }>()
 
 const component = computed(() => {
@@ -29,5 +31,5 @@ const component = computed(() => {
 </script>
 
 <template>
-  <component :is="component" :section="section" />
+  <component :is="component" :section="section" :video="video" />
 </template>

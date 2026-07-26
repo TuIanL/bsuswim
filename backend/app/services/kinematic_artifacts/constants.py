@@ -9,7 +9,7 @@ from enum import StrEnum
 SCHEMA_VERSION = "swim-kinematic-artifacts.v1"
 
 GENERATOR_NAME = "kinematics_visuals"
-GENERATOR_VERSION = "1.0.0"
+GENERATOR_VERSION = "1.2.0"
 STYLE_PROFILE = "kinematics_report_light_v1"
 ARTIFACT_PLAN_VERSION = "artifact-plan.v1"
 

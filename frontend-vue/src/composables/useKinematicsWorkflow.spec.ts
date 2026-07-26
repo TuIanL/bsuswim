@@ -11,6 +11,7 @@ const api = vi.hoisted(() => ({
   listTasks: vi.fn(),
   listAnnotations: vi.fn(),
   getReport: vi.fn(),
+  generateReport: vi.fn(),
   getAnalysisStatus: vi.fn(),
   submitAnalysis: vi.fn(),
   retryAnalysisTask: vi.fn(),
@@ -25,6 +26,7 @@ vi.mock('../services/api', () => ({
   listTasks: api.listTasks,
   listAnnotations: api.listAnnotations,
   getReport: api.getReport,
+  generateReport: api.generateReport,
   getAnalysisStatus: api.getAnalysisStatus,
   submitAnalysis: api.submitAnalysis,
   retryAnalysisTask: api.retryAnalysisTask,
@@ -144,18 +146,42 @@ describe('useKinematicsWorkflow 工作流阶段推导 (16.8–16.16)', () => {
     expect(wf.workflowPhase.value).toBe('video_required')
   })
 
-  it('报告缺失（completed 但 getReport 404）→ analysis_failed + resubmit', async () => {
+  it('报告缺失（completed 但 getReport 404）→ 自动补生成报告', async () => {
     const wf = boot()
     api.getSession.mockResolvedValue({ id: 1, athlete_id: 1 })
     api.listSessionVideos.mockResolvedValue([{ id: 1, video_file_id: 99, view_type: 'side' }])
     api.listTasks.mockResolvedValue([
       makeTask({ status: 'completed', error_code: 'REPORT_METADATA_MISSING', failed_stage: 'assembling_report', actions: ['resubmit', 'details'] })
     ])
-    api.getReport.mockRejectedValue(new Error('404'))
+    const notFound = Object.assign(new Error('not found'), {
+      isAxiosError: true,
+      response: { status: 404 }
+    })
+    api.getReport.mockRejectedValue(notFound)
+    api.generateReport.mockResolvedValue({ session_id: 1, task_id: 1, report: {} })
     await wf.init()
-    expect(wf.workflowPhase.value).toBe('analysis_failed')
-    expect(wf.latestTask.value?.error_code).toBe('REPORT_METADATA_MISSING')
-    expect(wf.latestTask.value?.actions).toContain('resubmit')
+    expect(api.generateReport).toHaveBeenCalledWith(1)
+    expect(wf.report.value).not.toBeNull()
+    expect(wf.reportFreshness.value).toBe('current')
+  })
+
+  it('completed 任务报告短暂 404 时自动补生成报告', async () => {
+    const wf = boot()
+    api.getSession.mockResolvedValue({ id: 1, athlete_id: 1 })
+    api.listSessionVideos.mockResolvedValue([{ id: 1, video_file_id: 99, view_type: 'side' }])
+    api.listTasks.mockResolvedValue([makeTask({ status: 'completed', error_code: null })])
+    const notFound = Object.assign(new Error('not found'), {
+      isAxiosError: true,
+      response: { status: 404 }
+    })
+    api.getReport.mockRejectedValue(notFound)
+    api.generateReport.mockResolvedValue({ session_id: 1, task_id: 1, report: {} })
+
+    await wf.init()
+
+    expect(api.generateReport).toHaveBeenCalledWith(1)
+    expect(wf.report.value).not.toBeNull()
+    expect(wf.reportFreshness.value).toBe('current')
   })
 
   it('16.16 端到端链路：提交 annotation pipeline 后进入 running', async () => {
@@ -186,5 +212,30 @@ describe('useKinematicsWorkflow 工作流阶段推导 (16.8–16.16)', () => {
     await wf.init()
     expect(wf.selectedAnnotationId.value).toBe(1)
     expect(wf.selectedAnnotation.value?.quality_status).not.toBe('invalid')
+  })
+
+  it('任务从运行中变为完成时，会再次加载已持久化的报告', async () => {
+    vi.useFakeTimers()
+    try {
+      const wf = boot()
+      api.getSession.mockResolvedValue({ id: 1, athlete_id: 1 })
+      api.listSessionVideos.mockResolvedValue([{ id: 1, video_file_id: 99, view_type: 'side' }])
+      api.listAnnotations.mockResolvedValue([
+        makeAnnotation({ normalized_annotation_id: 1, quality_status: 'valid' })
+      ])
+      api.listTasks.mockResolvedValue([makeTask({ id: 7, status: 'processing' })])
+      api.getAnalysisStatus.mockResolvedValue({ id: 7, status: 'completed' })
+      api.getReport
+        .mockRejectedValueOnce(new Error('report commit is still pending'))
+        .mockResolvedValueOnce({ report: { task_input: { annotation_id: 1, annotation_revision: 1 } } })
+
+      await wf.init()
+      await vi.advanceTimersByTimeAsync(2500)
+
+      expect(api.getReport).toHaveBeenCalledTimes(2)
+      expect(wf.report.value).not.toBeNull()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

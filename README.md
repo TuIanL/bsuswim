@@ -154,6 +154,7 @@ data/swim_coco/images/val/
 
 ## 文档导航
 
+- [统一评价指标体系](README_METRICS.md)
 - [技术栈与架构说明](docs/tech-stack.md)
 - [数据库设计](docs/database-design.md)
 - [AI 接口规范](docs/ai-api-spec.md)

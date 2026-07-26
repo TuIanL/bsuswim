@@ -1,5 +1,8 @@
 import json
 import os
+import re
+
+import cv2
 from dataclasses import dataclass
 
 from fastapi import HTTPException
@@ -31,6 +34,57 @@ from app.services.parsers import (
     parse_cvat_xml,
     parse_kinovea_annotation,
 )
+
+
+_FRAME_NUMBER_RE = re.compile(r"(\d+)(?=\.[^.]+$)")
+
+
+def _probe_video_frame_count(video_path: str | None) -> int | None:
+    if not video_path:
+        return None
+    cap = cv2.VideoCapture(video_path)
+    try:
+        if not cap.isOpened():
+            return None
+        count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        return count if count > 0 else None
+    finally:
+        cap.release()
+
+
+def _build_cvat_filename_manifest(raw_frames, video_frame_count: int | None) -> list[dict] | None:
+    """Turn CVAT image names into current-video frame references when possible.
+
+    CVAT image exports often retain the original source frame number while the
+    uploaded video is a cropped clip. If the numbered image span matches the
+    uploaded video's frame count, the first numbered image is the crop origin.
+    """
+    entries = []
+    numbered = []
+    for frame in raw_frames:
+        name = getattr(frame, "image_name", None)
+        match = _FRAME_NUMBER_RE.search(name or "")
+        if not name or not match:
+            return None
+        numbered.append(int(match.group(1)))
+        entries.append({
+            "annotation_frame": frame.annotation_frame,
+            "image_name": name,
+            "source_video_frame": None,
+            "timestamp_sec": None,
+        })
+
+    if len(numbered) < 2:
+        return None
+
+    source_origin = min(numbered)
+    source_frames = [number - source_origin for number in numbered]
+    if video_frame_count and max(source_frames) + 1 == video_frame_count:
+        for entry, source_frame in zip(entries, source_frames):
+            entry["source_video_frame"] = source_frame
+        return entries
+
+    return None
 
 
 def _get_validator() -> AnnotationQualityValidator:
@@ -133,6 +187,7 @@ def parse_annotation_file(
             fps = parsed.fps or fallback_fps or float(ann_file.annotation_fps or 60)
             events = [e.model_dump() for e in parsed.events]
             keypoint_frames = [k.model_dump() for k in parsed.keypoint_frames]
+            kf_dicts = keypoint_frames
             trajectories = [t.model_dump() for t in parsed.trajectories]
             manual_tags = [m.model_dump() for m in parsed.manual_tags]
             scale = parsed.scale.model_dump() if parsed.scale else None
@@ -146,7 +201,11 @@ def parse_annotation_file(
 
             session_video = ann_file.session_video
             video_file = session_video.video_file if session_video and hasattr(session_video, 'video_file') else None
-            video_frame_count = int(video_file.frame_count) if video_file and hasattr(video_file, 'frame_count') and video_file.frame_count else None
+            video_frame_count = (
+                int(video_file.frame_count)
+                if video_file and hasattr(video_file, 'frame_count') and video_file.frame_count
+                else _probe_video_frame_count(video_file.storage_path if video_file else None)
+            )
 
             fps_source: str | None = None
             fps_verified = False
@@ -194,6 +253,13 @@ def parse_annotation_file(
                     raise CvatParseError("MANIFEST_READ_ERROR", f"failed to read companion JSON: {exc}")
 
             required_frames = {f.annotation_frame for f in cvat_parsed.raw_keypoint_frames}
+            if json_manifest is None:
+                filename_manifest = _build_cvat_filename_manifest(
+                    cvat_parsed.raw_keypoint_frames,
+                    video_frame_count=video_frame_count,
+                )
+                if filename_manifest:
+                    json_manifest = filename_manifest
             frame_mapping = FrameMappingResolver.resolve(
                 cvat_parsed.native_metadata,
                 video_fps=video_fps,
@@ -281,6 +347,7 @@ def parse_annotation_file(
             frame_count = raw_json.get("frame_count") or raw_json.get("video", {}).get("frame_count")
             duration_sec = raw_json.get("duration_sec") or raw_json.get("video", {}).get("duration_sec")
             build_metadata = raw_json.get("metadata", {})
+            kf_dicts = keypoint_frames
     except KinoveaParseError as exc:
         _fail(exc)
     except CvatParseError as exc:

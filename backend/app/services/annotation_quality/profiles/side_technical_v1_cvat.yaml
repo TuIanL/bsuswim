@@ -2,7 +2,7 @@ id: side_technical_v1_cvat
 version: "1.0.0"
 
 global_gate:
-  minimum_ready_core_modules: 2
+    minimum_ready_core_modules: 1
 
 modules:
   body_position:
@@ -39,7 +39,7 @@ modules:
     minimum_landmark_coverage: 0.80
     minimum_sample_frames: 3
 
-    efficiency:
+  efficiency:
     core: false
     required_references:
       - scale

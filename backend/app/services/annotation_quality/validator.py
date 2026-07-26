@@ -35,6 +35,7 @@ from app.services.annotation_quality.models import (
     QualityProfileRef,
     QualityStatus,
     QualitySummary,
+    SuggestedAction,
 )
 from app.services.annotation_quality.provider import QualityProfile, QualityProfileProvider
 
@@ -130,8 +131,8 @@ class AnnotationQualityValidator:
                 category="coverage",
                 severity="error",
                 blocking=True,
-                message="不存在任何关键帧数据",
-                user_message="标注中缺少关键点数据，无法进行分析。",
+            message=f"不存在任何关键帧数据（keypoint_frames数量=0, events数量={len(events) if events else 0}, source_revision={source_revision}），整条管路已阻塞",
+            user_message="标注中缺少关键点数据，无法进行分析。请检查标注文件是否包含骨架点。",
             ))
         if session_video:
             issues.extend(check_video_metadata(session_video))
@@ -160,6 +161,8 @@ class AnnotationQualityValidator:
                 annotated_ranges=annotated_ranges,
                 analysis_ranges=analysis_ranges,
             ))
+
+        _add_repair_actions(issues)
 
         module_readiness = compute_module_readiness(issues, profile)
         status = derive_global_status(issues, module_readiness, profile)
@@ -190,3 +193,27 @@ class AnnotationQualityValidator:
             issues=issues,
             module_readiness=module_readiness,
         )
+
+
+_REPAIR_ACTIONS = {
+    "SCALE_INVALID": ("scale", "补充标尺"),
+    "SCALE_MISSING": ("scale", "补充标尺"),
+    "WATERLINE_MISSING": ("waterline", "标记水面线"),
+    "SWIM_DIRECTION_UNSET": ("swim_direction", "设置游泳方向"),
+    "COMPLETE_CYCLE_INSUFFICIENT": ("events", "标记入水事件"),
+    "EVENT_HAND_ENTRY_MISSING": ("events", "标记入水事件"),
+    "TIME_MAPPING_UNVERIFIED": ("frame_mapping", "确认帧映射"),
+    "TIME_MAPPING_MISSING": ("frame_mapping", "确认帧映射"),
+}
+
+
+def _add_repair_actions(issues: list[QualityIssue]) -> None:
+    for issue in issues:
+        action = _REPAIR_ACTIONS.get(issue.code)
+        if action and issue.suggested_action is None:
+            action_type, label = action
+            issue.suggested_action = SuggestedAction(
+                type=action_type,
+                label=label,
+                payload={"issue_code": issue.code},
+            )

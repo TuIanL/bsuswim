@@ -26,7 +26,9 @@ def engine():
     alembic_cfg.set_main_option("script_location", os.path.join(os.path.dirname(__file__), "..", "alembic"))
     command.upgrade(alembic_cfg, "head")
     yield e
-    command.downgrade(alembic_cfg, "base")
+    # Keep the shared development database usable after tests. Individual
+    # tests already roll back their data transaction in db_session.
+    command.upgrade(alembic_cfg, "head")
 
 
 @pytest.fixture
@@ -146,3 +148,5 @@ def test_normalized_annotation(db_session: Session, test_session_video: SessionV
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "integration: mark test as requiring a real database")
+    config.addinivalue_line("markers", "golden_contract: mark test as golden contract verification (per-PR required)")
+    config.addinivalue_line("markers", "golden_e2e: mark test as full-stack golden E2E (release required)")

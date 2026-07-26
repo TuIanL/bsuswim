@@ -1,5 +1,7 @@
 import { computed, onUnmounted, ref, shallowRef } from 'vue'
+import { isAxiosError } from 'axios'
 import {
+  generateReport,
   getAnalysisStatus,
   getReport,
   getSession,
@@ -63,6 +65,13 @@ export function useKinematicsWorkflow(sessionId: number) {
     annotations.value.find((a) => a.normalized_annotation_id === selectedAnnotationId.value) ?? null
   )
 
+  const annotationMetricId = computed<number | null>(() => {
+    const steps = latestTask.value?.pipeline_progress?.steps
+    if (!steps) return null
+    const calcStep = steps.find((s) => s.key === 'calculating_metrics')
+    return calcStep?.details?.annotation_metric_id ?? null
+  })
+
   const workflowPhase = computed<WorkflowPhase>(() =>
     deriveWorkflowPhase({
       hasSideVideo: hasSideVideo.value,
@@ -100,6 +109,16 @@ export function useKinematicsWorkflow(sessionId: number) {
     annotations.value = await listAnnotations(sessionId, sideVideo.value.video_file_id)
   }
 
+  async function refreshAnnotationQuality() {
+    const currentId = selectedAnnotationId.value
+    await loadAnnotations()
+    if (currentId && annotations.value.some((item) => item.normalized_annotation_id === currentId)) {
+      selectedAnnotationId.value = currentId
+    } else {
+      restoreSelection()
+    }
+  }
+
   async function loadLatestTask() {
     const tasks = await listTasks({
       session_id: sessionId,
@@ -123,9 +142,25 @@ export function useKinematicsWorkflow(sessionId: number) {
         reportTaskAnnotationId,
         reportTaskRevision
       })
-    } catch {
+    } catch (error) {
       report.value = null
       reportFreshness.value = 'none'
+
+      // Analysis completion and report persistence are separate commits. Recover
+      // the short 404 window, and also repair older completed tasks with no row.
+      if (
+        completedTask.value
+        && isAxiosError(error)
+        && error.response?.status === 404
+      ) {
+        try {
+          const generated = await generateReport(sessionId)
+          report.value = generated
+          reportFreshness.value = 'current'
+        } catch {
+          // Keep the report unavailable state; the next poll can retry safely.
+        }
+      }
     }
   }
 
@@ -154,6 +189,12 @@ export function useKinematicsWorkflow(sessionId: number) {
         }
         if (activeTask.value) {
           await loadReport()
+        } else if (completedTask.value) {
+          // The pipeline commits the task and report in separate steps. A
+          // completion status can arrive on the first poll after report
+          // persistence, so always reload the report before stopping.
+          await loadReport()
+          stopPolling()
         } else {
           stopPolling()
         }
@@ -261,6 +302,7 @@ export function useKinematicsWorkflow(sessionId: number) {
     activeTask,
     completedTask,
     failedTask,
+    annotationMetricId,
     workflowPhase,
     canSubmit,
     requiresAck,
@@ -268,6 +310,7 @@ export function useKinematicsWorkflow(sessionId: number) {
     refresh,
     ingestCvat,
     reparse,
+    refreshAnnotationQuality,
     submit,
     retry,
     resubmit,

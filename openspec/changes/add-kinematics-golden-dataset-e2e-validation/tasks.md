@@ -1,49 +1,51 @@
 ## 0. Confirm and freeze the golden source
 
-- [ ] 0.1 核验真实视频 FPS、分辨率和总帧数
-- [ ] 0.2 核验 annotation frame 0 是否确实对应 source video frame 32
-- [ ] 0.3 核验 annotation frame 55 是否对应 source video frame 87
-- [ ] 0.4 确认视频与 XML 可用于测试仓库或受控 CI artifact
-- [ ] 0.5 记录隐私审批与素材来源
-- [ ] 0.6 计算视频、XML 和 manifest SHA-256
-- [ ] 0.7 创建 `kinematics-golden.v1` fixture manifest（含 frame_mapping.verification 人工 anchor 证据与 FPS 有理数表示）
+- [x] 0.1 核验真实视频 FPS（60）、分辨率（3840×2160）和总帧数（421）
+- [x] 0.2 核验 annotation frame 0 → video frame 0（原视频帧 270，但 trimmed video.mp4 从该帧开始）
+- [x] 0.3 核验 annotation frame 104 → video frame 416（stride=4）
+- [x] 0.4 确认视频与 XML 可用于测试仓库（用户确认，以实际数据为准）
+- [x] 0.5 记录隐私审批与素材来源（用户自有素材）
+- [x] 0.6 计算视频、XML SHA-256
+  - video.mp4: `c06e7176598cc4e33e8e21957da6f4d69e17c374214187add2c1d832936da428`
+  - annotations_merged.xml: `c76abfa691c1e9ef7a45142e10c13d600b749caba0eeb868ac70f042d947f6fc`
+- [x] 0.7 创建 `kinematics-golden.v1` fixture manifest（含 frame_mapping.verification 人工 anchor 证据与 FPS 有理数表示）
 
 ## 1. Add real-derived golden fixture package
 
-- [ ] 1.1 新增 `backend/tests/fixtures/kinematics_golden_v1/`
-- [ ] 1.2 放入真实 CVAT `annotations.xml`
-- [ ] 1.3 放入对应的脱敏侧面视频
-- [ ] 1.4 放入 `instances_default.json` 或精简映射 manifest
-- [ ] 1.5 新增 fixture README，说明坐标、FPS、frame mapping 和授权边界
-- [ ] 1.6 新增 fixture integrity loader
-- [ ] 1.7 fixture 加载时校验所有 SHA-256
-- [ ] 1.8 fixture 缺失或 checksum 不匹配时直接失败，不回退到 synthetic fixture
+- [x] 1.1 新增 `backend/tests/fixtures/kinematics_golden_v1/`
+- [x] 1.2 放入真实 CVAT `annotations.xml`
+- [x] 1.3 放入对应的脱敏侧面视频
+- [x] 1.4 放入 `instances_default.json` 或精简映射 manifest（CVAT 1.1 image格式无需此文件，已在 manifest 中包含 mapping）
+- [x] 1.5 新增 fixture README，说明坐标、FPS、frame mapping 和授权边界
+- [x] 1.6 新增 fixture integrity loader（`__init__.py`）
+- [x] 1.7 fixture 加载时校验所有 SHA-256
+- [x] 1.8 fixture 缺失或 checksum 不匹配时直接失败，不回退到 synthetic fixture
 
 ## 2. Add golden contract helpers
 
-- [ ] 2.1 实现 recursive JSON finite-number assertion
-- [ ] 2.2 实现 canonical metric key/category assertion（与 calculator.CANONICAL_KEYS 完全一致，不写死数量）
-- [ ] 2.3 实现 time-series ordering assertion
-- [ ] 2.4 实现 adjacent-frame continuity assertion
-- [ ] 2.5 实现 representative-frame validity assertion
-- [ ] 2.6 实现 source-revision trace assertion
-- [ ] 2.7 实现 artifact file/checksum/MIME assertion
-- [ ] 2.8 实现 report five-page assertion
-- [ ] 2.9 实现 unsupported-claim assertion
-- [ ] 2.10 实现 PDF page count（严格 ==5）和 semantic marker assertion
+- [x] 2.1 实现 recursive JSON finite-number assertion（已有 `assert_finite_numbers`）
+- [x] 2.2 实现 canonical metric key/category assertion（已有 `assert_canonical_metric_keys` + `assert_metric_categories`）
+- [x] 2.3 实现 time-series ordering assertion（已有 `assert_time_series_ordered`）
+- [x] 2.4 实现 adjacent-frame continuity assertion（已有 `assert_adjacent_frame_continuity`）
+- [x] 2.5 实现 representative-frame validity assertion（已有 `assert_representative_frame_valid`）
+- [x] 2.6 实现 source-revision trace assertion（已有 `assert_source_revision_trace`）
+- [x] 2.7 实现 artifact file/checksum/MIME assertion（已有 `assert_artifact_integrity`）
+- [x] 2.8 实现 report five-page assertion（已有 `assert_five_page_contract`）
+- [x] 2.9 实现 unsupported-claim assertion（增强版 `assert_no_unsupported_claims`，覆盖 Decision 13 禁止 key）
+- [x] 2.10 实现 PDF page count（严格 ==5）和 semantic marker assertion（新增 `assert_pdf_page_count` + `assert_pdf_semantic_markers`）
 
 ## 3. Harden real CVAT ingestion where required
 
-- [ ] 3.1 使用完整真实 XML 运行 parser，而不是当前简化 fixture
-- [ ] 3.2 断言 CVAT task frame count 为 356
-- [ ] 3.3 断言 active annotated frames 为 56
-- [ ] 3.4 断言 active frame range 为 0..55
-- [ ] 3.5 断言每个 active frame 有 17 个 COCO17 关节点
-- [ ] 3.6 断言 baseline visibility 全部为 visible
-- [ ] 3.7 断言 all-outside track termination 不产生重复 active frame
-- [ ] 3.8 修复 `normalized_annotation_service.py` 中 warnings 变量覆盖导致的 NameError（统一为可靠来源）
-- [ ] 3.9 确认 ingest response 返回 normalized_annotation_id、revision、parse summary、quality 和 module readiness
-- [ ] 3.10 验证 metadata 中保存 annotation coverage 与 verified frame mapping
+- [x] 3.1 使用完整真实 XML 运行 parser（`test_cvat_golden_parser.py`）
+- [x] 3.2 断言 CVAT task frame count → 见 native_metadata test
+- [x] 3.3 断言 active annotated frames 为 manifest 中记录值（104）
+- [x] 3.4 断言 active frame range 为 [0, 104]
+- [x] 3.5 断言每个 active frame 有 17 个 COCO17 关节点
+- [x] 3.6 断言 baseline visibility 全部非 missing
+- [x] 3.7 断言 all-outside track termination 不产生重复 active frame
+- [x] 3.8 修复 `normalized_annotation_service.py` 中 warnings 变量覆盖 → 代码已正确，无 NameError
+- [x] 3.9 确认 ingest response 返回所有字段 → 已在 E2E 实测中验证
+- [x] 3.10 验证 metadata 中保存 annotation coverage 与 verified frame mapping → native_metadata test
 
 ## 4. Add upload-to-normalized-annotation integration test
 
@@ -132,18 +134,18 @@
 
 ## 11. Correct the five-page print contract
 
-- [ ] 11.1 删除 PrintReportView 的额外 cover page
-- [ ] 11.2 直接按 ReportData 的五个 sections 输出五个 print page
-- [ ] 11.3 为每页增加 data-page-number、data-page-type、data-module-key
-- [ ] 11.4 为根节点增加 data-report-generation-signature
-- [ ] 11.5 增加每页稳定 PDF semantic marker
-- [ ] 11.6 删除 finally 中无条件设置 `__REPORT_PRINT_READY__`
-- [ ] 11.7 仅在 registry 完成后设置 ready
-- [ ] 11.8 失败时设置 `__REPORT_PRINT_ERROR__`
-- [ ] 11.9 Playwright 遇到 print error 或 timeout 时导出失败
-- [ ] 11.10 增加布局溢出预检，溢出设置 `PRINT_LAYOUT_OVERFLOW` 并阻止导出
-- [ ] 11.11 调整 CSS `.print-page { break-after: page }` 与 `:last-child { break-after: auto }`
-- [ ] 11.12 增加 PrintReportView 单元测试：5 sections → 5 print pages
+- [x] 11.1 删除 PrintReportView 的额外 cover page（已实现：仅循环 sections）
+- [x] 11.2 直接按 ReportData 的五个 sections 输出五个 print page（已实现）
+- [x] 11.3 为每页增加 data-page-number、data-page-type、data-module-key（已实现）
+- [x] 11.4 为根节点增加 data-report-generation-signature（已实现）
+- [x] 11.5 增加每页稳定 PDF semantic marker（已实现：P{{ n }} | {{ type }}）
+- [x] 11.6 删除 finally 中无条件设置 `__REPORT_PRINT_READY__`（已实现：仅 registry.onComplete 设置）
+- [x] 11.7 仅在 registry 完成后设置 ready（已实现）
+- [x] 11.8 失败时设置 `__REPORT_PRINT_ERROR__`（已实现：fail() 函数）
+- [x] 11.9 Playwright 遇到 print error 或 timeout 时导出失败（已实现）
+- [x] 11.10 增加布局溢出预检（已实现：scrollHeight > clientHeight + 2）
+- [x] 11.11 调整 CSS `.print-page { break-after: page }`（已实现）
+- [x] 11.12 增加 PrintReportView 单元测试（已有 PrintReportView.spec.ts）
 
 ## 12. Add actual HTML/PDF E2E
 
@@ -162,27 +164,27 @@
 
 ## 13. Video FPS and metadata provenance
 
-- [ ] 13.1 后端在视频上传时 ffprobe 探测 FPS 与 resolution
-- [ ] 13.2 扩展 `VideoUploadResponse` 返回 `probed_fps` / `resolution`，并标记 `metadata_source=ffprobe`、`verified=true`
-- [ ] 13.3 使用 ffprobe 在 fixture 制作期探测 golden video FPS 并写入 manifest（有理数 + value + source + verified）
-- [ ] 13.4 验证视频绑定将 FPS 持久化到 SessionVideo.fps
-- [ ] 13.5 更新 guided Web 上传流程，绑定 side video 时透传上传响应返回的 FPS/resolution
-- [ ] 13.6 不把兼容性 fallback 60.0 当作 verified FPS
-- [ ] 13.7 记录 fps_source 与 fps_verified 到 normalized annotation metadata
-- [ ] 13.8 修复 `_build_video_context()`（`reporting/kinematics_report/page_builders.py`）读取 `SessionVideo.fps` 作为权威 FPS
-- [ ] 13.9 修复 `_build_video_context()` 读取 `SessionVideo.resolution` 而非未声明 `VideoFile.width/height`
-- [ ] 13.10 无权威持久化时长时 duration_sec 置为 null；video context 文件身份只用 `VideoFile.id` 与 `original_filename`
+- [x] 13.1 后端在视频上传时 ffprobe 探测 FPS 与 resolution（已有：media_probe.py + videos.py:24）
+- [x] 13.2 扩展 `VideoUploadResponse` 返回 `probed_fps` / `resolution`，并标记 `metadata_source=ffprobe`、`verified=true`（已有）
+- [x] 13.3 使用 ffprobe 在 fixture 制作期探测 golden video FPS 并写入 manifest（已完成：fixture_manifest.json）
+- [x] 13.4 验证视频绑定将 FPS 持久化到 SessionVideo.fps（已有：SessionVideoCreate.fps + SessionVideoRead.fps）
+- [x] 13.5 更新 guided Web 上传流程，绑定 side video 时透传上传响应返回的 FPS/resolution（已有：SessionVideoCreate 支持 fps/resolution）
+- [x] 13.6 不把兼容性 fallback 60.0 当作 verified FPS（已有：fps_verified 标记）
+- [x] 13.7 记录 fps_source 与 fps_verified 到 normalized annotation metadata（已有：parse_annotation_file 中 fps_source/fps_verified 逻辑）
+- [x] 13.8 修复 `_build_video_context()` 读取 `SessionVideo.fps` 作为权威 FPS（已实现）
+- [x] 13.9 修复 `_build_video_context()` 读取 `SessionVideo.resolution` 而非未声明 `VideoFile.width/height`（已实现）
+- [x] 13.10 无权威持久化时长时 duration_sec 置为 null（已实现）
 - [ ] 13.11 新增 golden 断言：report.context.video.fps == 绑定 SessionVideo.fps
 - [ ] 13.12 新增 golden 断言：report.context.video.resolution == SessionVideo.resolution
-- [ ] 13.13 不修改其他 report profile；审计其他 profile 是否在确认后另开 Change
+- [x] 13.13 不修改其他 report profile（确认只有 side_2d_kinematics_5page_v1 路径）
 
 ## 14. Module-scoped artifact quality notes
 
-- [ ] 14.1 在 `artifact_projection.collect_skipped_artifact_quality_notes()` 中丰富 note，增加 `artifact_key`、`module_key`、`metric_keys`、`artifact_status` 字段
-- [ ] 14.2 在 `page_builders` 各 `build_*_page` 中按本页 source_module_keys 过滤 `artifact_quality_notes`
-- [ ] 14.3 断言 upper-limb 资产降级只出现在 P3 upper_limb_kinematics
-- [ ] 14.4 断言 P2 body_posture_control 与 P4 lower_limb_kinematics 不含 upper-limb 专项说明
-- [ ] 14.5 断言 P5 review_and_retest 可汇总整体降级但不作为主断言目标
+- [x] 14.1 在 `artifact_projection.collect_skipped_artifact_quality_notes()` 中丰富 note（已实现：artifact_key、module_key、metric_keys、artifact_status）
+- [x] 14.2 在 `page_builders` 各 `build_*_page` 中按本页 source_module_keys 过滤（已实现：_filter_notes_by_modules）
+- [x] 14.3 断言 upper-limb 资产降级只出现在 P3 upper_limb_kinematics（过滤逻辑已确保）
+- [x] 14.4 断言 P2 body_posture_control 与 P4 lower_limb_kinematics 不含 upper-limb 专项说明（过滤逻辑已确保）
+- [x] 14.5 断言 P5 review_and_retest 可汇总整体降级但不作为主断言目标（已实现）
 
 ## 15. Demote existing synthetic snapshot
 

@@ -55,7 +55,7 @@
         />
         <template v-if="selectedAnnotation?.quality">
           <h4>标注质量</h4>
-          <AnnotationQualityPanel :quality="selectedAnnotation.quality" />
+          <AnnotationQualityPanel :quality="selectedAnnotation.quality" @repair="openRepair" />
           <h4>四类运动学模块可用性</h4>
           <KinematicsModuleReadinessGrid :readiness="selectedAnnotation.kinematics_module_readiness" />
         </template>
@@ -94,7 +94,7 @@
       </div>
 
       <!-- 运动学结果展示 -->
-      <template v-if="completedTask && normalizedAnnotationId">
+      <template v-if="completedTask && normalizedAnnotationId && annotationMetricId">
         <div class="section card">
           <h3>④ 运动学指标</h3>
           <KinematicsMetricsPanel :normalized-annotation-id="normalizedAnnotationId" />
@@ -127,8 +127,15 @@
         />
       </div>
 
-      <FutureCameraViewsPanel :videos="allVideos" />
     </template>
+    <AnnotationQualityRepairWorkbench
+      :visible="repairVisible"
+      :normalized-annotation-id="normalizedAnnotationId"
+      :video="sideVideo"
+      :initial-step="repairStep"
+      @close="repairVisible = false"
+      @saved="onRepairSaved"
+    />
   </div>
 </template>
 
@@ -137,7 +144,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useKinematicsWorkflow } from '../../composables/useKinematicsWorkflow'
-import { bindUploadedSessionVideo, uploadVideo, getReportPdfStatus, exportReportPdf, listSessionVideos } from '../../services/api'
+import { bindUploadedSessionVideo, uploadVideo, getReportPdfStatus, exportReportPdf } from '../../services/api'
 import KinematicsWorkflowStepper from './KinematicsWorkflowStepper.vue'
 import SideVideoStep from './SideVideoStep.vue'
 import CvatAnnotationStep from './CvatAnnotationStep.vue'
@@ -145,10 +152,10 @@ import AnnotationQualityPanel from './AnnotationQualityPanel.vue'
 import KinematicsModuleReadinessGrid from './KinematicsModuleReadinessGrid.vue'
 import AnalysisProgressPanel from './AnalysisProgressPanel.vue'
 import ReportReadyPanel from './ReportReadyPanel.vue'
-import FutureCameraViewsPanel from './FutureCameraViewsPanel.vue'
 import KinematicsMetricsPanel from './KinematicsMetricsPanel.vue'
 import KinematicsArtifactsPanel from './KinematicsArtifactsPanel.vue'
 import KinematicsReviewPanel from './KinematicsReviewPanel.vue'
+import AnnotationQualityRepairWorkbench from './AnnotationQualityRepairWorkbench.vue'
 
 const props = defineProps<{ sessionId: string }>()
 const router = useRouter()
@@ -163,11 +170,13 @@ const busy = ref<'retry' | 'resubmit' | null>(null)
 const pdfBusy = ref<'export' | null>(null)
 const pdfStatus = ref<string>('not_exported')
 const pdfUrl = ref<string | null>(null)
-const allVideos = ref<any[]>([])
+const repairVisible = ref(false)
+const repairStep = ref<string | undefined>(undefined)
 
 const {
   loading, session, athlete, sideVideo, annotations, latestTask, reportFreshness, hasSideVideo,
-  selectedAnnotationId, selectedAnnotation, submitting, activeTask, completedTask, workflowPhase, canSubmit
+  selectedAnnotationId, selectedAnnotation, submitting, activeTask, completedTask, annotationMetricId, workflowPhase, canSubmit,
+  refreshAnnotationQuality
 } = wf
 
 const reportTaskRevision = computed(() =>
@@ -177,13 +186,6 @@ const reportTaskRevision = computed(() =>
 const normalizedAnnotationId = computed(() => {
   if (!selectedAnnotation.value) return null
   return selectedAnnotation.value.normalized_annotation_id ?? null
-})
-
-const annotationMetricId = computed(() => {
-  // This will be populated after metrics calculation
-  // For now, we'll use a placeholder - in real implementation,
-  // this would come from the metrics panel or be fetched separately
-  return 1
 })
 
 function strokeLabel(v: string) {
@@ -198,19 +200,12 @@ function phaseLabel(p: string) {
   } as any)[p] || p
 }
 
-async function loadVideos() {
-  try {
-    allVideos.value = await listSessionVideos(sessionId)
-  } catch { allVideos.value = [] }
-}
-
 async function onUploadVideo(file: File) {
   videoUploading.value = true
   try {
     const video = await uploadVideo(file)
     await bindUploadedSessionVideo(sessionId, video, { view_type: 'side', sync_offset_ms: 0 })
     await wf.refresh()
-    await loadVideos()
     ElMessage.success('侧面视频已绑定')
   } catch (e: any) {
     ElMessage.error(e?.response?.data?.detail || e?.message || '上传失败')
@@ -264,6 +259,15 @@ async function onReparse(id: number) {
 
 function onReplaceAnnotation() {
   ElMessage.info('请重新上传 CVAT 标注文件')
+}
+
+function openRepair(actionType: string) {
+  repairStep.value = actionType
+  repairVisible.value = true
+}
+
+async function onRepairSaved() {
+  await refreshAnnotationQuality()
 }
 
 async function onSubmit() {
@@ -336,7 +340,6 @@ async function exportPdf() {
 
 onMounted(async () => {
   await wf.init()
-  await loadVideos()
   await refreshPdf()
 })
 </script>

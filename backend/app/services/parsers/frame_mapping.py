@@ -35,6 +35,15 @@ class FrameMappingResolver:
         if options and options.frame_mapping_override:
             override = options.frame_mapping_override
             if override.confirmed:
+                if json_manifest:
+                    evidence = FrameMappingResolver._resolve_explicit(
+                        json_manifest, video_fps, required_annotation_frames
+                    )
+                    if evidence.verified and not FrameMappingResolver._override_matches_manifest(
+                        override, evidence.entries or []
+                    ):
+                        evidence.verification_reason = "filename_manifest_conflicts_with_override"
+                        return evidence
                 return FrameMapping(
                     mode=override.mode,
                     verified=True,
@@ -66,6 +75,18 @@ class FrameMappingResolver:
             verified=False,
             verification_reason="no_mapping_source_available",
         )
+
+    @staticmethod
+    def _override_matches_manifest(override, entries: list[FrameMappingEntry]) -> bool:
+        if not entries or any(e.source_video_frame is None for e in entries):
+            return True
+        offset = override.source_frame_offset or 0
+        stride = override.source_frame_stride or 1
+        for entry in entries:
+            expected = entry.annotation_frame if override.mode == "identity" else offset + entry.annotation_frame * stride
+            if expected != entry.source_video_frame:
+                return False
+        return True
 
     @staticmethod
     def _resolve_explicit(

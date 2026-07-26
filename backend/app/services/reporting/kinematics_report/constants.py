@@ -81,9 +81,9 @@ PAGE_ASSET_ORDER: dict[str, list[str]] = {
     "body_posture_control": [
         "body_posture.keyframe.body_axis_min",
         "body_posture.keyframe.body_axis_max",
+        "head_trunk.keyframe.head_motion_spike",
         "body_posture.chart.angle_timeseries",
         "body_posture.chart.hip_trajectory",
-        "head_trunk.keyframe.head_motion_spike",
         "overview.chart.range_comparison",
     ],
     "upper_limb_kinematics": [

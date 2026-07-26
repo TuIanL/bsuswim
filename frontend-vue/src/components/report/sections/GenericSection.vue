@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { NormalizedSection } from '../../../types/report'
+import type { NormalizedSection, ReportVideoContext } from '../../../types/report'
 import MetricCard from '../shared/MetricCard.vue'
 import FindingList from '../shared/FindingList.vue'
 import RecommendationList from '../shared/RecommendationList.vue'
@@ -8,6 +8,7 @@ import ReportChart from '../shared/ReportChart.vue'
 
 defineProps<{
   section: NormalizedSection
+  video?: ReportVideoContext
 }>()
 </script>
 
@@ -30,6 +31,7 @@ defineProps<{
         v-for="asset in section.assets"
         :key="asset.key"
         :asset="asset"
+        :video="video"
       />
     </div>
 

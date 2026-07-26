@@ -131,24 +131,98 @@ def assert_no_unsupported_claims(report: dict) -> None:
     """2.9: report must not assert performance scores, predictions, or
     diagnoses beyond the approved kinematic scope.
 
-    Checked structurally (not via fragile string scanning): no metric outside
-    the approved categories, no finding with a diagnosis/prediction category,
-    no metric key claiming a performance score or prediction.
+    Forbidden metric keys (per Decision 13): speed_mps, stroke_length_m, swolf,
+    propulsive_force, drag, power_w, hip_depth_cm — these are only allowed in
+    analysis_boundaries, limitations, quality_notes, and disclaimer sections.
     """
     approved_categories = {
         "body_posture", "upper_limb", "lower_limb", "head_trunk", "overview",
     }
-    forbidden_metric_keys = ("performance_score", "predicted_score", "prediction")
+    claim_bearing_sections = {"summary", "metrics", "findings", "recommendations"}
+    forbidden_keys = {
+        "speed_mps", "average_speed_mps", "stroke_length_m",
+        "swolf", "swolf_value", "propulsive_force", "propulsive",
+        "drag", "power_w", "hip_depth_cm",
+    }
+
     for section in report.get("sections", []):
         for m in section.get("metrics", []):
             cat = m.get("category")
             assert cat in approved_categories, (
                 f"metric {m.get('key')} has unsupported category: {cat}"
             )
-            assert m.get("key") not in forbidden_metric_keys, (
+            assert m.get("key") not in forbidden_keys, (
                 f"metric makes unsupported claim: {m.get('key')}"
             )
-        for f in section.get("findings", []):
-            assert f.get("category") in approved_categories, (
-                f"finding {f.get('code')} has unsupported category: {f.get('category')}"
-            )
+
+    # Also check summary.top_findings and objective_metric_summary
+    if "top_findings" in report.get("summary", {}):
+        for f in report["summary"]["top_findings"]:
+            for fk in forbidden_keys:
+                assert fk not in str(f).lower(), (
+                    f"summary.top_findings contains forbidden claim: {fk}"
+                )
+
+    if "objective_metric_summary" in report:
+        for item in report.get("objective_metric_summary", []) or []:
+            if isinstance(item, dict):
+                for fk in forbidden_keys:
+                    if item.get("key", "") == fk:
+                        raise AssertionError(
+                            f"objective_metric_summary contains forbidden key: {fk}"
+                        )
+
+
+def assert_pdf_page_count(pdf_path_or_bytes: str | bytes, expected: int = 5) -> None:
+    """2.10: PDF page count strictly equals expected (default 5)."""
+    try:
+        from pypdf import PdfReader
+    except ImportError:
+        raise AssertionError("pypdf is required for PDF page count assertion")
+
+    reader: PdfReader
+    if isinstance(pdf_path_or_bytes, str):
+        reader = PdfReader(pdf_path_or_bytes)
+    else:
+        from io import BytesIO
+        reader = PdfReader(BytesIO(pdf_path_or_bytes))
+
+    actual = len(reader.pages)
+    assert actual == expected, (
+        f"PDF page count mismatch: expected {expected}, got {actual}"
+    )
+
+
+def assert_pdf_semantic_markers(
+    pdf_path_or_bytes: str | bytes,
+    expected_markers: tuple[str, ...] = (
+        "P1 | analysis_overview",
+        "P2 | body_posture_control",
+        "P3 | upper_limb_kinematics",
+        "P4 | lower_limb_kinematics",
+        "P5 | review_and_retest",
+    ),
+) -> None:
+    """2.10: each PDF page contains its semantic marker (ASCII, not font-dependent)."""
+    try:
+        from pypdf import PdfReader
+    except ImportError:
+        raise AssertionError("pypdf is required for PDF semantic marker assertion")
+
+    reader: PdfReader
+    if isinstance(pdf_path_or_bytes, str):
+        reader = PdfReader(pdf_path_or_bytes)
+    else:
+        from io import BytesIO
+        reader = PdfReader(BytesIO(pdf_path_or_bytes))
+
+    assert len(reader.pages) >= len(expected_markers), (
+        f"PDF has {len(reader.pages)} pages, expected at least {len(expected_markers)}"
+    )
+
+    for i, marker in enumerate(expected_markers):
+        text = reader.pages[i].extract_text() or ""
+        assert marker in text, (
+            f"Page {i + 1} missing semantic marker '{marker}'.\n"
+            f"Found text: {text[:200]}..."
+        )

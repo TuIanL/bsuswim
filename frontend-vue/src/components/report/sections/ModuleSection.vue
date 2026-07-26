@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { NormalizedSection } from '../../../types/report'
+import type { NormalizedSection, ReportVideoContext } from '../../../types/report'
 import { resolveModuleLayout } from '../../../utils/reportSections'
-import MetricCard from '../shared/MetricCard.vue'
+import MetricOverview from '../shared/MetricOverview.vue'
 import EvidenceFrameCard from '../shared/EvidenceFrameCard.vue'
 import FindingList from '../shared/FindingList.vue'
 import RecommendationList from '../shared/RecommendationList.vue'
@@ -10,9 +10,20 @@ import ReportChart from '../shared/ReportChart.vue'
 
 const props = defineProps<{
   section: NormalizedSection
+  video?: ReportVideoContext
 }>()
 
 const layout = computed(() => resolveModuleLayout(props.section))
+const keyframeAssets = computed(() =>
+  (props.section.assets ?? []).filter((asset) =>
+    asset.artifact_type === 'annotated_keyframe' || asset.type === 'annotated_frame'
+  )
+)
+const otherAssets = computed(() =>
+  (props.section.assets ?? []).filter((asset) =>
+    asset.artifact_type !== 'annotated_keyframe' && asset.type !== 'annotated_frame'
+  )
+)
 </script>
 
 <template>
@@ -22,34 +33,47 @@ const layout = computed(() => resolveModuleLayout(props.section))
       <p v-if="section.summary" class="section-summary">{{ section.summary }}</p>
     </header>
 
-    <div v-if="section.metrics?.length" class="metric-row">
-      <MetricCard
-        v-for="metric in section.metrics"
-        :key="metric.key"
-        :metric="metric"
+    <MetricOverview v-if="section.metrics?.length" :metrics="section.metrics" />
+
+    <div v-if="keyframeAssets.length" class="diagnostic-keyframes">
+      <div class="diagnostic-keyframes__heading">自动诊断关键帧</div>
+      <div class="frame-grid frame-grid--diagnostic">
+        <EvidenceFrameCard
+          v-for="asset in keyframeAssets"
+          :key="asset.key"
+          :asset="asset"
+          :video="video"
+        />
+      </div>
+    </div>
+
+    <div v-if="section.quality_notes?.length" class="quality-notes">
+      <div v-for="note in section.quality_notes" :key="note.code || note.message" class="quality-note">
+        {{ note.message }}
+      </div>
+    </div>
+
+    <div v-if="layout === 'frame_grid_3' && otherAssets.length" class="frame-grid frame-grid--3">
+      <EvidenceFrameCard
+        v-for="asset in otherAssets"
+        :key="asset.key"
+        :asset="asset"
+        :video="video"
       />
     </div>
 
-    <div v-if="layout === 'frame_grid_3'" class="frame-grid frame-grid--3">
+    <div v-else-if="layout === 'frame_grid_2' && otherAssets.length" class="frame-grid frame-grid--2">
       <EvidenceFrameCard
-        v-for="asset in section.assets"
+        v-for="asset in otherAssets"
         :key="asset.key"
         :asset="asset"
       />
     </div>
 
-    <div v-else-if="layout === 'frame_grid_2'" class="frame-grid frame-grid--2">
-      <EvidenceFrameCard
-        v-for="asset in section.assets"
-        :key="asset.key"
-        :asset="asset"
-      />
-    </div>
-
-    <div v-else-if="layout === 'mixed_media'" class="mixed-media-layout">
+    <div v-else-if="layout === 'mixed_media' && otherAssets.length" class="mixed-media-layout">
       <div class="mixed-media-layout__assets">
         <EvidenceFrameCard
-          v-for="asset in section.assets"
+          v-for="asset in otherAssets"
           :key="asset.key"
           :asset="asset"
         />
@@ -72,9 +96,9 @@ const layout = computed(() => resolveModuleLayout(props.section))
     </div>
 
     <div v-else class="module-compact">
-      <div v-if="section.assets?.length" class="frame-grid frame-grid--auto">
+      <div v-if="otherAssets.length" class="frame-grid frame-grid--auto">
         <EvidenceFrameCard
-          v-for="asset in section.assets"
+          v-for="asset in otherAssets"
           :key="asset.key"
           :asset="asset"
         />
@@ -154,6 +178,31 @@ const layout = computed(() => resolveModuleLayout(props.section))
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
+.diagnostic-keyframes {
+  margin-bottom: 20px;
+}
+
+.diagnostic-keyframes__heading {
+  margin-bottom: 10px;
+  color: #203040;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.frame-grid--diagnostic {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.frame-grid--diagnostic :deep(.frame-image-wrap) {
+  aspect-ratio: 16 / 9;
+  min-height: 0;
+}
+
+.frame-grid--diagnostic :deep(.frame-image) {
+  height: 100%;
+  object-fit: cover;
+}
+
 .mixed-media-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -190,12 +239,30 @@ const layout = computed(() => resolveModuleLayout(props.section))
   gap: 20px;
 }
 
+.quality-notes {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 16px;
+}
+
+.quality-note {
+  padding: 8px 10px;
+  border-left: 3px solid #e6a23c;
+  background: #fdf6ec;
+  color: #7a5b20;
+  font-size: 12px;
+}
+
 @media (max-width: 900px) {
   .mixed-media-layout {
     grid-template-columns: 1fr;
   }
 
   .frame-grid--3 {
+    grid-template-columns: 1fr;
+  }
+
+  .frame-grid--diagnostic {
     grid-template-columns: 1fr;
   }
 

@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     frontend_base_url: str = "http://localhost:5174"
     pdf_render_base_url: str = "http://localhost:5174"
     backend_public_base_url: str = "http://localhost:8000"
+    pdf_browser_executable_path: str | None = None
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

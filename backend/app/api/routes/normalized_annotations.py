@@ -15,6 +15,8 @@ from app.schemas.normalized_annotation import (
     NormalizedAnnotationRead,
     ParseAnnotationOptions,
     ParseResponse,
+    QualityRepairPayload,
+    QualityRepairResponse,
 )
 from app.services.annotation_quality.legacy import normalize_quality_payload
 from app.services.annotation_quality.profile_resolver import resolve_quality_profile_id
@@ -25,6 +27,7 @@ from app.services.normalized_annotation_service import (
     create_normalized_annotation,
     parse_annotation_file,
 )
+from app.services.annotation_quality.repair_service import apply_quality_repair
 
 import os
 
@@ -214,6 +217,11 @@ def revalidate_normalized_annotation(
         swim_direction=ann.swim_direction,
         source_revision=ann.revision,
         validator_version=VALIDATOR_VERSION,
+        frame_mapping=(ann.annotation_metadata or {}).get("frame_mapping"),
+        video_metadata=(ann.annotation_metadata or {}).get("video"),
+        video_width=int(str(ann.session_video.resolution).split("x", 1)[0]) if ann.session_video and ann.session_video.resolution and "x" in str(ann.session_video.resolution) else None,
+        video_height=int(str(ann.session_video.resolution).split("x", 1)[1]) if ann.session_video and ann.session_video.resolution and "x" in str(ann.session_video.resolution) else None,
+        view_type=str(ann.session_video.view_type.value) if ann.session_video and hasattr(ann.session_video.view_type, "value") else str(ann.session_video.view_type) if ann.session_video else None,
     )
 
     ann.quality = report.model_dump(mode="json")
@@ -228,3 +236,18 @@ def revalidate_normalized_annotation(
         "analysis_readiness": derive_analysis_readiness(ann.quality),
         "cached": False,
     }
+
+
+@router.post(
+    "/normalized-annotations/{normalized_annotation_id}/quality-repair",
+    response_model=QualityRepairResponse,
+)
+def repair_normalized_annotation(
+    normalized_annotation_id: int,
+    payload: QualityRepairPayload,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    ann = get_with_ownership_check(db, normalized_annotation_id, current_user.id)
+    result = apply_quality_repair(db, ann, payload)
+    return result

@@ -24,6 +24,7 @@ def check_coordinate_validity(
             else:
                 continue
             if x is None or y is None or (isinstance(x, float) and (math.isnan(x) or math.isinf(x))) or (isinstance(y, float) and (math.isnan(y) or math.isinf(y))):
+                reason = "None" if (x is None or y is None) else "NaN" if (isinstance(x, float) and math.isnan(x)) or (isinstance(y, float) and math.isnan(y)) else "Inf"
                 issues.append(
                     QualityIssue(
                         code=KEYPOINT_COORDINATE_INVALID,
@@ -32,8 +33,8 @@ def check_coordinate_validity(
                         blocking=True,
                         path=f"keypoint_frames.{frame}.points.{name}",
                         frame=frame,
-                        message=f"关键点 {name} 在帧 {frame} 的坐标为无效值",
-                        user_message=f"帧 {frame} 的 {name} 坐标无效，请检查标注。",
+                        message=f"关键点 {name} 在帧 {frame} 的坐标无效（x={x}, y={y}, 原因={reason}）",
+                        user_message=f"帧 {frame} 的 {name} 坐标无效（x={x}, y={y}），请检查标注文件。",
                     )
                 )
             if video_width is not None and video_height is not None:
@@ -64,8 +65,8 @@ def check_scale_validity(scale: dict | None) -> list[QualityIssue]:
                 blocking=True,
                 module="efficiency",
                 path="scale",
-                message="缺少有效的标尺信息",
-                user_message="缺少标尺信息，速度和划幅模块不可用。请在 Kinovea 中添加标尺。",
+                message=f"缺少标尺信息（scale={scale}），速度和划幅模块不可用",
+                user_message="缺少标尺信息，速度和划幅模块不可用。请在标注工具中添加标尺。",
             )
         ]
     ppm = scale.get("pixels_per_meter")

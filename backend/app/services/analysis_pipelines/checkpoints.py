@@ -172,3 +172,4 @@ def refresh_session_analysis_status(db: Session, session_id: int) -> None:
         session.status = new_status
         db.add(session)
         db.flush()
+        db.commit()

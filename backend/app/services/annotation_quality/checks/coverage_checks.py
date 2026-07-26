@@ -22,7 +22,12 @@ def compute_landmark_coverage(
     total = len(keypoint_frames)
     counts: dict[str, int] = {}
     for kf in keypoint_frames:
-        points = kf.get("points", {}) if isinstance(kf, dict) else {}
+        if isinstance(kf, dict):
+            points = kf.get("points", {}) or {}
+        elif hasattr(kf, "points"):
+            points = kf.points or {}
+        else:
+            points = {}
         for name in points:
             counts[name] = counts.get(name, 0) + 1
     coverage: dict[str, float] = {}
@@ -43,10 +48,12 @@ def check_landmark_coverage(
     if not keypoint_frames:
         return []
     coverage = compute_landmark_coverage(keypoint_frames)
+    total_frames = len(keypoint_frames)
     issues: list[QualityIssue] = []
     for lm in required_landmarks:
-        cov = coverage.get(lm, 0)
+        cov = _resolve_landmark_coverage(lm, coverage, total_frames)
         if cov < min_coverage:
+            actual_count = int(cov * total_frames)
             issues.append(
                 QualityIssue(
                     code=LANDMARK_COVERAGE_LOW,
@@ -54,11 +61,26 @@ def check_landmark_coverage(
                     severity="warning",
                     blocking=False,
                     path=f"keypoint_frames.points.{lm}",
-                    message=f"关键点 {lm} 覆盖率 {cov:.0%} 低于 {min_coverage:.0%}",
-                    user_message=f"{lm} 的标注覆盖率仅 {cov:.0%}，相关分析结果的可靠性可能降低。",
+                    message=f"关键点 {lm} 覆盖率 {cov:.0%} 低于阈值 {min_coverage:.0%}（{actual_count}/{total_frames} 帧），相关分析结果的可靠性可能降低",
+                    user_message=f"{lm} 的标注覆盖率仅 {cov:.0%}（{actual_count}/{total_frames} 帧），相关分析结果的可靠性可能降低。",
                 )
             )
     return issues
+
+
+def _resolve_landmark_coverage(
+    lm: str,
+    coverage: dict[str, float],
+    total_frames: int,
+) -> float:
+    bare_cov = coverage.get(lm, 0)
+    left_key = f"left_{lm}"
+    right_key = f"right_{lm}"
+    left_cov = coverage.get(left_key, 0)
+    right_cov = coverage.get(right_key, 0)
+    if left_cov > 0 or right_cov > 0:
+        return max(left_cov, right_cov)
+    return bare_cov
 
 
 def check_required_events(
@@ -77,7 +99,7 @@ def check_required_events(
                     severity="warning",
                     blocking=False,
                     path=f"events.{req}",
-                    message=f"缺少必需事件 {req}",
+                    message=f"缺少必需事件 {req}（已有事件: {sorted(event_names)}）",
                     user_message=_event_user_message(req),
                 )
             )
@@ -116,7 +138,7 @@ def check_reference_elements(
                 severity="warning",
                 blocking=False,
                 path="reference_lines.waterline",
-                message="未提供水面线，hip_depth_cm 未计算",
+                message=f"未提供水面线（reference_lines={reference_lines}），hip_depth_cm 未计算",
                 user_message="缺少水面线，身体深度相关指标不可用。",
             )
         )
@@ -128,7 +150,7 @@ def check_reference_elements(
                 severity="info",
                 blocking=False,
                 path="swim_direction",
-                message="未设置游泳方向，前伸距离以绝对值计算",
+                message=f"未设置游泳方向（swim_direction={swim_direction}），前伸距离以绝对值计算",
                 user_message="未设置游泳方向，前伸距离将以绝对值计算。",
             )
         )

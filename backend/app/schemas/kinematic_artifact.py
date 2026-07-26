@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from enum import StrEnum
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -20,8 +21,11 @@ from app.services.kinematic_artifacts.constants import (
 class ArtifactPresentation(BaseModel):
     title: str | None = None
     label: str | None = None
-    value: str | None = None
+    value: Any = None
     caption: str | None = None
+    metric_label: str | None = None
+    unit: str | None = None
+    selection_reason: str | None = None
     report_asset_type: str | None = None  # annotated_frame | image
 
 

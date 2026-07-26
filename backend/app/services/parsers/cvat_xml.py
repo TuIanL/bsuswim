@@ -144,6 +144,54 @@ def parse_cvat_xml(file_path: str) -> ParsedCvatAnnotation:
 
                 elem.clear()
 
+            if event == "end" and tag == "image":
+                image_id_str = elem.get("id", "")
+                image_name = elem.get("name", "")
+                try:
+                    image_id = int(image_id_str)
+                except (ValueError, TypeError):
+                    elem.clear()
+                    continue
+
+                frame = image_id - 1
+
+                for skel in elem.findall("skeleton"):
+                    skeleton_count += 1
+                    if skeleton_count > MAX_SKELETON_RECORDS:
+                        warnings.append(
+                            f"skeleton record count exceeds limit {MAX_SKELETON_RECORDS}"
+                        )
+                        elem.clear()
+                        continue
+
+                    label = skel.get("label", "")
+                    source = skel.get("source", "manual")
+                    track_id = f"image_{image_id}"
+
+                    points_list: list[dict[str, Any]] = []
+                    for pt in skel.findall("points"):
+                        pt_label = pt.get("label", "")
+                        outside = pt.get("outside", "0")
+                        occluded = pt.get("occluded", "0")
+                        points_str = pt.get("points", "")
+                        points_list.append({
+                            "label": pt_label,
+                            "outside": outside,
+                            "occluded": occluded,
+                            "points": points_str,
+                        })
+
+                    raw_tracks.append({
+                        "track_id": track_id,
+                        "label": label,
+                        "source": source,
+                        "frame": frame,
+                        "points": points_list,
+                        "image_name": image_name,
+                    })
+
+                elem.clear()
+
     except ET.ParseError as exc:
         raise CvatParseError("XML_PARSE_ERROR", f"XML parse error: {exc}")
 
@@ -306,6 +354,7 @@ def _skeleton_to_raw_frame(
 
     return RawCvatKeypointFrame(
         annotation_frame=frame,
+        image_name=skeleton.get("image_name"),
         points=points,
         source_track_ids=source_track_ids,
     )

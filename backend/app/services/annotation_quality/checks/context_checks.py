@@ -12,8 +12,8 @@ def check_video_context_exists(session_video: dict | None) -> list[QualityIssue]
                 category="context",
                 severity="error",
                 blocking=True,
-                message="无法获取关联视频信息",
-                user_message="当前标注缺少关联视频，无法继续分析。",
+                message=f"无法获取关联视频信息（session_video={session_video}，缺少id字段）",
+                user_message="当前标注缺少关联视频，无法继续分析。请先上传并绑定视频。",
             )
         ]
     return []
@@ -29,8 +29,8 @@ def check_video_metadata(session_video: dict) -> list[QualityIssue]:
                 category="context",
                 severity="error",
                 blocking=True,
-                message="无法获取关联视频的帧率",
-                user_message="当前标注缺少视频帧率信息，无法检查帧号和时间。",
+                message=f"无法获取关联视频的帧率（fps={fps}，需 > 0）",
+                user_message=f"当前标注缺少视频帧率信息（当前值: {fps}），无法检查帧号和时间。请在视频上传/绑定时提供帧率。",
             )
         )
     return issues

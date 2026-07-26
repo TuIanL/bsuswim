@@ -16,7 +16,7 @@ async function settle() {
   }
 }
 
-function makeReport(sections: number[]) {
+function makeReport(sections: number[]): any {
   return {
     report_data: {
       schema_version: 'swim-report.v1',
@@ -79,6 +79,34 @@ describe('PrintReportView', () => {
     expect(pages[2].attributes('data-page-number')).toBe('3')
     expect(pages[2].attributes('data-page-type')).toBe('type-3')
     expect(pages[2].attributes('data-module-key')).toBe('module-3')
+  })
+
+  it('renders keyframe evidence inside the category page', async () => {
+    const data = makeReport([1, 2, 3, 4, 5])
+    data.report_data.sections[2].assets = [{
+      key: 'upper_limb.keyframe.left_elbow_min',
+      type: 'annotated_frame',
+      artifact_type: 'annotated_keyframe',
+      title: '左肘角最小',
+      metric_label: '左肘角',
+      value: 82.5,
+      unit: '°',
+      annotation_frame: 12,
+      source_video_frame: 44,
+      url: '/uploads/keyframe.png',
+    }]
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => data }))
+
+    const wrapper = mount(PrintReportView, {
+      props: { sessionId: '1', token: 't' } as any,
+    })
+
+    await settle()
+
+    const page = wrapper.findAll('.print-page')[2]
+    expect(page.text()).toContain('左肘角最小')
+    expect(page.text()).toContain('标注帧 12')
+    expect(wrapper.findAll('.print-page')).toHaveLength(5)
   })
 
   it('does not set __REPORT_PRINT_READY__ unconditionally in finally', async () => {

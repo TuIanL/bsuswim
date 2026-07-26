@@ -2,9 +2,7 @@
 
 ## Purpose
 定义标注质量验证能力，包括 annotation quality validator（标注输入质量）、metric quality evaluator（指标计算质量）和 analysis quality aggregator（两阶段聚合）。覆盖结构化问题码、模块 readiness、profile 系统和重新验证机制。
-
 ## Requirements
-
 ### Requirement: Quality status uses valid/warning/invalid three-state
 系统 SHALL 使用 `valid/warning/invalid` 作为 `NormalizedAnnotation.quality.status` 的枚举值，废弃旧有的 `good/warning/error`。
 
@@ -32,7 +30,7 @@
 - **THEN** `issues` MUST 为空数组
 
 ### Requirement: Issues have stable code and structured fields
-每个 `QualityIssue` SHALL 包含 `code`（稳定机器码）、`category`、`severity`（error/warning/info）、`blocking`（boolean）、`module`、`path`、`frame`（nullable）、`message`、`user_message`、`suggested_action`。
+每个 `QualityIssue` SHALL 包含 `code`（稳定机器码）、`category`、`severity`（error/warning/info）、`blocking`（boolean）、`module`、`path`、`frame`（nullable）、`message`、`user_message`、`suggested_action`。对于可由质量修复工作台处理的问题，`suggested_action` SHALL 包含稳定的 action type、用户可见 label 和打开修复步骤所需的 payload。
 
 #### Scenario: Issue references specific frame
 - **WHEN** 帧号超出视频范围
@@ -41,6 +39,11 @@
 #### Scenario: Non-blocking issue
 - **WHEN** 缺少非核心 event（如 catch_start 而非 hand_entry）
 - **THEN** `blocking` MUST 为 `false`
+
+#### Scenario: Repairable issue includes action
+- **WHEN** issue code is `SCALE_INVALID`、`SCALE_MISSING`、`WATERLINE_MISSING`、`SWIM_DIRECTION_UNSET`、`COMPLETE_CYCLE_INSUFFICIENT` 或 `TIME_MAPPING_UNVERIFIED`
+- **THEN** issue MUST include `suggested_action.type` and `suggested_action.label`
+- **AND** action type MUST map to a supported repair workbench step
 
 ### Requirement: Module readiness has three states
 `ModuleReadiness` SHALL 使用 `ready/degraded/blocked` 三态表示每个报告模块的数据可用性。
@@ -121,7 +124,7 @@
 - **THEN** 组合后的模块状态 MUST 为 `degraded`
 
 ### Requirement: Validate endpoint supports re-validation
-`POST /api/normalized-annotations/{id}/validate` SHALL 根据 `(source_revision + validator_version + profile_version)` 判断缓存是否有效，支持 `force=true` 跳过缓存。
+`POST /api/normalized-annotations/{id}/validate` SHALL 根据 `(source_revision + validator_version + profile_version)` 判断缓存是否有效，支持 `force=true` 跳过缓存；质量修复保存后 SHALL 递增 `source_revision` 并使旧缓存失效。
 
 #### Scenario: Fresh revision triggers re-validation
 - **WHEN** annotation 的 `revision` 大于缓存的 `source_revision`
@@ -130,6 +133,11 @@
 #### Scenario: Force re-validation ignores cache
 - **WHEN** 调用方传递 `force=true`
 - **THEN** 系统 MUST 执行完整验证，即使缓存有效
+
+#### Scenario: Repair revision invalidates cache
+- **WHEN** quality repair successfully increments annotation revision
+- **THEN** the next validation MUST NOT return the prior revision's cached quality
+- **AND** `quality.source_revision` MUST equal the new annotation revision
 
 ### Requirement: Issue code namespace is stable
 Issue code SHALL 按领域前缀分类：`VIDEO_`（上下文）、`FRAME_`（时序）、`KEYPOINT_`（几何）、`EVENT_`（覆盖率）、`ANNOTATION_`（门禁）。
@@ -161,7 +169,7 @@ Issue code SHALL 按领域前缀分类：`VIDEO_`（上下文）、`FRAME_`（�
 - **THEN** `quality.status` MUST 为 `warning`
 
 ### Requirement: Indicator-level availability over module-level
-quality profile SHALL 按具体指标声明依赖，指标 availability 聚合为模块 readiness。不按大模块笼统声明 availability。
+ quality profile SHALL 按具体指标声明依赖，指标 availability 聚合为模块 readiness。不按大模块笼统声明 availability。
 
 #### Scenario: CVAT source keypoints only, metric level
 - **WHEN** `source = "cvat"`，只有 keypoint_frames，无 events 无 scale，有 timestamp_sec
@@ -176,7 +184,7 @@ quality profile SHALL 按具体指标声明依赖，指标 availability 聚合�
 - **THEN** `efficiency` readiness MUST 为 `degraded`，包含可用子集清单
 
 ### Requirement: Indicator availability matrix for source=cvat
-以下为 `source=cvat` 场景下的指标级可用性矩阵：
+系统 SHALL 提供 `source=cvat` 场景下的指标级可用性矩阵：
 
 | 指标 | 必需条件 |
 |------|---------|
@@ -219,7 +227,7 @@ quality profile SHALL 按具体指标声明依赖，指标 availability 聚合�
 - **THEN** 时间类指标 MUST 可正常评估，即使 `fps_verified = false`
 
 ### Requirement: v1 compatibility for time metrics
-`swim-annotation.v1` 时间类指标继续使用 `frame / fps` 兼容计算，不受 v2 `verified` 规则影响。
+`swim-annotation.v1` 时间类指标 SHALL 继续使用 `frame / fps` 兼容计算，不受 v2 `verified` 规则影响。
 
 #### Scenario: v1 time metrics computed via frame/fps
 - **WHEN** `schema_version = "swim-annotation.v1"`

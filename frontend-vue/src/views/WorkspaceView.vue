@@ -45,12 +45,23 @@
           {{ video.view_type }} · {{ video.video.original_filename }}
         </el-tag>
         <h2>核心指标</h2>
-        <div class="metric-grid">
-          <div v-for="(value, key) in data.result?.metrics || {}" :key="key" class="metric">
-            <span>{{ key }}</span>
-            <strong>{{ value }}</strong>
-          </div>
-        </div>
+        <WorkspaceMetricsPanel
+          :metrics="data.result?.metrics"
+          :schema-version="data.result?.schema_version"
+        />
+        <el-alert
+          v-if="data.result?.metrics?.quality?.issues?.length"
+          class="mt"
+          :title="`质量提示（${data.result.metrics.quality.level}）`"
+          type="warning"
+          :closable="false"
+        >
+          <ul class="issue-list">
+            <li v-for="(issue, idx) in data.result.metrics.quality.issues" :key="idx">
+              {{ issue.user_message || issue.message }}
+            </li>
+          </ul>
+        </el-alert>
       </div>
     </div>
   </div>
@@ -59,6 +70,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import OverlayCanvas from '../components/OverlayCanvas.vue'
+import WorkspaceMetricsPanel from '../components/WorkspaceMetricsPanel.vue'
 import { getAnalysisWorkspace, resolveMediaUrl } from '../services/api'
 import type { WorkspaceData } from '../types'
 
@@ -110,5 +122,12 @@ onUnmounted(() => window.clearInterval(timer))
 
 .video-tag {
   margin: 8px 8px 0 0;
+}
+
+.issue-list {
+  margin: 8px 0 0 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.6;
 }
 </style>

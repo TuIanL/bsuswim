@@ -1,5 +1,7 @@
-## ADDED Requirements
+## Purpose
 
+定义原始标注文件的摄取、解析、质量检查和刷新后恢复能力。
+## Requirements
 ### Requirement: One-step annotation ingestion
 
 系统 SHALL 支持通过一个高层接口完成原始标注上传、解析、质量检查和 readiness 计算。
@@ -35,19 +37,20 @@ AnnotationFile.status SHALL 与 quality.status 独立。
 - **AND** 用户 MUST 能通过 POST .../parse 重试
 
 ### Requirement: Ingestion result is reloadable
-
-摄取结果 SHALL 不依赖单次 HTTP 响应，且标注列表响应 SHALL 提供刷新后恢复解析摘要、质量详情与四类模块可用状态所需的数据。
+摄取结果 SHALL 不依赖单次 HTTP 响应；前端在导入后进行质量修复时，刷新列表或详情仍 SHALL 能恢复当前 normalized annotation、revision、quality 和 analysis readiness。
 
 #### Scenario: Page reload after successful ingestion
 - **WHEN** 用户刷新上传页面
 - **THEN** 列表响应 MUST 返回 `normalized_annotation_id`
-- **AND** 返回 `normalized_revision`
 - **AND** 返回 `quality_status`
 - **AND** 返回 `analysis_readiness`
-- **AND** 返回持久化的 `parse_summary`
-- **AND** 返回完整的 `quality` 报告
-- **AND** 返回 `kinematics_module_readiness`（body_posture / upper_limb / lower_limb / head_trunk，状态为 ready|degraded|blocked）
 - **AND** 返回持久化的 parse warnings
+
+#### Scenario: Page reload after quality repair
+- **WHEN** 用户已保存一次或多次质量修复后刷新页面
+- **THEN** 列表或详情 MUST 返回最新 `normalized_annotation_id` 和 `normalized_revision`
+- **AND** quality MUST 对应最新 revision
+- **AND** 页面 MUST 能继续打开质量修复工作台而不要求重新上传原始文件
 
 ### Requirement: Standard UI uses ingestion exclusively
 
@@ -57,3 +60,4 @@ AnnotationFile.status SHALL 与 quality.status 独立。
 - **WHEN** 用户选择文件并点击上传
 - **THEN** 前端 MUST 调用 `POST .../annotations/ingest`
 - **AND** MUST NOT 拆分为 upload + parse 两次调用
+

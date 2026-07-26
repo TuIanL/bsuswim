@@ -142,6 +142,11 @@ def assemble_five_page_kinematics_report(
 
     # 8. Fill in context
     report.context = _build_report_context(ctx)
+    if report.sections:
+        overview_content = getattr(report.sections[0], "content", {}) or {}
+        for key in ("quality", "available_modules", "analysis_boundaries"):
+            if key in overview_content:
+                report.context[key] = overview_content[key]
 
     return report
 

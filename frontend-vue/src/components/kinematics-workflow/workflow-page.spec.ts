@@ -71,4 +71,52 @@ describe('KinematicsWorkflowPage (8.5 绑定前阻断后续步骤)', () => {
     expect(wrapper.findComponent({ name: 'CvatAnnotationStep' }).exists()).toBe(true)
     expect(wrapper.text()).not.toContain('请先绑定侧面视频')
   })
+
+  it('质量问题 action 打开修复工作台并定位到对应步骤', async () => {
+    api.getSession.mockResolvedValue({ id: 1, athlete_id: 1, title: 'S' })
+    api.listSessionVideos.mockResolvedValue([{ id: 1, video_file_id: 99, view_type: 'side', fps: 60 }])
+    api.listAnnotations.mockResolvedValue([{
+      id: 1,
+      session_video_id: 1,
+      source: 'cvat',
+      view_type: 'side',
+      status: 'parsed',
+      normalized_annotation_id: 7,
+      normalized_revision: 3,
+      quality_status: 'warning',
+      analysis_readiness: { can_submit: true, requires_acknowledgement: true, blocking_issue_count: 0, affected_modules: [] },
+      quality: {
+        status: 'invalid',
+        summary: { blocking_count: 1, warning_count: 0, info_count: 0 },
+        issues: [{
+          code: 'SCALE_MISSING',
+          severity: 'error',
+          blocking: true,
+          message: 'missing scale',
+          user_message: '缺少标尺',
+          suggested_action: { type: 'scale', label: '补充标尺' }
+        }]
+      },
+      kinematics_module_readiness: {}
+    }])
+
+    const wrapper = mount(KinematicsWorkflowPage, {
+      props: { sessionId: '1' },
+      global: {
+        plugins: [router],
+        stubs: {
+          AnnotationQualityRepairWorkbench: {
+            props: ['visible', 'initialStep'],
+            template: '<div v-if="visible" data-testid="repair-workbench">step: {{ initialStep }}</div>'
+          }
+        }
+      }
+    })
+    await flush()
+
+    const repairButton = wrapper.findAll('button').find((item) => item.text().includes('补充标尺'))
+    expect(repairButton).toBeDefined()
+    await repairButton!.trigger('click')
+    expect(wrapper.get('[data-testid="repair-workbench"]').text()).toContain('step: scale')
+  })
 })

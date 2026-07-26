@@ -22,8 +22,8 @@ def check_frame_mapping(
                     severity="error",
                     blocking=True,
                     path="frame_mapping",
-                    message="帧映射缺失，时间相关指标不可用",
-                    user_message="缺少帧映射信息，速度与频率类指标不可用。",
+                    message=f"帧映射缺失（frame_mapping={frame_mapping}），时间指标/视频帧对应关系不可用",
+                    user_message=f"缺少帧映射信息（当前: {frame_mapping}），速度与频率类指标不可用。请在解析标注时提供帧映射。",
                 )
             ]
         return []
@@ -38,8 +38,8 @@ def check_frame_mapping(
             severity="warning",
             blocking=False,
             path="frame_mapping.verified",
-            message="帧映射未经确认，时间相关指标不可用",
-            user_message="标注帧与视频帧的对应关系未经确认，速度与划频指标不可用。请在解析时提供帧映射确认。",
+            message=f"帧映射未确认（verified={frame_mapping.get('verified')}），时间指标不可用",
+            user_message=f"标注帧与视频帧的对应关系未确认（verified={frame_mapping.get('verified')}），速度与划频指标不可用。请在解析时提供帧映射确认。",
         )
     ]
 
@@ -105,8 +105,8 @@ def check_sequence_coverage(
                 severity="error",
                 blocking=True,
                 path="analysis_ranges",
-                message="分析区间存在未被标注的帧",
-                user_message="所选分析范围中存在未被标注的帧，请检查标注或调整分析范围。",
+                    message=f"分析区间存在未被标注覆盖的帧（analysis_ranges={analysis_ranges}, annotated_ranges={annotated_ranges}）",
+                    user_message="所选分析范围中存在未被标注覆盖的帧，请检查标注文件或调整分析范围。",
             )
         )
         return issues

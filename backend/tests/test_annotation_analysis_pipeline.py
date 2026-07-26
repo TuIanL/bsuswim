@@ -193,6 +193,7 @@ def test_full_annotation_pipeline_persists_all_products(db_session):
     assert task.status == "completed"
     assert task.stage == "completed"
     assert task.progress == 100
+    assert fx_session.status == "completed"
 
     # 指标由 pipeline 重新计算并 upsert（fixture 已建一条，pipeline 应复用同一 calculator 记录）
     metric = _sel(db_session, AnnotationMetric, normalized_annotation_id=ann.id)

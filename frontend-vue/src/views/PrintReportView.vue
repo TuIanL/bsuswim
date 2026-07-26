@@ -19,7 +19,7 @@
         <span class="print-page-marker" aria-hidden="true">
           P{{ section.page_number }} | {{ section.page_type }}
         </span>
-        <ReportSectionRenderer :section="section" />
+        <ReportSectionRenderer :section="section" :video="viewModel.video" />
       </section>
 
       <div class="no-print" style="display:none" />

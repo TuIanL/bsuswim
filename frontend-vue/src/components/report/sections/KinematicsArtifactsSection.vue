@@ -10,7 +10,7 @@
             v-if="asset.type === 'image' || asset.type === 'annotated_frame'"
             :src="asset.url"
             :alt="asset.title || asset.label"
-            loading="lazy"
+            loading="eager"
           />
           <div v-else class="asset-placeholder">
             <span class="asset-type">{{ asset.type }}</span>

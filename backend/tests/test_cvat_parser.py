@@ -19,6 +19,7 @@ from app.services.parsers.cvat_xml import (
     _is_safe_coordinate,
     parse_cvat_xml,
 )
+from app.services.normalized_annotation_service import _build_cvat_filename_manifest
 
 FIXTURES = os.path.join(os.path.dirname(__file__), "fixtures")
 
@@ -201,6 +202,43 @@ class TestFrameMappingResolver:
         )
         assert mapping.mode == "unknown"
         assert mapping.verified is False
+
+    def test_filename_manifest_wins_over_conflicting_identity_override(self):
+        from app.schemas.normalized_annotation import FrameMappingOverride, ParseAnnotationOptions
+
+        manifest = [
+            {"annotation_frame": 0, "source_video_frame": 0, "image_name": "frame_00000270.jpg"},
+            {"annotation_frame": 1, "source_video_frame": 4, "image_name": "frame_00000274.jpg"},
+        ]
+        options = ParseAnnotationOptions(
+            frame_mapping_override=FrameMappingOverride(mode="identity", confirmed=True)
+        )
+        mapping = self.FrameMappingResolver.resolve(
+            cvat_meta={}, video_fps=60.0, options=options, json_manifest=manifest,
+            required_annotation_frames={0, 1},
+        )
+        assert mapping.verified is True
+        assert mapping.mode == "explicit"
+        assert mapping.verification_reason == "filename_manifest_conflicts_with_override"
+
+
+def test_cvat_filename_manifest_normalizes_cropped_source_frames():
+    raw = [
+        RawCvatKeypointFrame(annotation_frame=0, image_name="frame_00000270.jpg"),
+        RawCvatKeypointFrame(annotation_frame=1, image_name="frame_00000274.jpg"),
+        RawCvatKeypointFrame(annotation_frame=2, image_name="frame_00000278.jpg"),
+    ]
+    manifest = _build_cvat_filename_manifest(raw, video_frame_count=10)
+    assert manifest is None
+    manifest = _build_cvat_filename_manifest(raw, video_frame_count=421)
+    assert manifest is None
+    manifest = _build_cvat_filename_manifest(
+        raw + [RawCvatKeypointFrame(annotation_frame=3, image_name="frame_00000690.jpg")],
+        video_frame_count=421,
+    )
+    assert manifest is not None
+    assert manifest[0]["source_video_frame"] == 0
+    assert manifest[1]["source_video_frame"] == 4
 
 
 class TestCvatAnnotationNormalizer:

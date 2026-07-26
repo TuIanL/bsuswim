@@ -32,6 +32,7 @@ from .finding_projection import project_and_sort_findings, sort_findings
 from .overview import build_overview_stats
 from .retest import build_retest_metrics, resolve_retest_source_metric_keys
 from .status import derive_section_status
+from app.services.storage import playback_url
 
 
 def _build_athlete_context(ctx) -> dict:
@@ -91,6 +92,7 @@ def _build_video_context(ctx) -> dict:
         "session_video_id": getattr(sv, "id", None) if sv else None,
         "video_file_id": getattr(vf, "id", None) if vf else None,
         "original_filename": getattr(vf, "original_filename", None) if vf else None,
+        "playback_url": playback_url(vf.stored_filename) if vf and getattr(vf, "stored_filename", None) else None,
         "view_type": getattr(sv, "view_type", None) if sv else None,
         "fps": float(fps) if fps is not None else None,
         "resolution": resolution,
@@ -116,6 +118,10 @@ def _build_annotation_context(ctx) -> dict:
     kpf = getattr(ann, "keypoint_frames", None)
     frame_count = len(kpf) if isinstance(kpf, list) else 0
     eff = getattr(ctx, "_effective_frame_count", frame_count)
+    metadata = getattr(ann, "annotation_metadata", None) or {}
+    derived = metadata.get("derived") if isinstance(metadata.get("derived"), dict) else {}
+    mapping = metadata.get("frame_mapping") or derived.get("frame_mapping") or {}
+    mapping_status = "verified" if isinstance(mapping, dict) and mapping.get("verified") else getattr(ann, "frame_mapping_status", "unknown")
     return {
         "normalized_annotation_id": getattr(ann, "id", None),
         "source": getattr(ann, "source", None),
@@ -123,7 +129,7 @@ def _build_annotation_context(ctx) -> dict:
         "frame_count": frame_count,
         "effective_frame_count": eff,
         "joint_schema": getattr(ann, "joint_schema", None),
-        "frame_mapping_status": getattr(ann, "frame_mapping_status", "unknown"),
+        "frame_mapping_status": mapping_status,
         "reference_body_length_px": _get_ref_body_length(ctx),
     }
 
@@ -494,6 +500,10 @@ def build_review_and_retest_page(
 
     quality_notes: list[ReportQualityNote] = []
     for n in artifact_quality_notes:
+        # Module pages already show the per-asset mapping note. Repeating the
+        # same list on the review page makes the report look broken.
+        if n.get("code") == "frame_mapping_unverified":
+            continue
         quality_notes.append(ReportQualityNote(**n))
     if radar_semantics is None:
         quality_notes.append(

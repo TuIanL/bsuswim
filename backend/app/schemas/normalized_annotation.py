@@ -164,6 +164,50 @@ class ParseAnnotationOptions(BaseModel):
     analysis_ranges: list[AnalysisRange] = []
 
 
+class RepairPoint(BaseModel):
+    x: float
+    y: float
+
+
+class ScaleRepair(BaseModel):
+    points: list[RepairPoint] = Field(min_length=2, max_length=2)
+    reference_length_m: float = Field(gt=0)
+    method: Literal["lane_marker", "pool_wall_marker", "manual_reference"] = "manual_reference"
+    confidence: float | None = Field(default=None, ge=0, le=1)
+    note: str | None = None
+
+
+class WaterlineRepair(BaseModel):
+    points: list[RepairPoint] = Field(min_length=2, max_length=2)
+    confidence: float | None = Field(default=None, ge=0, le=1)
+
+
+class EventRepair(BaseModel):
+    name: str
+    label: str | None = None
+    frame: int = Field(ge=0)
+    time_sec: float = Field(ge=0)
+    side: Literal["left", "right", "both", "unknown"] = "unknown"
+    confidence: float = Field(default=1.0, ge=0, le=1)
+
+
+class QualityRepairPayload(BaseModel):
+    expected_revision: int = Field(ge=1)
+    scale: ScaleRepair | None = None
+    waterline: WaterlineRepair | None = None
+    swim_direction: Literal["left_to_right", "right_to_left"] | None = None
+    events: list[EventRepair] = Field(default_factory=list)
+    frame_mapping: FrameMappingOverride | None = None
+
+
+class QualityRepairResponse(BaseModel):
+    normalized_annotation_id: int
+    revision: int
+    quality: AnnotationQualityReport
+    analysis_readiness: AnalysisReadiness
+    module_readiness: dict[str, Any] = Field(default_factory=dict)
+
+
 # ── CVAT raw data schemas ──
 
 
@@ -213,6 +257,7 @@ class RawCvatPoint(BaseModel):
 
 class RawCvatKeypointFrame(BaseModel):
     annotation_frame: int
+    image_name: str | None = None
     points: dict[str, RawCvatPoint] = Field(default_factory=dict)
     source_track_ids: list[str] = Field(default_factory=list)
 

@@ -16,6 +16,13 @@ uploads/*
 backend/.env
 model_service/.env.web-dev.log
 .web-dev.log
+.backend-dev.log
+.backend-dev.pid
+.web-dev.pid
+backend/.backend-dev.log
+backend/.backend-dev.pid
+frontend-vue/.web-dev.pid
+*.mp4
 .workbuddy/
 frontend/node_modules/
 frontend/dist/

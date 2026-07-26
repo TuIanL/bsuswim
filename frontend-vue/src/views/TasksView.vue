@@ -3,7 +3,7 @@
     <div class="page-head">
       <div>
         <h1>测试任务</h1>
-        <p>查看训练记录状态，继续上传多机位视频，或进入已有工作台与报告。</p>
+        <p>查看训练记录状态，继续上传侧面视频，或进入已有工作台与报告。</p>
       </div>
       <div class="action-row">
         <el-button @click="$router.push('/sessions/new')">创建测试</el-button>

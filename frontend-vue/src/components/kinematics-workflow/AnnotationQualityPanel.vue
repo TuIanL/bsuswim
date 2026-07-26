@@ -16,11 +16,15 @@
         :key="i"
         class="issue-item"
         :class="issue.severity || (issue.blocking ? 'error' : 'warning')"
-      >
-        <div class="issue-msg">{{ issue.user_message || issue.message }}</div>
-        <el-tag v-if="issue.suggested_action?.label" size="small" type="info" effect="plain">
-          {{ issue.suggested_action.label }}
-        </el-tag>
+        >
+          <div class="issue-msg">{{ issue.user_message || issue.message }}</div>
+        <el-button
+          v-if="issue.suggested_action?.label"
+          size="small"
+          text
+          type="primary"
+          @click="emit('repair', issue.suggested_action.type || issue.suggested_action.kind || '')"
+        >{{ issue.suggested_action.label }}</el-button>
       </div>
     </div>
   </div>
@@ -29,8 +33,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { AnnotationQualityReport } from '../../types'
+import { groupQualityIssues } from './qualityIssueGrouping'
 
 const props = defineProps<{ quality: AnnotationQualityReport | null }>()
+const emit = defineEmits<{ (event: 'repair', actionType: string): void }>()
 
 function qualityTagType(s?: string) {
   return s === 'valid' ? 'success' : s === 'warning' ? 'warning' : s === 'invalid' ? 'danger' : 'info'
@@ -39,7 +45,9 @@ function qualityLabel(s?: string) {
   return s === 'valid' ? '可分析' : s === 'warning' ? '质量警告' : s === 'invalid' ? '不可分析' : '未知'
 }
 const summary = computed(() => props.quality?.summary ?? {})
-const issues = computed(() => props.quality?.issues ?? [])
+const issues = computed(() => {
+  return groupQualityIssues(props.quality?.issues ?? [])
+})
 </script>
 
 <style scoped>

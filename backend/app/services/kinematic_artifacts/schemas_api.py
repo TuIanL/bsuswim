@@ -12,11 +12,15 @@ from app.services.storage import public_asset_url
 
 def _presentation(art: KinematicArtifact) -> dict | None:
     if art.artifact_type == "annotated_keyframe":
+        metadata = art.artifact_metadata or {}
         return {
-            "title": art.artifact_key.split(".")[-1],
+            "title": metadata.get("title") or art.artifact_key.split(".")[-1],
             "label": art.artifact_key,
-            "value": (art.artifact_metadata or {}).get("value"),
-            "caption": "基于二维骨架几何的客观指标。",
+            "value": metadata.get("value"),
+            "caption": metadata.get("caption") or "基于二维骨架几何的客观指标。",
+            "metric_label": metadata.get("metric_label"),
+            "unit": metadata.get("unit"),
+            "selection_reason": metadata.get("selection_reason"),
             "report_asset_type": "annotated_frame",
         }
     return {
@@ -95,15 +99,22 @@ def project_to_report_assets(artifact_set: KinematicArtifactSet) -> list[dict]:
     for art in artifact_set.artifacts:
         if art.status != "ready" or not art.storage_path:
             continue
+        metadata = art.artifact_metadata or {}
         assets.append(
             {
                 "key": art.artifact_key,
                 "type": "annotated_frame" if art.artifact_type == "annotated_keyframe" else "image",
-                "title": (art.artifact_metadata or {}).get("value") or art.artifact_key,
+                "title": metadata.get("title") or art.artifact_key,
                 "url": public_asset_url(art.storage_path),
                 "label": art.artifact_key,
-                "value": (art.artifact_metadata or {}).get("value"),
-                "caption": "基于二维骨架几何的客观指标。",
+                "value": metadata.get("value"),
+                "caption": metadata.get("caption") or "基于二维骨架几何的客观指标。",
+                "metric_label": metadata.get("metric_label"),
+                "unit": metadata.get("unit"),
+                "selection_reason": metadata.get("selection_reason"),
+                "annotation_frame": art.annotation_frame,
+                "source_video_frame": art.source_video_frame,
+                "source_annotation_revision": artifact_set.source_annotation_revision,
             }
         )
     return assets

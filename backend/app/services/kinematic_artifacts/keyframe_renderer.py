@@ -6,6 +6,7 @@ values onto an extracted video frame. Crops around the skeleton bbox with a
 """
 
 import math
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -39,6 +40,36 @@ VISIBLE_COLOR = (0, 200, 255)
 OCCLUDED_COLOR = (80, 120, 160)
 ESTIMATED_COLOR = (200, 200, 60)
 BODY_AXIS_COLOR = (0, 255, 0)
+
+
+def _font_path() -> str | None:
+    candidates = [
+        "/System/Library/Fonts/STHeiti Medium.ttc",
+        "/System/Library/Fonts/PingFang.ttc",
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    ]
+    return next((path for path in candidates if Path(path).is_file()), None)
+
+
+def _draw_text(img, text: str, xy: tuple[int, int], size: int, color=(20, 20, 20)):
+    """Draw Unicode text with Pillow, falling back to OpenCV for ASCII-only text."""
+    if not text:
+        return
+    font_path = _font_path()
+    if font_path:
+        from PIL import Image, ImageDraw, ImageFont
+
+        rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        canvas = Image.fromarray(rgb)
+        draw = ImageDraw.Draw(canvas)
+        font = ImageFont.truetype(font_path, size=size)
+        draw.text(xy, text, fill=tuple(reversed(color)), font=font)
+        img[:] = cv2.cvtColor(np.asarray(canvas), cv2.COLOR_RGB2BGR)
+        return
+    if any(ord(char) > 127 for char in text):
+        text = "Reference: screen horizontal" if "水平" in text else "Diagnostic keyframe"
+    cv2.putText(img, text, xy, cv2.FONT_HERSHEY_SIMPLEX, max(size / 32, 0.5), color, 2)
 
 
 def _point_xy(p) -> tuple[float, float] | None:
@@ -123,6 +154,7 @@ def render_keyframe(
     angle_overlay: dict | None = None,
     reference_basis_label: str = "相对画面水平线",
     value_label: str | None = None,
+    title_label: str | None = None,
 ) -> np.ndarray:
     """Render an annotated keyframe. Returns a KEYFRAME_WIDTH x KEYFRAME_HEIGHT BGR image."""
     h, w = image.shape[:2]
@@ -155,10 +187,11 @@ def render_keyframe(
                         shifted.points.get(angle_overlay["a"]), shifted.points.get(angle_overlay["b"]),
                         angle_overlay.get("label"))
 
-    cv2.putText(canvas, reference_basis_label, (20, KEYFRAME_HEIGHT - 30),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (20, 20, 20), 2)
+    _draw_text(canvas, reference_basis_label, (20, KEYFRAME_HEIGHT - 55), 28)
     if value_label:
-        cv2.putText(canvas, value_label, (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (20, 20, 20), 2)
+        _draw_text(canvas, value_label, (20, 78), 32)
+    if title_label:
+        _draw_text(canvas, title_label, (20, 42), 36)
     return canvas
 
 

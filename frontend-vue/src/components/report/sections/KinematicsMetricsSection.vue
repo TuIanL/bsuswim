@@ -12,7 +12,11 @@
           </span>
         </div>
         <div class="metric-value">
-          {{ metric.value }}
+          <div v-for="line in metricValueLines(metric)" :key="line.label || String(line.value)">
+            <span v-if="line.label" class="metric-sub-label">{{ line.label }}</span>
+            {{ line.value }}
+            <span v-if="line.unit" class="metric-unit">{{ line.unit }}</span>
+          </div>
           <span v-if="metric.unit" class="metric-unit">{{ metric.unit }}</span>
         </div>
       </div>
@@ -22,6 +26,7 @@
 
 <script setup lang="ts">
 import type { ReportMetric } from '../../../types/report'
+import { metricValueLines } from '../shared/formatMetricValue'
 
 defineProps<{
   metrics: ReportMetric[]
@@ -109,6 +114,15 @@ function getLevelText(level: string): string {
   font-size: 18px;
   font-weight: 600;
   color: #303133;
+}
+
+.metric-sub-label {
+  display: inline-block;
+  min-width: 76px;
+  margin-right: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #606266;
 }
 
 .metric-unit {

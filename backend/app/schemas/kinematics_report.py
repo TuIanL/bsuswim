@@ -108,8 +108,11 @@ class ReportAsset(BaseModel):
     checksum_sha256: str | None = None
 
     label: str | None = None
-    value: str | None = None
+    value: Any = None
     caption: str | None = None
+    metric_label: str | None = None
+    unit: str | None = None
+    selection_reason: str | None = None
 
     source_annotation_revision: int | None = None
     generator_version: str | None = None

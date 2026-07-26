@@ -2,8 +2,99 @@
 > zhiyong-yunshu-vue-platform@0.1.0 dev
 > vite --host 0.0.0.0 --host 127.0.0.1 --port 5174
 
-15:11:29 [vite] (client) Re-optimizing dependencies because lockfile has changed
 
-  VITE v6.4.3  ready in 579 ms
+  VITE v6.4.3  ready in 316 ms
 
   ➜  Local:   http://127.0.0.1:5174/
+11:23:06 [vite] (client) hmr update /src/components/OverlayCanvas.vue, /src/components/kinematics-workflow/KinematicsWorkflowStepper.vue, /src/components/kinematics-workflow/AnnotationQualityPanel.vue, /src/components/kinematics-workflow/AnalysisProgressPanel.vue, /src/components/kinematics-workflow/SideVideoStep.vue
+11:23:06 [vite] (client) page reload src/services/api.ts
+11:24:53 [vite] (client) hmr update /src/components/kinematics-workflow/AnnotationQualityPanel.vue
+11:25:35 [vite] (client) hmr update /src/components/kinematics-workflow/KinematicsWorkflowPage.vue
+11:25:50 [vite] (client) hmr update /src/components/kinematics-workflow/KinematicsWorkflowPage.vue
+11:26:04 [vite] (client) hmr update /src/components/kinematics-workflow/AnnotationQualityRepairWorkbench.vue
+11:31:03 [vite] (client) hmr update /src/components/kinematics-workflow/AnnotationQualityRepairWorkbench.vue
+11:32:24 [vite] (client) hmr update /src/components/kinematics-workflow/AnnotationQualityRepairWorkbench.vue
+11:33:13 [vite] (client) hmr update /src/components/kinematics-workflow/AnnotationQualityPanel.vue
+11:43:19 [vite] (client) hmr update /src/views/LoginView.vue
+11:52:02 [vite] (client) hmr update /src/components/kinematics-workflow/KinematicsWorkflowPage.vue
+12:37:51 [vite] (client) hmr update /src/views/ReportView.vue
+12:41:59 [vite] (client) hmr update /src/views/ReportView.vue
+12:44:12 [vite] (client) hmr update /src/components/report/sections/KinematicsArtifactsSection.vue
+12:45:57 [vite] (client) hmr update /src/views/ReportView.vue
+12:49:06 [vite] (client) page reload src/services/api.ts
+12:49:06 [vite] (client) hmr update /src/views/ReportView.vue
+13:25:10 [vite] (client) hmr update /src/views/WorkspaceView.vue
+13:25:20 [vite] (client) hmr update /src/views/WorkspaceView.vue
+13:25:28 [vite] (client) hmr update /src/views/WorkspaceView.vue?vue&type=style&index=0&scoped=f1666959&lang.css
+13:27:21 [vite] (client) hmr update /src/components/WorkspaceMetricsPanel.vue
+13:27:25 [vite] (client) hmr update /src/components/WorkspaceMetricsPanel.vue
+14:17:16 [vite] (client) hmr update /src/components/report/ReportSectionRenderer.vue, /src/components/report/ReportSummaryPanel.vue, /src/components/report/sections/GenericSection.vue, /src/components/report/sections/ModuleSection.vue, /src/components/report/shared/EvidenceFrameCard.vue, /src/components/report/shared/ReportChart.vue, /src/components/report/shared/MetricCard.vue
+14:17:16 [vite] (client) hmr update /src/views/ReportView.vue
+14:17:16 [vite] (client) hmr update /src/components/report/shared/EvidenceFrameCard.vue, /src/components/report/shared/EvidenceFrameCard.vue?vue&type=style&index=0&scoped=93f51204&lang.css
+14:17:38 [vite] (client) hmr update /src/components/report/sections/ModuleSection.vue, /src/components/report/sections/ModuleSection.vue?vue&type=style&index=0&scoped=84f59723&lang.css
+14:17:53 [vite] (client) hmr update /src/components/report/ReportSectionRenderer.vue, /src/components/report/ReportSummaryPanel.vue, /src/components/report/sections/GenericSection.vue, /src/components/report/sections/ModuleSection.vue, /src/components/report/shared/EvidenceFrameCard.vue, /src/components/report/shared/ReportChart.vue, /src/components/report/shared/MetricCard.vue
+14:17:53 [vite] (client) hmr update /src/views/ReportView.vue
+14:17:53 [vite] (client) hmr update /src/components/report/ReportSectionRenderer.vue, /src/components/report/sections/ModuleSection.vue
+14:17:53 [vite] (client) hmr update /src/components/report/sections/ModuleSection.vue, /src/components/report/sections/ModuleSection.vue?vue&type=style&index=0&scoped=84f59723&lang.css
+14:20:38 [vite] (client) hmr update /src/components/report/ReportSectionRenderer.vue, /src/components/report/ReportSummaryPanel.vue, /src/components/report/sections/GenericSection.vue, /src/components/report/sections/ModuleSection.vue, /src/components/report/shared/EvidenceFrameCard.vue, /src/components/report/shared/ReportChart.vue, /src/components/report/shared/MetricCard.vue
+14:35:11 [vite] (client) hmr update /src/components/kinematics-workflow/KinematicsWorkflowPage.vue
+15:13:22 [vite] (client) hmr update /src/components/report/ReportSectionRenderer.vue, /src/components/report/ReportSummaryPanel.vue, /src/components/report/sections/GenericSection.vue, /src/components/report/sections/ModuleSection.vue, /src/components/report/shared/EvidenceFrameCard.vue, /src/components/report/shared/ReportChart.vue, /src/components/report/shared/MetricCard.vue
+15:13:22 [vite] (client) hmr update /src/views/ReportView.vue
+15:13:36 [vite] (client) hmr update /src/components/report/ReportSectionRenderer.vue, /src/components/report/ReportSummaryPanel.vue, /src/components/report/sections/GenericSection.vue, /src/components/report/sections/ModuleSection.vue, /src/components/report/shared/EvidenceFrameCard.vue, /src/components/report/shared/ReportChart.vue, /src/components/report/shared/MetricCard.vue
+15:13:58 [vite] (client) hmr update /src/components/report/ReportSectionRenderer.vue, /src/components/report/ReportSummaryPanel.vue, /src/components/report/sections/GenericSection.vue, /src/components/report/sections/ModuleSection.vue, /src/components/report/shared/EvidenceFrameCard.vue, /src/components/report/shared/ReportChart.vue, /src/components/report/shared/MetricCard.vue
+15:13:58 [vite] (client) hmr update /src/views/ReportView.vue
+15:13:59 [vite] (client) warning: Duplicate key "video" in object literal
+157|      provenance: report.provenance,
+158|      video: report.context?.video ?? report.video,
+159|      video: report.context?.video ?? report.video,
+   |      ^
+160|    }
+161|  }
+
+  Plugin: vite:esbuild
+  File: /Users/tuian/Documents/大学/竞赛/大创/游泳/swim/frontend-vue/src/utils/reportAdapter.ts
+15:14:25 [vite] (client) hmr update /src/views/ReportView.vue
+15:14:25 [vite] (client) hmr update /src/components/report/ReportSectionRenderer.vue
+15:14:25 [vite] (client) warning: Duplicate key "video" in object literal
+169|      provenance: report.provenance,
+170|      video: report.context?.video ?? report.video,
+171|      video: report.context?.video ?? report.video,
+   |      ^
+172|    }
+173|  }
+
+  Plugin: vite:esbuild
+  File: /Users/tuian/Documents/大学/竞赛/大创/游泳/swim/frontend-vue/src/utils/reportAdapter.ts
+15:14:25 [vite] (client) hmr update /src/components/report/sections/ModuleSection.vue
+15:14:25 [vite] (client) hmr update /src/components/report/sections/GenericSection.vue
+15:14:51 [vite] (client) hmr update /src/components/report/shared/EvidenceFrameCard.vue, /src/components/report/shared/EvidenceFrameCard.vue?vue&type=style&index=0&scoped=93f51204&lang.css
+15:14:51 [vite] (client) hmr update /src/components/report/sections/GenericSection.vue
+15:14:52 [vite] (client) hmr update /src/views/ReportView.vue
+15:15:58 [vite] (client) hmr update /src/views/ReportView.vue
+15:15:58 [vite] (client) hmr update /src/components/report/sections/ModuleSection.vue
+15:23:42 [vite] (client) hmr update /src/views/ReportView.vue
+15:29:45 [vite] (client) hmr update /src/components/kinematics-workflow/KinematicsWorkflowPage.vue
+15:48:16 [vite] (client) hmr update /src/components/report/ReportSectionRenderer.vue, /src/components/report/ReportSummaryPanel.vue, /src/components/report/sections/GenericSection.vue, /src/components/report/sections/ModuleSection.vue, /src/components/report/shared/EvidenceFrameCard.vue, /src/components/report/shared/ReportChart.vue, /src/components/report/shared/MetricCard.vue
+15:48:16 [vite] (client) hmr update /src/components/report/shared/MetricCard.vue, /src/components/report/shared/MetricCard.vue?vue&type=style&index=0&scoped=1c54fbbc&lang.css
+15:48:38 [vite] (client) hmr update /src/components/report/sections/KinematicsMetricsSection.vue
+15:48:48 [vite] (client) hmr update /src/components/report/sections/KinematicsMetricsSection.vue
+15:48:55 [vite] (client) hmr update /src/components/report/sections/KinematicsMetricsSection.vue?vue&type=style&index=0&scoped=06b68dd6&lang.css
+15:49:09 [vite] (client) hmr update /src/components/report/ReportSectionRenderer.vue, /src/components/report/ReportSummaryPanel.vue, /src/components/report/sections/GenericSection.vue, /src/components/report/sections/ModuleSection.vue, /src/components/report/shared/EvidenceFrameCard.vue, /src/components/report/shared/ReportChart.vue, /src/components/report/shared/MetricCard.vue
+15:49:09 [vite] (client) hmr update /src/views/ReportView.vue
+15:49:09 [vite] (client) hmr update /src/views/ReportView.vue
+15:49:09 [vite] (client) hmr update /src/components/report/ReportSummaryPanel.vue
+15:49:16 [vite] (client) hmr update /src/components/report/ReportSummaryPanel.vue
+15:49:44 [vite] (client) hmr update /src/components/report/ReportSummaryPanel.vue
+15:49:54 [vite] (client) hmr update /src/components/report/ReportSummaryPanel.vue
+15:50:08 [vite] (client) hmr update /src/components/report/ReportSummaryPanel.vue?vue&type=style&index=0&scoped=4417233b&lang.css
+15:50:35 [vite] (client) hmr update /src/views/ReportView.vue
+15:51:34 [vite] (client) hmr update /src/components/report/shared/MetricCard.vue, /src/components/report/sections/KinematicsMetricsSection.vue
+16:11:54 [vite] (client) hmr update /src/components/report/shared/MetricCard.vue, /src/components/report/sections/KinematicsMetricsSection.vue
+16:12:48 [vite] (client) hmr update /src/components/report/shared/MetricCard.vue, /src/components/report/sections/KinematicsMetricsSection.vue
+16:23:51 [vite] (client) hmr update /src/views/ReportView.vue
+16:24:11 [vite] (client) hmr update /src/components/report/shared/EvidenceFrameCard.vue
+16:24:33 [vite] (client) hmr update /src/views/ReportView.vue, /src/views/ReportView.vue?vue&type=style&index=0&scoped=95801e60&lang.css
+16:52:47 [vite] (client) hmr update /src/components/report/sections/ModuleSection.vue
+16:53:06 [vite] (client) hmr update /src/components/report/shared/MetricOverview.vue
+16:53:41 [vite] (client) hmr update /src/components/report/shared/MetricOverview.vue
+16:56:40 [vite] (client) hmr update /src/components/report/shared/MetricOverview.vue?vue&type=style&index=0&scoped=c74e2cbb&lang.css

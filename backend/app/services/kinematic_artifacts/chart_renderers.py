@@ -18,6 +18,33 @@ from app.services.kinematic_artifacts.constants import (
 
 CSS_PX = "px"
 
+_LABELS = {
+    "torso_axis_angle_deg": "躯干轴角",
+    "body_axis_angle_deg": "身体轴角",
+    "left_elbow_angle_deg": "左肘角度",
+    "right_elbow_angle_deg": "右肘角度",
+    "left_knee_angle_deg": "左膝角度",
+    "right_knee_angle_deg": "右膝角度",
+    "left_wrist": "左腕轨迹",
+    "right_wrist": "右腕轨迹",
+    "left_knee": "左膝轨迹",
+    "right_knee": "右膝轨迹",
+    "hip": "髋部轨迹",
+    "body_posture": "身体姿态",
+    "upper_limb": "上肢动作",
+    "lower_limb_rhythm": "下肢节奏",
+    "head_trunk": "头躯干控制",
+    "head_control": "头部与躯干控制",
+    "data_completeness": "数据完整性",
+    "posture_stability": "姿态稳定性",
+    "kick_periodicity": "打腿周期性",
+    "trunk_vertical_stability": "躯干垂直稳定性",
+}
+
+
+def _label(value: str) -> str:
+    return _LABELS.get(value, value)
+
 # Deterministic, font-agnostic style.
 plt.rcParams.update(
     {
@@ -25,6 +52,8 @@ plt.rcParams.update(
         "axes.grid": True,
         "grid.alpha": 0.3,
         "figure.dpi": 100,
+        "font.sans-serif": ["Hiragino Sans GB", "PingFang SC", "Microsoft YaHei", "DejaVu Sans"],
+        "axes.unicode_minus": False,
     }
 )
 
@@ -54,9 +83,9 @@ def render_angle_timeseries(
             xs.append(p.get("source_video_frame") or p.get("annotation_frame") or p.get("frame"))
             ys.append(p["value"])
         if xs:
-            ax.plot(xs, ys, label=key, marker=".")
-    ax.set_xlabel("source video frame")
-    ax.set_ylabel("angle (deg)")
+            ax.plot(xs, ys, label=_label(key), marker=".")
+    ax.set_xlabel("视频帧")
+    ax.set_ylabel("角度（°）")
     ax.set_title(title)
     ax.legend(fontsize=8)
     fig.set_layout_engine("tight")
@@ -85,6 +114,7 @@ def render_trajectory_chart(
     viewbox_h: int = CHART_HEIGHT,
 ) -> bytes:
     fig, ax = plt.subplots(figsize=(viewbox_w / 100.0, viewbox_h / 100.0))
+    plotted = False
     for label, pts in trajectories.items():
         xs, ys = [], []
         for _af, rx, ry in pts:
@@ -93,11 +123,16 @@ def render_trajectory_chart(
             xs.append(rx)
             ys.append(ry)
         if xs:
-            ax.plot(xs, ys, marker=".", label=label)
-    ax.set_xlabel(f"relative x ({unit})")
-    ax.set_ylabel(f"relative y ({unit}, up positive)")
+            plotted = True
+            ax.plot(xs, ys, marker=".", label=_label(label))
+    unit_label = "身体长度比" if unit == "body length ratio" else unit
+    ax.set_xlabel(f"相对水平位置（{unit_label}）")
+    ax.set_ylabel(f"相对垂直位置（{unit_label}，向上为正）")
     ax.set_title(title)
-    ax.legend(fontsize=8)
+    if plotted:
+        ax.legend(fontsize=8)
+    else:
+        ax.text(0.5, 0.5, "当前标注没有足够的位置点，无法绘制轨迹", ha="center", va="center", transform=ax.transAxes, color="#6b7280")
     ax.set_aspect("equal", adjustable="datalim")
     fig.set_layout_engine("tight")
     return _save_svg(fig)
@@ -119,7 +154,11 @@ def render_range_comparison(
         labels = list(data.keys())
         vals = [data[k] for k in labels]
         ax.bar(range(len(labels)), vals)
-        ax.set_title(pkey)
+        ax.set_title({
+            "Joint ROM (deg)": "关节活动范围（°）",
+            "Vertical excursion": "垂直波动范围",
+            "Body axis range (deg)": "身体轴角范围（°）",
+        }.get(pkey, pkey))
         ax.set_xticks(range(len(labels)))
         ax.set_xticklabels(labels, rotation=30, ha="right", fontsize=8)
     fig.set_layout_engine("tight")
@@ -137,7 +176,7 @@ def render_stability_radar(
     n = len(axes)
     angles = [2 * math.pi * i / n for i in range(n)]
     fig, ax = plt.subplots(figsize=(viewbox_w / 100.0, viewbox_h / 100.0), subplot_kw=dict(polar=True))
-    labels = [a["axis"] for a in axes]
+    labels = [_label(a["axis"]) for a in axes]
     values = []
     available = []
     for a in axes:
@@ -154,7 +193,7 @@ def render_stability_radar(
         ax.plot(angles_c, values_c, color="tab:blue", linestyle="--")
     for ang, a in zip(angles, axes):
         if not (a.get("availability") == "available" or a.get("availability") == "degraded"):
-            ax.text(ang, 105, "N/A", ha="center", fontsize=8, color="red")
+            ax.text(ang, 105, "不可用", ha="center", fontsize=8, color="red")
     ax.set_xticks(angles)
     ax.set_xticklabels(labels, fontsize=9)
     ax.set_ylim(0, 100)

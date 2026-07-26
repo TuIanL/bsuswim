@@ -6,7 +6,7 @@ export type StrokeType = 'freestyle' | 'breaststroke' | 'backstroke' | 'butterfl
 
 export type TrainingSessionStatus = 'draft' | 'video_uploaded' | 'analyzing' | 'completed' | 'failed'
 
-export type SessionVideoView = 'side' | 'front' | 'top' | 'underwater' | 'semi_underwater'
+export type SessionVideoView = 'side' | 'front' | 'top' | 'underwater'
 
 export type BackendSessionVideoView = 'side' | 'front' | 'top' | 'underwater' | 'other'
 
@@ -311,8 +311,64 @@ export interface QualityIssue {
   user_message?: string
   suggested_action?: {
     label?: string
+    type?: string
     kind?: string
+    payload?: Record<string, any>
   } | null
+}
+
+export interface NormalizedAnnotationDetail {
+  id: number
+  session_video_id: number
+  revision: number
+  source: AnnotationSource
+  fps: number
+  frame_count: number | null
+  duration_sec: number | null
+  scale: Record<string, any> | null
+  events: Array<Record<string, any>>
+  reference_lines: Record<string, any> | null
+  swim_direction: string | null
+  annotation_metadata: Record<string, any>
+  quality: AnnotationQualityReport
+}
+
+export interface QualityRepairPayload {
+  expected_revision: number
+  scale?: {
+    points: Array<{ x: number; y: number }>
+    reference_length_m: number
+    method?: 'lane_marker' | 'pool_wall_marker' | 'manual_reference'
+    confidence?: number
+    note?: string
+  }
+  waterline?: {
+    points: Array<{ x: number; y: number }>
+    confidence?: number
+  }
+  swim_direction?: 'left_to_right' | 'right_to_left'
+  events?: Array<{
+    name: string
+    label?: string
+    frame: number
+    time_sec: number
+    side?: 'left' | 'right' | 'both' | 'unknown'
+    confidence?: number
+  }>
+  frame_mapping?: {
+    mode: 'affine' | 'identity'
+    source_frame_offset?: number
+    source_frame_stride?: number
+    confirmed?: boolean
+  }
+}
+
+export interface QualityRepairResponse {
+  normalized_annotation_id: number
+  revision: number
+  quality: AnnotationQualityReport
+  analysis_readiness: AnalysisReadiness
+  module_readiness: Record<string, ModuleReadiness>
 }
 
 export interface ModuleReadiness {

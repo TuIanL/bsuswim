@@ -1,10 +1,29 @@
 export interface NormalizedReportViewModel {
   title: string
   summary?: ReportSummaryViewModel
+  overview?: ReportOverviewContext
   sections: NormalizedSection[]
   generation_signature?: string
   provenance?: Record<string, any>
+  video?: ReportVideoContext
   legacy?: boolean
+}
+
+export interface ReportVideoContext {
+  playback_url?: string
+  original_filename?: string
+  fps?: number
+  resolution?: string
+}
+
+export interface ReportOverviewContext {
+  athlete?: Record<string, unknown>
+  session?: Record<string, unknown>
+  video?: ReportVideoContext & Record<string, unknown>
+  annotation?: Record<string, unknown>
+  quality?: Record<string, unknown>
+  available_modules?: unknown
+  analysis_boundaries?: unknown
 }
 
 export interface ReportSummaryViewModel {
@@ -32,13 +51,20 @@ export interface NormalizedSection {
   assets?: ReportAsset[]
   charts?: ReportChart[]
   tables?: ReportTable[]
+  quality_notes?: ReportQualityNote[]
   layout?: Record<string, any>
+}
+
+export interface ReportQualityNote {
+  code?: string
+  level?: 'info' | 'warning' | 'error'
+  message: string
 }
 
 export interface ReportMetric {
   key: string
   label: string
-  value: string | number
+  value: string | number | Record<string, unknown>
   unit?: string
   level?: 'excellent' | 'good' | 'normal' | 'warning' | 'poor'
 }
@@ -67,8 +93,18 @@ export interface ReportAsset {
   title?: string
   url?: string
   label?: string
-  value?: string
+  value?: string | number
   caption?: string
+  artifact_type?: string
+  module_key?: string
+  metric_keys?: string[]
+  annotation_frame?: number
+  source_video_frame?: number
+  source_annotation_revision?: number
+  metric_label?: string
+  unit?: string
+  selection_reason?: string
+  metadata?: Record<string, unknown>
   status?: 'good' | 'warning' | 'poor'
 }
 

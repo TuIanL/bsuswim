@@ -1,6 +1,7 @@
 """Tests for kinematic visual artifact generation (change add-kinematics-visual-artifact-generation)."""
 
 import os
+from uuid import uuid4
 
 import pytest
 
@@ -83,9 +84,10 @@ def _make_annotation(db, ann_dict, revision=3, verified=True):
     ts = TrainingSession(athlete_id=athlete.id, title="test-session", stroke_type=StrokeType.FREESTYLE)
     db.add(ts)
     db.flush()
+    stored_name = f"dummy-{uuid4().hex}.mp4"
     vf = VideoFile(
-        original_filename="dummy.mp4", stored_filename="dummy.mp4",
-        storage_path="uploads/dummy.mp4", mime_type="video/mp4",
+        original_filename=stored_name, stored_filename=stored_name,
+        storage_path=f"uploads/{stored_name}", mime_type="video/mp4",
         size_bytes=1, checksum_sha256="dummy",
     )
     db.add(vf)
@@ -111,7 +113,7 @@ def _make_annotation(db, ann_dict, revision=3, verified=True):
 def _make_metric(db, ann, result):
     metric = AnnotationMetric(
         normalized_annotation_id=ann.id,
-        session_video_id=1,
+        session_video_id=ann.session_video_id,
         schema_version="swim-side-kinematics.v1",
         camera_view="side",
         metrics=result,

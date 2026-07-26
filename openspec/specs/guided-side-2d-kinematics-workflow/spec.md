@@ -3,24 +3,33 @@
 ## Purpose
 
 侧视角二维运动学分析的引导式 Web 工作流能力：以侧面视频 + CVAT 骨架标注为中心的六步可恢复流程，覆盖上传、解析、质量与模块就绪确认、提交跟踪 annotation_kinematics 分析任务，以及完成后报告入口。
-
 ## Requirements
-
 ### Requirement: Six-step guided side-view 2D kinematics workflow
 
 系统 SHALL 在 `/sessions/:sessionId/upload` 提供可恢复的六步侧面二维运动学 Web 工作流：上传并绑定侧面视频、上传 CVAT Skeleton XML、自动解析并展示标注质量、确认四类运动学模块可用状态、提交并跟踪 annotation_kinematics 分析任务、查看 HTML 报告或导出/下载 PDF。
 
+分析完成后，系统 SHALL 展示三个运动学结果面板（指标、可视化分析、诊断建议），其数据 SHALL 从分析任务的真实 `annotation_metric_id` 加载。
+
 #### Scenario: User enters an upload page with no assets
 
 - **WHEN** 用户进入一次训练记录的上传页且不存在任何侧面视频与标注
-- **THEN** 系统 MUST 将当前工作流阶段推导为 `video_required`
+- **THEN** 系统 SHALL 将当前工作流阶段推导为 `video_required`
 - **AND** 仅展示侧面视频输入，不展示后续步骤的可操作内容
 
 #### Scenario: Full guided loop completes
 
 - **WHEN** 用户上传侧面视频、上传 CVAT XML、确认模块可用性并提交分析
-- **THEN** 系统 MUST 在页面内持续展示真实流水线进度直至报告生成
+- **THEN** 系统 SHALL 在页面内持续展示真实流水线进度直至报告生成
 - **AND** 报告完成后提供 HTML 报告入口与 PDF 导出/下载入口
+- **AND** 运动学结果面板 SHALL 使用分析任务产出的真实 `annotation_metric_id` 加载数据
+
+#### Scenario: Annotation metric ID is resolved from pipeline result
+
+- **WHEN** annotation_kinematics 分析任务完成
+- **THEN** 前端 SHALL 从 `AnalysisResult.raw_result.products.annotation_metric_id` 获取真实 metric ID
+- **AND** `KinematicsArtifactsPanel` SHALL 使用该 ID 加载可视化数据
+- **AND** `KinematicsReviewPanel` SHALL 使用该 ID 加载诊断数据
+- **AND** MUST NOT 使用硬编码或默认值
 
 ### Requirement: Workflow phase derived from server state
 
@@ -38,13 +47,13 @@
 
 ### Requirement: Primary flow fixes to side camera and CVAT
 
-主流程 SHALL 仅突出侧面机位，并将主标注入口固定为 CVAT Skeleton XML（`.xml`）。正面、俯视、水下、半水下 SHALL 作为只读的"后续扩展机位"区域，不提供上传按钮且不影响当前工作流就绪状态。
+主流程 SHALL 仅呈现并突出侧面机位，并将主标注入口固定为 CVAT Skeleton XML（`.xml`）。上传步骤 SHALL 仅提供侧面机位的上传入口，不得向用户展示任何其他机位（如正面、俯视、水下、半水下）的可选入口，也不得展示"后续扩展机位"之类的占位区域。
 
-#### Scenario: Non-side cameras are non-interactive
+#### Scenario: Only side camera is presented on the upload page
 
-- **WHEN** 用户查看后续扩展机位区域
-- **THEN** 系统 MUST NOT 显示上传按钮
-- **AND** 已有非侧面视频仅以只读素材展示
+- **WHEN** 用户进入一次训练记录的上传页
+- **THEN** 系统 MUST 仅展示侧面视频上传入口
+- **AND** 系统 MUST NOT 展示正面、俯视、水下、半水下等任何其他机位的卡片、选项卡或"后续扩展"占位区域
 
 #### Scenario: Primary annotation source restricted
 
@@ -77,3 +86,4 @@
 - **THEN** 系统 MUST 将 `workflow_phase` 保持为 `report_ready`
 - **AND** `report_freshness` MUST 为 `stale`
 - **AND** UI MUST 显示 stale 警告与重新生成动作
+

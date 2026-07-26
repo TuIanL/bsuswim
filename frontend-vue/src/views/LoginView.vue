@@ -9,13 +9,13 @@
         </div>
       </div>
       <h1>登录</h1>
-      <p>进入运动员档案、测试任务和多机位视频上传流程。</p>
+      <p>进入运动员档案、测试任务与侧面视频上传流程。</p>
       <el-form class="auth-form" label-position="top" :model="form" @submit.prevent="submit">
         <el-form-item label="用户名" required>
           <el-input v-model="form.username" autocomplete="username" placeholder="coach_demo" />
         </el-form-item>
         <el-form-item label="密码" required>
-          <el-input v-model="form.password" autocomplete="current-password" placeholder="请输入密码" show-password />
+        <el-input v-model="form.password" autocomplete="current-password" placeholder="请输入密码（本地演示：coach_demo123）" show-password />
         </el-form-item>
         <div class="form-row">
           <el-checkbox v-model="form.remember">记住登录状态</el-checkbox>

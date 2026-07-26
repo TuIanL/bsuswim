@@ -74,7 +74,7 @@ class CvatAnnotationNormalizer:
                 annotation_frame=af,
                 source_video_frame=source_video_frame,
                 timestamp_sec=timestamp_sec,
-                image_name=image_name,
+                image_name=image_name or raw.image_name,
                 points=points,
                 source_track_ids=raw.source_track_ids,
             )

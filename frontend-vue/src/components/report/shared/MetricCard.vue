@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { ReportMetric } from '../../../types/report'
+import { metricValueLines } from './formatMetricValue'
 
-defineProps<{
+const props = defineProps<{
   metric: ReportMetric
 }>()
 </script>
@@ -9,9 +10,12 @@ defineProps<{
 <template>
   <div class="metric-card" :class="metric.level ? `metric-card--${metric.level}` : ''">
     <span class="metric-card__label">{{ metric.label }}</span>
-    <strong class="metric-card__value">
-      {{ metric.value }}<small v-if="metric.unit">{{ metric.unit }}</small>
-    </strong>
+    <div class="metric-card__value">
+      <strong v-for="line in metricValueLines(props.metric)" :key="line.label || String(line.value)">
+        <span v-if="line.label" class="metric-card__sub-label">{{ line.label }}</span>
+        {{ line.value }}<small v-if="line.unit">{{ line.unit }}</small>
+      </strong>
+    </div>
     <span v-if="metric.level" class="metric-card__level">{{ metric.level }}</span>
   </div>
 </template>
@@ -34,8 +38,22 @@ defineProps<{
 }
 
 .metric-card__value {
+  display: grid;
+  gap: 5px;
+}
+
+.metric-card__value strong {
   font-size: 22px;
   font-weight: 700;
+}
+
+.metric-card__sub-label {
+  display: inline-block;
+  min-width: 72px;
+  margin-right: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #5f6b7a;
 }
 
 .metric-card__value small {

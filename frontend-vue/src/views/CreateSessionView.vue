@@ -3,7 +3,7 @@
     <div class="page-head">
       <div>
         <h1>创建测试任务</h1>
-        <p>选择运动员并填写测试信息，创建后进入多机位视频上传。</p>
+        <p>选择运动员并填写测试信息，创建后进入侧面视频上传。</p>
       </div>
       <el-button @click="$router.push('/athletes')">选择运动员</el-button>
     </div>
@@ -16,7 +16,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="测试标题" required>
-          <el-input v-model="form.title" placeholder="例如：自由泳 50m 多机位测试" />
+          <el-input v-model="form.title" placeholder="例如：自由泳 50m 侧面视频测试" />
         </el-form-item>
         <div class="form-grid">
           <el-form-item label="测试日期">
@@ -67,7 +67,7 @@
         <el-steps direction="vertical" :active="1">
           <el-step title="选择运动员" description="测试任务会绑定到运动员档案" />
           <el-step title="填写测试信息" description="泳姿、距离、泳池长度和训练场景" />
-          <el-step title="多机位上传" description="侧面、正面、俯视、水下与半水下视频" />
+          <el-step title="侧面视频上传" description="上传侧面视频（本次仅分析侧面机位）" />
           <el-step title="进入分析" description="提交后进入工作台与报告流程" />
         </el-steps>
       </div>

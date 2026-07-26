@@ -32,7 +32,7 @@ export function resolveSectionKind(section: NormalizedSection): SectionKind {
     if (section.page_type === 'body_posture_head_trunk' || 
         section.page_type === 'upper_limb' || 
         section.page_type === 'lower_limb') {
-      return 'kinematics_metrics'
+      return 'module'
     }
     if (section.page_type === 'review_summary') {
       return 'kinematics_artifacts'

@@ -8,6 +8,7 @@ import asyncio
 import hashlib
 import json
 import uuid
+from pathlib import Path
 from typing import Any
 
 from sqlalchemy.orm import Session
@@ -41,6 +42,7 @@ from app.services.kinematic_artifacts.constants import (
 from app.services.kinematic_artifacts.frame_provider import KinematicFrameSequenceProvider
 from app.services.kinematic_artifacts.frame_selection import select_all_keyframes
 from app.services.kinematic_artifacts.keyframe_renderer import render_keyframe
+from app.services.kinematic_artifacts.presentation import keyframe_presentation
 from app.services.kinematic_artifacts.signature import generation_signature, metric_hash
 from app.services.metrics.kinematics.frame_resolver import resolve_frames
 from app.services.storage import StorageService, public_asset_url
@@ -176,8 +178,19 @@ def _render_all(db, artifact_set, metric, annotation, session_video, video_file,
     selected = select_all_keyframes(summary, time_series, canonical, ref_px)
     selected_by_key = {s.artifact_metric_key: s for s in selected}
 
-    mapping = (annotation.annotation_metadata or {}).get("frame_mapping", {})
+    metadata = annotation.annotation_metadata or {}
+    # Older imports stored the mapping at the top level; quality repair stores
+    # it under derived. Accept both layouts so a confirmed mapping enables
+    # real-video keyframe extraction after repair.
+    derived = metadata.get("derived") if isinstance(metadata.get("derived"), dict) else {}
+    mapping = metadata.get("frame_mapping") or derived.get("frame_mapping", {})
     mapping_verified = bool(mapping.get("verified")) if isinstance(mapping, dict) else False
+    if mapping_verified:
+        # Confirmed identity mappings may come from older CVAT imports that did
+        # not persist source_video_frame on every keypoint frame.
+        for item in selected:
+            if item.source_video_frame is None:
+                item.source_video_frame = item.annotation_frame
 
     base_dir = (
         f"kinematic-artifacts/{metric.id}/r{metric.source_revision}/{artifact_set.generation_signature[:12]}"
@@ -188,7 +201,8 @@ def _render_all(db, artifact_set, metric, annotation, session_video, video_file,
     extracted: dict[int, Any] = {}
 
     # --- keyframes (require verified mapping + video) ---
-    if mapping_verified and video_file is not None:
+    video_path_exists = bool(video_file and video_file.storage_path and Path(video_file.storage_path).is_file())
+    if mapping_verified and video_path_exists:
         from app.services.kinematic_artifacts.video_extractor import VideoFrameExtractor
 
         try:
@@ -204,7 +218,7 @@ def _render_all(db, artifact_set, metric, annotation, session_video, video_file,
                 extracted = {}
                 warnings.append(SkipReason.VIDEO_DECODE_FAILED)
             extractor.close()
-    elif video_file is None:
+    elif video_file is None or not video_path_exists:
         warnings.append(SkipReason.SOURCE_VIDEO_MISSING)
     else:
         warnings.append(SkipReason.FRAME_MAPPING_UNVERIFIED)
@@ -270,9 +284,18 @@ def _render_keyframe(storage, base_dir, key, module_key, selected_by_key, canoni
     if frame is None:
         art.skip_reason = SkipReason.SOURCE_FRAME_MISSING
         return art
+    presentation = keyframe_presentation(key)
+    selected_metadata = sel.metadata or {}
+    value = selected_metadata.get("value")
+    value_text = f"{value:g} {presentation.unit}" if isinstance(value, (int, float)) and presentation.unit else str(value) if value is not None else "N/A"
     try:
-        img = render_keyframe(ef.image, frame, reference_basis_label="相对画面水平线",
-                              value_label=f"{key.split('.')[-1]}")
+        img = render_keyframe(
+            ef.image,
+            frame,
+            reference_basis_label="相对画面水平线",
+            value_label=value_text,
+            title_label=presentation.title,
+        )
     except ValueError:
         art.skip_reason = SkipReason.COORDINATE_SPACE_MISMATCH
         return art
@@ -286,7 +309,17 @@ def _render_keyframe(storage, base_dir, key, module_key, selected_by_key, canoni
     art.height = img.shape[0]
     art.size_bytes = res["size_bytes"]
     art.checksum_sha256 = res["checksum_sha256"]
-    art.artifact_metadata = sel.metadata or {}
+    art.artifact_metadata = {
+        **selected_metadata,
+        "annotation_source": "来自当前 CVAT XML 手工标注点位",
+        "title": presentation.title,
+        "label": presentation.label,
+        "metric_label": presentation.metric_label,
+        "unit": presentation.unit,
+        "selection_reason": presentation.selection_reason,
+        "caption": presentation.caption,
+        "selection_formula_id": sel.selection_formula_id,
+    }
     return art
 
 
@@ -344,7 +377,13 @@ def _render_trajectory(storage, base_dir, key, module_key, canonical, ref_px):
     art.height = 675
     art.size_bytes = res["size_bytes"]
     art.checksum_sha256 = res["checksum_sha256"]
-    art.artifact_metadata = {"unit": unit, "reference_body_length_px": ref_px}
+    point_count = sum(1 for points in trajectories.values() for _, x, y in points if x is not None and y is not None)
+    art.artifact_metadata = {
+        "unit": unit,
+        "reference_body_length_px": ref_px,
+        "point_count": point_count,
+        "data_available": point_count > 0,
+    }
     return art
 
 
@@ -356,8 +395,8 @@ def _rel_series(canonical, target_side_joint, anchor_side_joint, ref_px):
     out = []
     anchor0 = None
     for f in canonical:
-        t = f.points.get(target_side_joint)
-        a = f.points.get(anchor_side_joint)
+        t = _frame_point(f, target_side_joint)
+        a = _frame_point(f, anchor_side_joint)
         tp, ap = _pt(t), _pt(a)
         if tp is None or ap is None:
             out.append((f.annotation_frame, None, None))
@@ -367,6 +406,17 @@ def _rel_series(canonical, target_side_joint, anchor_side_joint, ref_px):
             rx, ry = rx / ref_px, ry / ref_px
         out.append((f.annotation_frame, rx, ry))
     return out
+
+
+def _frame_point(frame, key):
+    """Read both annotated points and resolver-created midpoint points."""
+    if key == "shoulder_mid":
+        return frame.shoulder_mid
+    if key == "hip_mid":
+        return frame.hip_mid
+    if key == "ankle_mid":
+        return frame.ankle_mid
+    return frame.points.get(key)
 
 
 def _limb_trajectories(canonical, sides, wrist, elbow, ref_px):
@@ -483,6 +533,19 @@ def _render_radar(storage, base_dir, key, module_key, summary, time_series):
 
 
 def _radar_inputs(summary, time_series):
+    def values(key):
+        return [p.get("value") for p in (time_series.get(key) or []) if p.get("value") is not None]
+
+    def mean_abs_delta(*series):
+        deltas = []
+        for points in series:
+            deltas.extend(abs(b - a) for a, b in zip(points, points[1:]))
+        return sum(deltas) / len(deltas) if deltas else None
+
+    left_elbow = values("left_elbow_angle_deg")
+    right_elbow = values("right_elbow_angle_deg")
+    elbow_total = sum(len(points) for points in (left_elbow, right_elbow))
+    elbow_continuity = elbow_total / max(2 * max(len(left_elbow), len(right_elbow)), 1) if elbow_total else None
     return {
         "body_posture": {
             "posture_stability_cv": _env_val(summary, "posture_stability_cv") or 0,
@@ -492,6 +555,10 @@ def _radar_inputs(summary, time_series):
             "kick_periodicity_score": (_env_val(summary, "kick_periodicity") or {}).get("score")
             if isinstance(_env_val(summary, "kick_periodicity"), dict) else None,
             "continuity_factor": (_env_val(summary, "kick_periodicity") or {}).get("continuity_factor"),
+        },
+        "upper_limb": {
+            "elbow_angle_smoothness": mean_abs_delta(left_elbow, right_elbow),
+            "valid_sample_continuity": elbow_continuity,
         },
         "head_control": {
             "trunk_vertical_stability": _env_val(summary, "trunk_vertical_stability") or 0,
