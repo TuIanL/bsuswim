@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -9,8 +11,19 @@ from app.core.config import get_settings
 settings = get_settings()
 
 
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    from app.db.session import SessionLocal
+    from app.services.report_interpretation.scheduler import schedule_interpretation
+    from app.services.report_interpretation.service import recover_stale_jobs
+
+    with SessionLocal() as db:
+        recover_stale_jobs(db, schedule_interpretation)
+    yield
+
+
 def create_app() -> FastAPI:
-    app = FastAPI(title=settings.app_name)
+    app = FastAPI(title=settings.app_name, lifespan=lifespan)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,

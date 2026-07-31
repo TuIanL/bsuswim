@@ -93,6 +93,18 @@ export interface TrainingSession {
   updated_at: string
 }
 
+export interface StorageCleanupFailure {
+  id: number
+  session_id: number
+  storage_path: string
+  error_message: string
+  status: 'pending' | 'resolved'
+  retry_count: number
+  last_attempt_at?: string | null
+  created_at?: string | null
+  resolved_at?: string | null
+}
+
 export interface CreateSessionForm {
   athlete_id: number | null
   title: string
@@ -252,6 +264,63 @@ export interface ReportData {
   source: string
   generated_at: string
   report: Record<string, any>
+  ai_interpretation?: AIInterpretationEnvelope | null
+}
+
+export type AIInterpretationStatus = 'not_configured' | 'pending' | 'generating' | 'ready' | 'failed' | 'stale'
+
+export interface AIInterpretationBlock {
+  text: string
+  fact_refs: string[]
+  knowledge_refs: string[]
+  evidence_refs?: string[]
+}
+
+export interface AIModuleExplanation extends AIInterpretationBlock {
+  module_key: 'body_posture_head_trunk' | 'upper_limb' | 'lower_limb'
+}
+
+export interface AITrainingSuggestion extends AIInterpretationBlock {
+  title: string
+  applicability: string
+  cautions: string[]
+}
+
+export interface AIRetestTarget extends AIInterpretationBlock {
+  metric_key: string
+}
+
+export interface AIInterpretationContent {
+  schema_version: string
+  plain_language_summary: AIInterpretationBlock
+  module_explanations: AIModuleExplanation[]
+  priority_focus: AIInterpretationBlock[]
+  training_suggestions: AITrainingSuggestion[]
+  retest_targets: AIRetestTarget[]
+  limitations: string[]
+}
+
+export interface AIInterpretationTrace {
+  generation_signature: string
+  base_report_generation_signature: string
+  provider: string
+  model: string
+  prompt_version: string
+  output_schema_version: string
+  knowledge_base_version: string
+  knowledge_ids: string[]
+  execution_mode?: 'text' | 'visual'
+  evidence_ids?: string[]
+  evidence_exclusion_reasons?: string[]
+  generated_at?: string | null
+}
+
+export interface AIInterpretationEnvelope {
+  status: AIInterpretationStatus
+  content?: AIInterpretationContent | null
+  trace?: AIInterpretationTrace | null
+  error?: { code: string; message: string; retryable: boolean } | null
+  can_regenerate: boolean
 }
 
 // ---- annotation file types ----

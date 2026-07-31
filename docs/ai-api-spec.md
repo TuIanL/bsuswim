@@ -255,7 +255,28 @@ Content-Type: application/json
 
 接入真实 YOLO / MMPose 时，优先保持这份接口规范不变，只替换 runtime 内部实现。
 
-## 10. NormalizedAnnotation — 标准化标注输入层
+## 10. 大模型报告解读接口
+
+大模型解读与姿态模型服务是两条独立链路。基础 `swim-report.v1` 先持久化，AI
+解读异步生成并单独保存在 `report_interpretations`，不会改写报告指标或规则发现。
+
+```http
+GET /api/v1/sessions/{session_id}/report/interpretation
+POST /api/v1/sessions/{session_id}/report/interpretation/generate
+Authorization: Bearer <token>
+```
+
+生成请求为 `{"force": false}`，成功受理返回 HTTP 202。`force=false` 会复用相同
+generation signature 的 pending/generating/ready 记录；`force=true` 创建可审计的新
+attempt。两条接口均复用 session 所有权检查，并可能返回
+`not_configured | pending | generating | ready | failed | stale`。
+
+报告读取接口 `GET /api/v1/reports/{session_id}` 也会组合返回同一个
+`ai_interpretation` envelope。响应只包含已校验内容、追溯摘要和结构化错误，不包含
+API key、完整 system policy 或 provider 原始响应。具体配置和故障码见
+[`ai-report-interpretation-operations.md`](./ai-report-interpretation-operations.md)。
+
+## 11. NormalizedAnnotation — 标准化标注输入层
 
 ### 概述
 

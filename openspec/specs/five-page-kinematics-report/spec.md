@@ -3,9 +3,7 @@
 ## Purpose
 
 定义由 annotation_kinematics pipeline 装配并持久化的五页泳姿运动学报告（swim-report.v1）的数据结构、装配规则、来源稳定性与错误非吞咽约束。
-
 ## Requirements
-
 ### Requirement: Report is assembled and persisted by the analysis pipeline
 
 五页报告 SHALL 可由 annotation_kinematics pipeline 装配并写入 ReportMetadata。
@@ -40,7 +38,7 @@ The system SHALL assemble a `swim-report.v1` document using report profile
 `side_2d_kinematics_5page_v1`.
 
 The document SHALL contain exactly five sections with `page_number` values
-`[1, 2, 3, 4, 5]`.
+`[1, 2, 3, 4, 5]`, including when pages 2 through 4 contain diagnostic keyframe evidence.
 
 #### Scenario: Complete current inputs are available
 
@@ -51,6 +49,14 @@ The document SHALL contain exactly five sections with `page_number` values
 - **THEN** the report SHALL contain exactly five sections
 - **AND** their `page_number` values SHALL be `[1, 2, 3, 4, 5]`
 - **AND** the report `assembly_status` SHALL be `ready`
+
+#### Scenario: Keyframe evidence is available
+
+- **GIVEN** a current metric, artifact set and finding set are available
+- **WHEN** the report is assembled
+- **THEN** the report SHALL contain exactly five sections
+- **AND** its page numbers SHALL remain `[1, 2, 3, 4, 5]`
+- **AND** keyframe evidence SHALL be included inside the category pages rather than an additional page
 
 ### Requirement: Report-page module keys are profile-specific
 
@@ -113,19 +119,34 @@ and explicit analysis boundaries before any technical metrics are shown.
 Pages 2, 3 and 4 SHALL group content by analysis module category: page 2 covers
 `body_posture` and `head_trunk`, page 3 covers `upper_limb`, page 4 covers
 `lower_limb`, each drawing metrics, assets and findings from its category.
+Within each category, ready `annotated_keyframe` assets SHALL be presented as
+diagnostic evidence before or alongside chart assets, retaining artifact identity,
+frame references, metric values and source annotation revision. A keyframe SHALL
+NOT be interpreted as an action-phase label.
 
 #### Scenario: Body and head-trunk data are available
 
 - **THEN** page 2 SHALL contain `body_posture` and `head_trunk`
   metrics, assets and findings
+- **AND** ready keyframe assets SHALL be grouped under their originating module
+- **AND** each displayed keyframe SHALL retain its annotation frame and source revision when available
 
 #### Scenario: Upper-limb data are available
 
 - **THEN** page 3 SHALL contain `upper_limb` metrics, assets and findings
+- **AND** ready upper-limb keyframes SHALL be displayed with their metric meaning and frame references
 
 #### Scenario: Lower-limb data are available
 
 - **THEN** page 4 SHALL contain `lower_limb` metrics, assets and findings
+- **AND** ready lower-limb keyframes SHALL be displayed with their metric meaning and frame references
+
+#### Scenario: A category has no ready keyframe
+
+- **WHEN** a category has no ready annotated keyframe asset
+- **THEN** its page SHALL remain renderable
+- **AND** the page SHALL show a structured quality note when keyframes were skipped or unavailable
+- **AND** chart and metric content SHALL not be removed solely because keyframes are unavailable
 
 ### Requirement: Page five remains a review page
 
@@ -404,3 +425,54 @@ assembly service SHALL NOT 将规则配置或 staleness 异常静默降级为“
        或其他系统异常
 - **THEN** 系统 SHALL 正常向上抛出
 - **AND** MUST NOT 静默降级为无 findings
+
+### Requirement: Five-page report exposes optional AI interpretation separately from deterministic content
+
+`side_2d_kinematics_5page_v1` 的读取模型 SHALL 可关联当前 AI 解读状态和 ready 内容，但确定性 `report_data`、五个 section、指标、发现、资产、质量说明和基础 generation signature SHALL 不因 AI 解读生成而被改写。
+
+#### Scenario: Current ready interpretation exists
+
+- **WHEN** 用户读取当前五页报告且存在匹配基础报告 generation signature 的 ready AI 解读
+- **THEN** 响应 SHALL 包含该 AI 解读及其独立 generation signature 和追溯信息
+- **AND** 基础报告 SHALL 仍包含恰好五个 section
+- **AND** 基础报告 generation signature SHALL 保持不变
+
+#### Scenario: No current ready interpretation exists
+
+- **WHEN** AI 解读未配置、生成中、失败或 stale
+- **THEN** 五页基础报告 SHALL 完整返回
+- **AND** 响应 SHALL 暴露明确的 AI 解读状态
+- **AND** SHALL NOT 用模板化占位内容伪装成 ready AI 解读
+
+### Requirement: AI interpretation presentation preserves page ownership and report boundaries
+
+五页报告的 AI 解读展示 SHALL 保持现有页面职责：总体通俗总结归属页面 1，身体与头躯干、上肢、下肢模块解释分别归属页面 2、3、4，优先关注项、条件式训练建议、复测目标和限制归属页面 5。
+
+#### Scenario: AI interpretation is mapped to report pages
+
+- **WHEN** ready AI 解读在 Web 或 PDF 中渲染
+- **THEN** 页面 1 SHALL 只展示总体解释和 AI 来源状态
+- **AND** 页面 2 至 4 SHALL 只展示与当前 source module 对应的模块解释
+- **AND** 页面 5 SHALL 展示优先关注项、条件式训练建议、复测目标、限制和引用
+- **AND** 报告 SHALL 继续保持五页，不得新增第六页
+
+#### Scenario: AI content conflicts with deterministic report
+
+- **WHEN** AI 解读中的引用或表述无法与当前报告事实一致
+- **THEN** 渲染层 SHALL 忽略该 AI 解读并展示基础报告
+- **AND** SHALL 显示结构化的 AI 内容不可用状态
+
+### Requirement: Five-page report exposes stable references for AI evidence selection
+
+五页报告 SHALL 为可用于 AI 多模态证据包的已生成关键姿态资产和时序资产保留稳定资产身份、来源 revision、模块、媒体类型和关联指标/发现信息，且不改变现有五页顺序、内容边界或打印页数。
+
+#### Scenario: Report contains current visual artifacts
+- **WHEN** 五页报告装配包含当前关键姿态或时序资产
+- **THEN** 每个可选资产 SHALL 保留供服务端解析的稳定引用与来源追溯信息
+- **AND** 报告页面 SHALL 继续按既有结构渲染该资产
+
+#### Scenario: Report has no suitable visual asset
+- **WHEN** 页面没有当前、可读取的关键姿态或时序资产
+- **THEN** 报告 SHALL 保持可用并呈现既有质量说明
+- **AND** AI 解读 SHALL 能降级为不含视觉证据的文本模式
+

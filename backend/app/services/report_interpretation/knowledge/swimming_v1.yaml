@@ -1,0 +1,61 @@
+entries:
+  - knowledge_id: freestyle-body-line-observation
+    version: "1.0"
+    title: 自由泳身体姿态复核
+    summary: 身体轴和髋部波动应结合呼吸、滚转、镜头与遮挡共同复核；训练中可尝试低强度流线和核心控制练习，并以姿态稳定而非单一角度越小越好为目标。
+    stroke_types: [freestyle]
+    metric_keys: [body_axis_angle_deg, body_angle_std_deg, hip_vertical_range_px, posture_stability_cv]
+    finding_codes: [body_axis_variation_review, hip_vertical_variation_review]
+    athlete_levels: []
+    training_goals: [body_stability]
+    contraindications: [二维视频不能确定力量原因, 呼吸阶段可能改变身体轴]
+    source_title: 智泳云枢统一评价指标体系
+    source_locator: README_METRICS.md#身体姿态与稳定性
+    review_status: active
+    reviewed_by: project-metric-spec-maintainers
+    reviewed_at: "2026-07-30"
+  - knowledge_id: freestyle-upper-limb-review
+    version: "1.0"
+    title: 自由泳上肢活动范围复核
+    summary: 肘关节活动范围和左右差异需要结合划水阶段与原视频确认；可尝试慢速分解划水或单臂对照练习，由教练观察轨迹连续性，不能仅凭二维角度判断力量问题。
+    stroke_types: [freestyle]
+    metric_keys: [left_elbow_angle_deg, right_elbow_angle_deg, elbow_rom_deg, arm_extension_ratio]
+    finding_codes: [elbow_rom_outlier_review, elbow_rom_asymmetry_review]
+    athlete_levels: []
+    training_goals: [arm_path, symmetry]
+    contraindications: [未识别划水阶段, 遮挡和身体滚转影响二维角度]
+    source_title: 智泳云枢统一评价指标体系
+    source_locator: README_METRICS.md#上肢技术
+    review_status: active
+    reviewed_by: project-metric-spec-maintainers
+    reviewed_at: "2026-07-30"
+  - knowledge_id: freestyle-lower-limb-review
+    version: "1.0"
+    title: 自由泳下肢节奏复核
+    summary: 膝角、踝部范围和周期性用于观察打腿动作幅度与重复性；可尝试扶板或侧身低强度打腿，由教练确认是否以髋部带动并保持稳定节奏。
+    stroke_types: [freestyle]
+    metric_keys: [left_knee_angle_deg, right_knee_angle_deg, knee_rom_deg, ankle_vertical_range_px, kick_periodicity]
+    finding_codes: [large_knee_flexion_review, weak_ankle_periodicity_review]
+    athlete_levels: []
+    training_goals: [kick_rhythm]
+    contraindications: [未识别具体打腿阶段, 样本不足会降低周期性可信度]
+    source_title: 智泳云枢统一评价指标体系
+    source_locator: README_METRICS.md#下肢技术
+    review_status: active
+    reviewed_by: project-metric-spec-maintainers
+    reviewed_at: "2026-07-30"
+  - knowledge_id: side-video-retest-quality
+    version: "1.0"
+    title: 侧面视频复测采集
+    summary: 复测应尽量保持机位、距离、帧率、标注口径和泳速条件一致，并确认标注帧到原视频帧的映射，以便比较指标变化。
+    stroke_types: [freestyle]
+    metric_keys: [body_axis_angle_deg, elbow_rom_deg, knee_rom_deg, kick_periodicity]
+    finding_codes: []
+    athlete_levels: []
+    training_goals: [retest]
+    contraindications: [采集条件变化会削弱跨报告可比性]
+    source_title: 智泳云枢统一评价指标体系
+    source_locator: README_METRICS.md#版本治理
+    review_status: active
+    reviewed_by: project-metric-spec-maintainers
+    reviewed_at: "2026-07-30"

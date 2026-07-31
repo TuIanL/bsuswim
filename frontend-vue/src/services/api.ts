@@ -13,6 +13,7 @@ import type {
   ReportData,
   SessionVideo,
   SessionVideoCreateInput,
+  StorageCleanupFailure,
   TrainingSession,
   User,
   VideoFile,
@@ -30,11 +31,13 @@ import type {
   QualityRepairPayload,
   QualityRepairResponse
 } from '../types'
+import type { AIInterpretationEnvelope } from '../types'
 import {
   bindDemoSessionVideo,
   createDemoAthlete,
   createDemoSession,
   createDemoVideo,
+  deleteDemoSession,
   demoUser,
   getDemoAthlete,
   getDemoAthleteSessions,
@@ -178,6 +181,26 @@ export async function listSessions(): Promise<TrainingSession[]> {
 export async function getSession(sessionId: number): Promise<TrainingSession | null> {
   if (demoMode) return getDemoSession(sessionId)
   const response = await client.get<TrainingSession>(`/sessions/${sessionId}`)
+  return response.data
+}
+
+export async function deleteSession(sessionId: number): Promise<void> {
+  if (demoMode) {
+    deleteDemoSession(sessionId)
+    return
+  }
+  await client.delete(`/sessions/${sessionId}`)
+}
+
+export async function listStorageCleanupFailures(): Promise<StorageCleanupFailure[]> {
+  if (demoMode) return []
+  const response = await client.get<StorageCleanupFailure[]>('/sessions/cleanup-failures')
+  return response.data
+}
+
+export async function retryStorageCleanup(failureId: number): Promise<{ id: number; resolved: boolean }> {
+  if (demoMode) return { id: failureId, resolved: true }
+  const response = await client.post<{ id: number; resolved: boolean }>(`/sessions/cleanup-failures/${failureId}/retry`)
   return response.data
 }
 
@@ -332,6 +355,26 @@ export async function getReport(
     return getDemoReport(sessionId, format)
   }
   const response = await client.get<ReportData>(`/reports/${sessionId}`)
+  return response.data
+}
+
+export async function getReportInterpretation(sessionId: number): Promise<AIInterpretationEnvelope> {
+  if (demoMode) return { status: 'not_configured', can_regenerate: false }
+  const response = await client.get<AIInterpretationEnvelope>(
+    `/sessions/${sessionId}/report/interpretation`
+  )
+  return response.data
+}
+
+export async function generateReportInterpretation(
+  sessionId: number,
+  force: boolean = false
+): Promise<{ interpretation_id?: number; status: string; generation_signature?: string; reused: boolean }> {
+  if (demoMode) return { status: 'not_configured', reused: false }
+  const response = await client.post(
+    `/sessions/${sessionId}/report/interpretation/generate`,
+    { force }
+  )
   return response.data
 }
 

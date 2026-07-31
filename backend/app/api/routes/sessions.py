@@ -6,8 +6,23 @@ from sqlalchemy.orm import Session, joinedload
 from app.api.routes.videos import _read_video
 from app.core.deps import get_current_user
 from app.db.session import get_db
-from app.models import Athlete, SessionVideo, TrainingSession, TrainingSessionStatus, User, VideoFile
-from app.schemas import SessionVideoCreate, SessionVideoRead, TrainingSessionCreate, TrainingSessionRead
+from app.models import Athlete, SessionVideo, StorageCleanupFailure, TrainingSession, TrainingSessionStatus, User, VideoFile
+from app.schemas import (
+    SessionVideoCreate,
+    SessionVideoRead,
+    StorageCleanupFailureRead,
+    StorageCleanupRetryRead,
+    TrainingSessionCreate,
+    TrainingSessionRead,
+)
+from app.services.history_deletion_service import (
+    ActiveAnalysisTaskError,
+    HistoryNotFoundError,
+    StorageCleanupError,
+    UnsafeStoragePathError,
+    delete_training_history,
+    retry_storage_cleanup,
+)
 
 router = APIRouter()
 
@@ -42,6 +57,33 @@ def list_sessions(
     return list(db.scalars(query).all())
 
 
+@router.get("/cleanup-failures", response_model=list[StorageCleanupFailureRead])
+def list_cleanup_failures(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> list[StorageCleanupFailure]:
+    return list(
+        db.scalars(
+            select(StorageCleanupFailure)
+            .where(StorageCleanupFailure.coach_id == current_user.id, StorageCleanupFailure.resolved_at.is_(None))
+            .order_by(StorageCleanupFailure.created_at.desc())
+        ).all()
+    )
+
+
+@router.post("/cleanup-failures/{failure_id}/retry", response_model=StorageCleanupRetryRead)
+def retry_cleanup_failure(
+    failure_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> StorageCleanupRetryRead:
+    try:
+        resolved = retry_storage_cleanup(db, failure_id, current_user.id)
+    except HistoryNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="清理失败记录不存在") from exc
+    return StorageCleanupRetryRead(id=failure_id, resolved=resolved)
+
+
 @router.get("/{session_id}", response_model=TrainingSessionRead)
 def get_session(
     session_id: int,
@@ -50,6 +92,27 @@ def get_session(
 ) -> TrainingSessionRead:
     session = _get_owned_session(db, session_id, current_user)
     return session
+
+
+@router.delete("/{session_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_session(
+    session_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> None:
+    try:
+        delete_training_history(db, session_id, current_user.id)
+    except HistoryNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="训练记录不存在") from exc
+    except ActiveAnalysisTaskError as exc:
+        raise HTTPException(status_code=409, detail="分析任务仍在进行，暂时不能删除") from exc
+    except UnsafeStoragePathError as exc:
+        raise HTTPException(status_code=400, detail="关联文件路径无效，未执行删除") from exc
+    except StorageCleanupError as exc:
+        raise HTTPException(
+            status_code=500,
+            detail={"message": "数据库记录已删除，但部分文件清理失败", "cleanup_failure_ids": exc.failure_ids},
+        ) from exc
 
 
 @router.post("/{session_id}/videos", response_model=SessionVideoRead, status_code=status.HTTP_201_CREATED)

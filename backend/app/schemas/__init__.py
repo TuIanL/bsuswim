@@ -38,6 +38,7 @@ from app.schemas.normalized_annotation import (
     VideoContext,
 )
 from app.schemas.report import ReportData, ReportGenerate
+from app.schemas.storage_cleanup import StorageCleanupFailureRead, StorageCleanupRetryRead
 from app.schemas.training_session import TrainingSessionCreate, TrainingSessionRead
 from app.schemas.user import UserRead
 from app.schemas.video import SessionVideoCreate, SessionVideoRead, VideoFileRead, VideoUploadResponse
@@ -71,6 +72,8 @@ __all__ = [
     "ParseSummary",
     "ReportData",
     "ReportGenerate",
+    "StorageCleanupFailureRead",
+    "StorageCleanupRetryRead",
     "SessionVideoCreate",
     "SessionVideoRead",
     "ScaleInfo",

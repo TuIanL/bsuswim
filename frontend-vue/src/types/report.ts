@@ -1,8 +1,12 @@
+import type { AIInterpretationEnvelope } from '../types'
+
 export interface NormalizedReportViewModel {
   title: string
   summary?: ReportSummaryViewModel
   overview?: ReportOverviewContext
   sections: NormalizedSection[]
+  printSections?: NormalizedSection[]
+  aiInterpretation?: AIInterpretationEnvelope | null
   generation_signature?: string
   provenance?: Record<string, any>
   video?: ReportVideoContext

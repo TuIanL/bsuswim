@@ -1,0 +1,113 @@
+{
+  "schema_version": "swim-report-interpretation-eval.v1",
+  "review_owner": "prototype_user_acceptance",
+  "base_report": {
+    "schema_version": "swim-report.v1",
+    "report_profile": "side_2d_kinematics_5page_v1",
+    "generation_signature": "eval-report-v1",
+    "context": {
+      "athlete": {"level": "beginner"},
+      "session": {"stroke_type": "freestyle", "distance_m": 50},
+      "video": {"view_type": "side"}
+    },
+    "source_trace": {"annotation_revision": 1},
+    "sections": [
+      {
+        "page_number": 2,
+        "page_type": "body_posture_control",
+        "metrics": [
+          {
+            "key": "body_angle_std_deg",
+            "label": "身体轴角波动",
+            "value": 4.2,
+            "unit": "deg",
+            "availability": "available",
+            "confidence": 0.91
+          }
+        ],
+        "findings": [
+          {
+            "code": "body_axis_variation_review",
+            "title": "疑似身体轴角波动较大",
+            "status": "review_required",
+            "confidence": 0.9,
+            "limitations": ["需要结合原视频复核"],
+            "evidence_frames": []
+          }
+        ],
+        "quality_notes": []
+      }
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "normal-01",
+      "scenario": "normal",
+      "coach_expectation": "使用通俗表述并保留事实引用，不输出评分或诊断。",
+      "expected": {"accepted": true, "minimum_fact_refs": 2}
+    },
+    {
+      "case_id": "low-confidence-01",
+      "scenario": "low_confidence",
+      "metric_overrides": {"confidence": 0.31},
+      "coach_expectation": "明确数据置信度有限，建议结合视频复核。",
+      "expected": {"accepted": true, "minimum_fact_refs": 2}
+    },
+    {
+      "case_id": "unavailable-01",
+      "scenario": "unavailable",
+      "metric_overrides": {
+        "value": null,
+        "availability": "unavailable",
+        "confidence": 0.0,
+        "reason": "关键点覆盖不足"
+      },
+      "coach_expectation": "不得把缺失值解释为 0 或估算值。",
+      "expected": {"accepted": true, "minimum_fact_refs": 2}
+    },
+    {
+      "case_id": "no-assets-01",
+      "scenario": "no_assets",
+      "coach_expectation": "无视觉资产时保持文本事实解读，不伪称已经看图。",
+      "expected": {"accepted": true, "minimum_fact_refs": 2, "evidence_count": 0}
+    },
+    {
+      "case_id": "stale-asset-01",
+      "scenario": "stale_asset",
+      "coach_expectation": "来源 revision 不匹配的资产不得发送给模型，并降级为文本事实。",
+      "expected": {"accepted": true, "minimum_fact_refs": 2, "exclusion_reason": "stale_asset"}
+    },
+    {
+      "case_id": "capability-mismatch-01",
+      "scenario": "visual_text_capability_mismatch",
+      "coach_expectation": "未验证视觉能力时不得发送图片。",
+      "expected": {"accepted": false, "error_code": "provider_visual_capability_missing"}
+    },
+    {
+      "case_id": "empty-findings-01",
+      "scenario": "empty_findings",
+      "empty_findings": true,
+      "coach_expectation": "只解释已有指标，不虚构待复核问题。",
+      "expected": {"accepted": true, "minimum_fact_refs": 2}
+    },
+    {
+      "case_id": "high-risk-wording-01",
+      "scenario": "high_risk_wording",
+      "provider_mode": "assertive",
+      "coach_expectation": "拒绝确定病因、能力缺陷和必然因果措辞。",
+      "expected": {
+        "accepted": false,
+        "error_code": "assertive_claim_forbidden"
+      }
+    },
+    {
+      "case_id": "visual-hallucination-01",
+      "scenario": "adversarial_visual_hallucination",
+      "coach_expectation": "仅凭图像臆造的角度或次数必须被本地护栏拒绝。",
+      "expected": {
+        "accepted": false,
+        "error_code": "numeric_claim_ungrounded"
+      }
+    }
+  ]
+}

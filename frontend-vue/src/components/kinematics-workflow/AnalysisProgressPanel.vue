@@ -3,9 +3,9 @@
     <div class="progress-head">
       <span>分析进度</span>
       <small v-if="attempt > 1">（第 {{ attempt }} 次尝试）</small>
-      <span class="pct">{{ progress }}%</span>
+      <span class="pct">{{ percentage }}%</span>
     </div>
-    <el-progress :percentage="progress" :status="progressStatus" />
+    <el-progress :percentage="percentage" :status="progressStatus" :stroke-width="8" />
 
     <ul class="step-list">
       <li v-for="step in steps" :key="step.key" class="step" :class="`step-${step.status}`">
@@ -58,6 +58,11 @@ const emit = defineEmits<{ (e: 'retry'): void; (e: 'resubmit'): void }>()
 const steps = computed<PipelineStep[]>(() => props.progress?.steps ?? [])
 const attempt = computed(() => props.progress?.attempt_count ?? 1)
 const warnings = computed(() => props.progress?.warnings ?? [])
+const percentage = computed(() => {
+  const values = steps.value.map((step) => Number(step.progress)).filter(Number.isFinite)
+  if (values.length) return Math.max(0, Math.min(100, Math.max(...values)))
+  return props.status === 'completed' ? 100 : 0
+})
 const failed = computed(() => props.status === 'failed')
 const progressStatus = computed(() =>
   props.status === 'failed' ? 'exception' : props.status === 'completed' ? 'success' : undefined
@@ -65,13 +70,13 @@ const progressStatus = computed(() =>
 </script>
 
 <style scoped>
-.progress-panel { padding: 12px 0; }
-.progress-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.pct { margin-left: auto; font-weight: 600; }
-.step-list { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-direction: column; gap: 6px; }
-.step { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #909399; }
-.step-running { color: #409eff; }
-.step-completed { color: #67c23a; }
+.progress-panel { padding: 8px 0 4px; }
+.progress-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: #26384a; font-weight: 650; }
+.pct { margin-left: auto; font-variant-numeric: tabular-nums; }
+.step-list { list-style: none; padding: 0; margin: 14px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+.step { min-height: 34px; display: flex; align-items: center; gap: 7px; padding: 7px 9px; border: 1px solid #e5ebf0; background: #fbfcfd; font-size: 12px; color: #8492a0; }
+.step-running { color: #247cdb; border-color: #d4e8ff; background: #f5faff; }
+.step-completed { color: #258447; border-color: #d8eddd; background: #f7fcf8; }
 .step-failed { color: #f56c6c; }
 .step-err { font-size: 11px; color: #f56c6c; }
 .warnings { margin-top: 10px; }

@@ -32,11 +32,12 @@
           <el-progress :percentage="row.progress" />
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="320" fixed="right">
+      <el-table-column label="操作" width="380" fixed="right">
         <template #default="{ row }">
           <el-button size="small" @click="$router.push(`/sessions/${row.id}/upload`)">上传</el-button>
           <el-button size="small" :disabled="!row.task" @click="$router.push(`/workspace/${row.task.id}`)">工作台</el-button>
           <el-button size="small" :disabled="row.displayStatus !== 'completed'" @click="$router.push(`/reports/${row.id}`)">报告</el-button>
+          <el-button size="small" type="danger" plain :loading="deletingId === row.id" @click="remove(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -45,12 +46,14 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { listSessions, listTasks } from '../services/api'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { deleteSession, listSessions, listTasks } from '../services/api'
 import type { AnalysisTask, TaskStatus, TrainingSessionStatus, TrainingSession } from '../types'
 
 const sessions = ref<TrainingSession[]>([])
 const tasks = ref<AnalysisTask[]>([])
 const loading = ref(false)
+const deletingId = ref<number | null>(null)
 let timer = 0
 
 type DisplayStatus = TrainingSessionStatus | TaskStatus
@@ -77,6 +80,30 @@ async function load() {
     tasks.value = taskRows
   } finally {
     loading.value = false
+  }
+}
+
+async function remove(row: TrainingSession) {
+  try {
+    await ElMessageBox.confirm(
+      `将永久删除“${row.title}”及其视频、标注、分析结果和报告，且无法恢复。`,
+      '删除测试任务',
+      { confirmButtonText: '永久删除', cancelButtonText: '取消', type: 'warning', confirmButtonClass: 'el-button--danger' }
+    )
+  } catch {
+    return
+  }
+
+  deletingId.value = row.id
+  try {
+    await deleteSession(row.id)
+    await load()
+    ElMessage.success('测试任务已删除')
+  } catch (error: any) {
+    const detail = error?.response?.data?.detail
+    ElMessage.error(detail?.message || detail || error?.message || '删除测试任务失败')
+  } finally {
+    deletingId.value = null
   }
 }
 

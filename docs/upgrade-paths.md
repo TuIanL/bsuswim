@@ -39,3 +39,15 @@ API 调用方不应依赖本地绝对路径，只使用后端返回的 `playback
 - `error_message`
 
 模型服务可以单独安装 CUDA、PyTorch、OpenCV、MMPose、YOLO 权重和视频处理依赖，不应把这些重依赖加入业务后端。
+
+## 进程内 AI 解读调度到持久队列
+
+AI 报告解读当前通过独立的 `InterpretationScheduler` 协议和进程内线程池执行。
+数据库先保存 `pending` 状态，应用启动时会恢复 pending 或超时的 generating 任务。
+迁移到 Celery/RQ/Redis worker 时保持以下边界：
+
+- API 和 pipeline 只调用 `schedule(interpretation_id)`，不传递报告正文或凭据。
+- worker 通过 ID 重新读取受控事实包并执行 `execute_interpretation`。
+- 保留同一 report、generation signature、attempt 的幂等约束。
+- 队列确认必须发生在 pending 记录提交之后；失败不得修改基础报告状态。
+- 多实例部署必须替换当前进程内线程池，否则任务只在接收请求的实例上执行。

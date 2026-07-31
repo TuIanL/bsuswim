@@ -43,6 +43,9 @@ from app.services.reporting.kinematics_report.assembly_service import (
     AssemblyError,
     assemble_five_page_kinematics_report,
 )
+from app.core.config import get_settings
+from app.services.report_interpretation import create_or_reuse_interpretation
+from app.services.report_interpretation.scheduler import schedule_interpretation
 
 ANNOTATION_PIPELINE_VERSION = "side_2d_v1"
 REPORT_SCHEMA_VERSION = "swim-analysis.annotation-kinematics.v1"
@@ -256,6 +259,19 @@ def _run_sync(task_id: int, pipeline_version: str, db: Optional[Session] = None)
         )
 
         writer.complete_pipeline(report_id=report.id)
+        settings = get_settings()
+        if settings.ai_interpretation_configured and settings.ai_interpretation_auto_generate:
+            try:
+                interpretation, reused = create_or_reuse_interpretation(
+                    db,
+                    report,
+                    requested_by_user_id=owner.id,
+                    settings=settings,
+                )
+                if interpretation is not None and not reused:
+                    schedule_interpretation(interpretation.id)
+            except Exception as exc:
+                writer.add_warning(f"ai_interpretation_schedule_failed:{type(exc).__name__}")
         return PipelineOutcome(task_id, "annotation_kinematics", pipeline_version, completed=True, report_id=report.id)
     except PipelineExecutionError as exc:
         db.rollback()

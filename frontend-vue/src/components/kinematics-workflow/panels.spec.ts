@@ -8,6 +8,20 @@ import type { PipelineProgress } from '../../types'
 const PROGRESS: PipelineProgress = makeTask().pipeline_progress!
 
 describe('AnalysisProgressPanel (16.13 失败 UI)', () => {
+  it('只渲染数值进度，不泄露原始 PipelineProgress JSON', () => {
+    const task = makeTask({ status: 'completed' })
+    const wrapper = mount(AnalysisProgressPanel, {
+      props: {
+        progress: task.pipeline_progress!,
+        status: task.status,
+        actions: task.actions,
+        busy: null
+      }
+    })
+    expect(wrapper.text()).toContain('100%')
+    expect(wrapper.text()).not.toContain('pipeline_type')
+  })
+
   it('真实失败任务展示失败阶段与错误码', () => {
     const task = makeTask({ status: 'failed', failed_stage: 'generating_artifacts', error_code: 'ARTIFACT_GENERATION_FAILED', actions: ['retry', 'details'] })
     const wrapper = mount(AnalysisProgressPanel, {

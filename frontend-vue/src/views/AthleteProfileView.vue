@@ -61,10 +61,11 @@
           <el-table-column label="状态" width="120">
             <template #default="{ row }"><el-tag>{{ statusLabel(row.status) }}</el-tag></template>
           </el-table-column>
-          <el-table-column label="操作" width="210">
+          <el-table-column label="操作" width="280">
             <template #default="{ row }">
               <el-button size="small" @click="$router.push(`/sessions/${row.id}/upload`)">上传</el-button>
               <el-button size="small" :disabled="row.status !== 'completed'" @click="$router.push(`/reports/${row.id}`)">报告</el-button>
+              <el-button size="small" type="danger" plain :loading="deletingId === row.id" @click="remove(row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -80,7 +81,8 @@
 import * as echarts from 'echarts'
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { getAthlete, getAthleteTrend, listAthleteSessions } from '../services/api'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { deleteSession, getAthlete, getAthleteTrend, listAthleteSessions } from '../services/api'
 import { useAuthStore } from '../stores/auth'
 import type { Athlete, AthleteTrendPoint, TrainingSession } from '../types'
 
@@ -92,6 +94,7 @@ const sessions = ref<TrainingSession[]>([])
 const trends = ref<AthleteTrendPoint[]>([])
 const loading = ref(true)
 const chartRef = ref<HTMLDivElement | null>(null)
+const deletingId = ref<number | null>(null)
 
 const latestSession = computed(() => sessions.value[0])
 const latestScore = computed(() => athlete.value?.current_score ?? latestSession.value?.score ?? '待测')
@@ -136,6 +139,30 @@ function renderChart() {
 function createSession() {
   if (!athlete.value) return
   router.push({ path: '/sessions/new', query: { athleteId: athlete.value.id } })
+}
+
+async function remove(session: TrainingSession) {
+  try {
+    await ElMessageBox.confirm(
+      `将永久删除“${session.title}”及其视频、标注、分析结果和报告，且无法恢复。`,
+      '删除历史测试',
+      { confirmButtonText: '永久删除', cancelButtonText: '取消', type: 'warning', confirmButtonClass: 'el-button--danger' }
+    )
+  } catch {
+    return
+  }
+
+  deletingId.value = session.id
+  try {
+    await deleteSession(session.id)
+    await load()
+    ElMessage.success('历史测试已删除')
+  } catch (error: any) {
+    const detail = error?.response?.data?.detail
+    ElMessage.error(detail?.message || detail || error?.message || '删除历史测试失败')
+  } finally {
+    deletingId.value = null
+  }
 }
 
 function calcAge(birthDate?: string | null) {

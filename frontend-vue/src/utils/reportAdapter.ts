@@ -97,12 +97,10 @@ function normalizeLegacyReport(report: Record<string, any>): NormalizedReportVie
   }
 }
 
-function normalizeSwimReportV1(report: Record<string, any>): NormalizedReportViewModel {
+function normalizeSwimReportV1(report: Record<string, any>, aiInterpretation?: any): NormalizedReportViewModel {
   const rawSections: any[] = report.sections ?? []
 
-  const sections: NormalizedSection[] = rawSections
-    .filter((s: any) => s.page_type !== 'analysis_overview')
-    .map((s: any) => ({
+  const normalizeSection = (s: any): NormalizedSection => ({
     key: s.key,
     type: s.type,
     title: s.title ?? '',
@@ -153,7 +151,9 @@ function normalizeSwimReportV1(report: Record<string, any>): NormalizedReportVie
     charts: s.charts ?? [],
     tables: s.tables ?? [],
     quality_notes: s.quality_notes ?? [],
-    }))
+    })
+  const printSections = rawSections.map(normalizeSection)
+  const sections = printSections.filter((s: any) => s.page_type !== 'analysis_overview')
 
   return {
     title: report.summary?.title ?? report.title ?? '游泳专项技术分析报告',
@@ -168,6 +168,8 @@ function normalizeSwimReportV1(report: Record<string, any>): NormalizedReportVie
       mainLimitations: report.summary?.main_limitations ?? [],
     },
     sections,
+    printSections,
+    aiInterpretation: aiInterpretation ?? report.ai_interpretation ?? null,
     overview: report.context ?? report.overview,
     provenance: report.provenance,
     video: report.context?.video ?? report.video,
@@ -181,7 +183,7 @@ export function normalizeReportData(raw: any): NormalizedReportViewModel {
     report.schema_version === 'swim-report.v1' || Array.isArray(report.sections)
 
   if (isSwimReportV1) {
-    return normalizeSwimReportV1(report)
+    return normalizeSwimReportV1(report, raw.ai_interpretation)
   }
 
   return normalizeLegacyReport(report)

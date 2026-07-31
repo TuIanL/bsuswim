@@ -349,6 +349,12 @@ export function getDemoSession(id: number) {
   return sessions.find((session) => session.id === id) || null
 }
 
+export function deleteDemoSession(sessionId: number) {
+  sessions = sessions.filter((session) => session.id !== sessionId)
+  tasks = tasks.filter((task) => task.session_id !== sessionId)
+  sessionVideos = sessionVideos.filter((video) => video.session_id !== sessionId)
+}
+
 export function createDemoSession(input: Partial<TrainingSession>) {
   const createdAt = new Date().toISOString()
   const session: TrainingSession = {

@@ -20,6 +20,20 @@ UPLOAD_DIR='uploads'
 JWT_SECRET_KEY='please-change-this-secret'
 ```
 
+AI 报告解读默认关闭。只做本地确定性联调时可使用 fake provider，不会发起外部请求：
+
+```bash
+AI_INTERPRETATION_ENABLED=true
+AI_INTERPRETATION_AUTO_GENERATE=true
+AI_INTERPRETATION_PROVIDER=fake
+AI_INTERPRETATION_MODEL=deterministic-test
+```
+
+接入 DeepSeek 时使用 `provider=deepseek`、base URL `https://api.deepseek.com` 和
+模型 `deepseek-v4-flash`，然后在本机设置 `AI_INTERPRETATION_API_KEY`。其他支持
+OpenAI 严格 JSON Schema 的服务仍可使用 `provider=openai_compatible`。完整预算、隐私与试运行约定见
+[`ai-report-interpretation-operations.md`](./ai-report-interpretation-operations.md)。
+
 前端连接业务后端:
 
 ```bash

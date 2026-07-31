@@ -5,7 +5,8 @@ from app.models.kinematic_artifact import KinematicArtifact, KinematicArtifactSe
 from app.models.kinematic_review_finding import KinematicReviewFindingSet
 from app.models.athlete import Athlete
 from app.models.normalized_annotation import NormalizedAnnotation
-from app.models.report import ReportMetadata
+from app.models.report import ReportInterpretation, ReportMetadata
+from app.models.storage_cleanup import StorageCleanupFailure
 from app.models.team import Team
 from app.models.training_session import StrokeType, TrainingSession, TrainingSessionStatus
 from app.models.user import User, UserRole
@@ -25,6 +26,8 @@ __all__ = [
     "Athlete",
     "NormalizedAnnotation",
     "ReportMetadata",
+    "StorageCleanupFailure",
+    "ReportInterpretation",
     "SessionVideo",
     "StrokeType",
     "Team",

@@ -351,7 +351,26 @@ def _render_timeseries(storage, base_dir, key, module_key, time_series):
     art.height = 675
     art.size_bytes = res["size_bytes"]
     art.checksum_sha256 = res["checksum_sha256"]
+    # Persist a small report-safe curve summary with the asset. This avoids
+    # reopening raw annotations when an AI explanation needs chart context.
+    art.artifact_metadata = {
+        "time_series": {
+            metric_key: _downsample_timeseries(points)
+            for metric_key, points in series.items()
+        },
+        "source_point_counts": {
+            metric_key: len(points) for metric_key, points in series.items()
+        },
+        "sampling": "uniform_downsample_v1",
+    }
     return art
+
+
+def _downsample_timeseries(points: list[dict], limit: int = 48) -> list[dict]:
+    if len(points) <= limit:
+        return points
+    stride = (len(points) - 1) / (limit - 1)
+    return [points[round(index * stride)] for index in range(limit)]
 
 
 def _render_trajectory(storage, base_dir, key, module_key, canonical, ref_px):

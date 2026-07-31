@@ -62,6 +62,13 @@ Every manifest artifact SHALL expose:
 - generator_version
 - status
 - structured skip or failure reason
+- presentation metadata for ready annotated keyframes, including a human-readable title, selection meaning, display metric label/unit and caption
+
+#### Scenario: A keyframe manifest is consumed by the report
+
+- **WHEN** a ready `annotated_keyframe` is projected into `swim-report.v1`
+- **THEN** its presentation metadata SHALL be available to the report asset
+- **AND** the report SHALL retain the original artifact key for traceability
 
 ### Requirement: Generate five visual artifact families
 
@@ -100,13 +107,20 @@ Annotated keyframes SHALL only be extracted from a source video when source-fram
 
 ### Requirement: Keyframe overlays remain factual
 
-Annotated frames SHALL display COCO17 skeletons, objective geometry and metric values only.
+Annotated frames SHALL display COCO17 skeletons, objective geometry and metric values only. Embedded titles and captions SHALL use a renderable Chinese font or a reliable fallback and SHALL NOT contain replacement glyphs for the supported Chinese display text.
 
 #### Scenario: Body-axis overlay is generated
 
 - **WHEN** body_axis_angle_deg is displayed
 - **THEN** the reference SHALL be labelled screen horizontal
 - **AND** the image MUST NOT label the angle as a water-surface angle
+- **AND** the title SHALL identify the metric and extremum without claiming an action phase
+
+#### Scenario: Chinese text cannot use the preferred font
+
+- **WHEN** the preferred renderer font is unavailable
+- **THEN** the renderer SHALL select a configured fallback font
+- **AND** SHALL produce readable title and caption text rather than question-mark replacement glyphs
 
 ### Requirement: Skeleton overlays and trajectories share one resolver
 

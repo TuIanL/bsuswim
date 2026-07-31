@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session, joinedload
 
 from app.core.deps import get_current_user
@@ -8,6 +8,7 @@ from app.models import AnalysisResult, AnalysisTask, ReportMetadata, TrainingSes
 from app.schemas import ReportData, ReportGenerate
 from app.services.report_builder import build_report_data, build_swim_report_data, merge_into_existing
 from app.services.reporting.resolver import resolve_annotation_metric_for_result
+from app.services.report_interpretation import resolve_interpretation_envelope
 
 router = APIRouter()
 
@@ -57,7 +58,7 @@ def generate_report(
     db.add(report)
     db.commit()
     db.refresh(report)
-    return _read_report(report)
+    return _read_report(report, db)
 
 
 @router.get("/{session_id}", response_model=ReportData)
@@ -70,7 +71,7 @@ def get_report(
     report = db.scalar(select(ReportMetadata).where(ReportMetadata.session_id == session_id))
     if not report:
         raise HTTPException(status_code=404, detail="报告尚未生成")
-    return _read_report(report)
+    return _read_report(report, db)
 
 
 def _get_owned_session(db: Session, session_id: int, current_user: User) -> TrainingSession:
@@ -80,13 +81,14 @@ def _get_owned_session(db: Session, session_id: int, current_user: User) -> Trai
     return session
 
 
-def _read_report(report: ReportMetadata) -> ReportData:
+def _read_report(report: ReportMetadata, db: Session) -> ReportData:
     return ReportData(
         session_id=report.session_id,
         task_id=report.task_id,
         source=report.source,
         generated_at=report.generated_at,
         report=report.report_data,
+        ai_interpretation=resolve_interpretation_envelope(db, report),
     )
 
 
@@ -143,6 +145,5 @@ def build_swim_report(
         "section_count": len(report_data.get("sections", [])),
         "warnings": report_data.get("warnings", []),
     }
-
 
 

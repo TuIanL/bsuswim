@@ -123,4 +123,34 @@ describe('PrintReportView', () => {
     expect((window as any).__REPORT_PRINT_ERROR__).toBeTruthy()
     expect((window as any).__REPORT_PRINT_ERROR__.code).toBe('PRINT_DATA_LOAD_FAILED')
   })
+
+  it('renders persisted AI content without making a generation request', async () => {
+    const data = makeReport([1, 2, 3, 4, 5])
+    data.report_data.sections[0].page_type = 'analysis_overview'
+    data.report_data.sections[0].module_key = 'overview'
+    data.report_data.ai_interpretation = {
+      status: 'ready',
+      can_regenerate: true,
+      trace: {
+        generation_signature: 'ai-sig',
+        base_report_generation_signature: 'sig-abc-123',
+        provider: 'fake', model: 'test', prompt_version: 'v1',
+        output_schema_version: 'v1', knowledge_base_version: 'v1', knowledge_ids: [],
+      },
+      content: {
+        schema_version: 'swim-report-interpretation.v1',
+        plain_language_summary: { text: '打印通俗总结', fact_refs: ['metric:a'], knowledge_refs: [] },
+        module_explanations: [], priority_focus: [], training_suggestions: [],
+        retest_targets: [], limitations: [],
+      },
+    }
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => data })
+    vi.stubGlobal('fetch', fetchMock)
+    const wrapper = mount(PrintReportView, { props: { sessionId: '1', token: 't' } as any })
+    await settle()
+    expect(wrapper.text()).toContain('打印通俗总结')
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(String(fetchMock.mock.calls[0][0])).toContain('/print-data')
+    expect(String(fetchMock.mock.calls[0][0])).not.toContain('/interpretation/generate')
+  })
 })

@@ -9,7 +9,7 @@
 
     <template v-else-if="viewModel">
       <section
-        v-for="section in viewModel.sections"
+        v-for="section in (viewModel.printSections || viewModel.sections)"
         :key="section.key"
         class="print-page"
         :data-page-number="section.page_number"
@@ -20,6 +20,11 @@
           P{{ section.page_number }} | {{ section.page_type }}
         </span>
         <ReportSectionRenderer :section="section" :video="viewModel.video" />
+        <AIInterpretationPanel
+          :interpretation="viewModel.aiInterpretation"
+          :module-key="section.module_key || section.page_type || ''"
+          print
+        />
       </section>
 
       <div class="no-print" style="display:none" />
@@ -34,6 +39,7 @@ import { normalizeReportData } from '../utils/reportAdapter'
 import { PrintReadyRegistry } from '../utils/printReadyRegistry'
 import type { NormalizedReportViewModel } from '../types/report'
 import ReportSectionRenderer from '../components/report/ReportSectionRenderer.vue'
+import AIInterpretationPanel from '../components/report/AIInterpretationPanel.vue'
 
 const route = useRoute()
 const sessionId = computed(() => route.params.sessionId as string)

@@ -34,4 +34,34 @@ describe('normalizeReportData diagnostic keyframes', () => {
     expect(asset?.source_video_frame).toBe(44)
     expect(asset?.source_annotation_revision).toBe(3)
   })
+
+  it('keeps the full five-page print set and maps persisted AI interpretation', () => {
+    const sections = [1, 2, 3, 4, 5].map((page) => ({
+      key: `page-${page}`,
+      page_number: page,
+      page_type: page === 1 ? 'analysis_overview' : `type-${page}`,
+      module_key: page === 1 ? 'overview' : `module-${page}`,
+      title: `Page ${page}`,
+    }))
+    const ai = {
+      status: 'ready',
+      can_regenerate: true,
+      content: {
+        schema_version: 'swim-report-interpretation.v1',
+        plain_language_summary: { text: '通俗总结', fact_refs: ['metric:a'], knowledge_refs: [] },
+        module_explanations: [],
+        priority_focus: [],
+        training_suggestions: [],
+        retest_targets: [],
+        limitations: [],
+      },
+    }
+    const viewModel = normalizeReportData({
+      report: { schema_version: 'swim-report.v1', sections },
+      ai_interpretation: ai,
+    })
+    expect(viewModel.sections).toHaveLength(4)
+    expect(viewModel.printSections).toHaveLength(5)
+    expect(viewModel.aiInterpretation?.content?.plain_language_summary.text).toBe('通俗总结')
+  })
 })

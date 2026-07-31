@@ -13,6 +13,7 @@ from app.services.pdf_export_service import PdfExportService
 from app.services.print_token_service import validate_print_token
 from app.services.reporting.pdf_url import build_session_report_pdf_url
 from app.services.storage import StorageService
+from app.services.report_interpretation import resolve_interpretation_envelope
 
 public_router = APIRouter(tags=["report-exports"])
 internal_router = APIRouter(
@@ -279,6 +280,7 @@ def get_print_data(
     from app.core.config import get_settings
     settings = get_settings()
     report_data = dict(report.report_data)
+    report_data["ai_interpretation"] = resolve_interpretation_envelope(db, report).model_dump(mode="json")
 
     sections = report_data.get("sections", []) or []
     for section in sections:

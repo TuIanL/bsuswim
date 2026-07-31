@@ -10,7 +10,8 @@ Covers:
 """
 import pytest
 
-from app.models import AnnotationMetric, ReportMetadata
+from app.core.config import Settings
+from app.models import AnnotationMetric, ReportInterpretation, ReportMetadata
 from app.schemas.analysis import ANNOTATION_PIPELINE_VERSION
 from app.services.analysis_service import create_analysis_task, retry_analysis_task
 from app.services.metrics.kinematics.quality_adapter import aggregate_side_2d_kinematics_quality
@@ -264,3 +265,87 @@ def test_retry_only_for_annotation(db_session):
     db_session.flush()
     retried = retry_analysis_task(db_session, task)
     assert retried.status == "queued"
+
+
+def _ai_settings(**overrides):
+    values = {
+        "_env_file": None,
+        "ai_interpretation_enabled": True,
+        "ai_interpretation_auto_generate": True,
+        "ai_interpretation_provider": "fake",
+        "ai_interpretation_model": "deterministic-test",
+        "ai_interpretation_rate_limit_per_hour": 100,
+    }
+    values.update(overrides)
+    return Settings(**values)
+
+
+def test_pipeline_auto_schedules_only_after_base_report_is_readable(db_session, monkeypatch):
+    from app.schemas import AnalysisSubmit
+
+    fx_session, ann = _build_chain(db_session)
+    task = create_analysis_task(
+        db_session,
+        AnalysisSubmit(session_id=fx_session.id, normalized_annotation_id=ann.id),
+    )
+    observed = []
+
+    def capture_schedule(interpretation_id):
+        db_session.expire_all()
+        current_task = db_session.get(type(task), task.id)
+        report = _sel(db_session, ReportMetadata, session_id=fx_session.id)
+        observed.append((interpretation_id, current_task.status, bool(report and report.report_data)))
+
+    monkeypatch.setattr(
+        "app.services.analysis_pipelines.annotation_kinematics.get_settings",
+        lambda: _ai_settings(),
+    )
+    monkeypatch.setattr(
+        "app.services.analysis_pipelines.annotation_kinematics.schedule_interpretation",
+        capture_schedule,
+    )
+
+    completed = _run_pipeline(db_session, task)
+
+    assert completed.status == "completed"
+    assert len(observed) == 1
+    interpretation_id, task_status_at_schedule, report_was_readable = observed[0]
+    assert task_status_at_schedule == "completed"
+    assert report_was_readable is True
+    assert db_session.get(ReportInterpretation, interpretation_id).status == "pending"
+
+
+def test_ai_timeout_does_not_change_completed_pipeline_or_base_report(db_session, monkeypatch):
+    from app.schemas import AnalysisSubmit
+    from app.services.report_interpretation.provider import FakeProvider
+    from app.services.report_interpretation.service import execute_interpretation
+
+    fx_session, ann = _build_chain(db_session)
+    task = create_analysis_task(
+        db_session,
+        AnalysisSubmit(session_id=fx_session.id, normalized_annotation_id=ann.id),
+    )
+    settings = _ai_settings()
+
+    monkeypatch.setattr(
+        "app.services.analysis_pipelines.annotation_kinematics.get_settings",
+        lambda: settings,
+    )
+    monkeypatch.setattr(
+        "app.services.analysis_pipelines.annotation_kinematics.schedule_interpretation",
+        lambda interpretation_id: execute_interpretation(
+            interpretation_id,
+            db=db_session,
+            settings=settings,
+            provider=FakeProvider("timeout"),
+        ),
+    )
+
+    completed = _run_pipeline(db_session, task)
+    report = _sel(db_session, ReportMetadata, session_id=fx_session.id)
+    interpretation = _sel(db_session, ReportInterpretation, report_metadata_id=report.id)
+
+    assert completed.status == "completed"
+    assert report.report_data["sections"]
+    assert interpretation.status == "failed"
+    assert interpretation.error_code == "provider_timeout"
