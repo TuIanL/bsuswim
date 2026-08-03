@@ -13,6 +13,7 @@ frontend-vue/dist/
 frontend-vue/.env*.local
 uploads/*
 !uploads/.gitkeep
+backend/uploads/
 backend/.env
 model_service/.env.web-dev.log
 .web-dev.log
