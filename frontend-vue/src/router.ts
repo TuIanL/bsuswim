@@ -27,7 +27,11 @@ export const router = createRouter({
     { path: '/tasks', component: TasksView },
     { path: '/workspace/:taskId', component: WorkspaceView, props: true },
     { path: '/reports/:sessionId', component: ReportView, props: true },
-    { path: '/reports/:sessionId/print', component: () => import('./views/PrintReportView.vue') }
+    {
+      path: '/reports/:sessionId/print',
+      component: () => import('./views/PrintReportView.vue'),
+      meta: { public: true }
+    }
   ]
 })
 

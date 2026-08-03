@@ -10,6 +10,7 @@ from app.db.session import get_db
 from app.models import ReportMetadata, User
 from app.repositories.training_session_repository import require_owned_session
 from app.services.pdf_export_service import PdfExportService
+from app.services.playwright_renderer import PdfRenderError
 from app.services.print_token_service import validate_print_token
 from app.services.reporting.pdf_url import build_session_report_pdf_url
 from app.services.storage import StorageService
@@ -167,7 +168,11 @@ async def export_session_report_pdf(
         failed_report = db.get(ReportMetadata, report.id)
         if failed_report:
             failed_report.pdf_status = "export_failed"
-            failed_report.pdf_error = str(exc)
+            failed_report.pdf_error = (
+                f"[{exc.code}] {exc.message}"
+                if isinstance(exc, PdfRenderError)
+                else str(exc)
+            )
             db.commit()
         raise HTTPException(
             status_code=500,

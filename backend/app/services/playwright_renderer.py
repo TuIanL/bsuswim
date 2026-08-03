@@ -9,8 +9,18 @@ from playwright.async_api import async_playwright
 from app.core.config import get_settings
 
 
-class PdfRenderTimeoutError(Exception):
-    pass
+class PdfRenderError(Exception):
+    """Raised when the print page is not rendered successfully, so export must abort."""
+
+    def __init__(self, code: str, message: str):
+        super().__init__(message)
+        self.code = code
+        self.message = message
+
+
+class PdfRenderTimeoutError(PdfRenderError):
+    def __init__(self, message: str = "PDF rendering timed out"):
+        super().__init__("PDF_RENDER_TIMEOUT", message)
 
 
 def _browser_executable_path() -> str | None:
@@ -38,6 +48,17 @@ def _browser_executable_path() -> str | None:
     )
 
 
+async def _assert_on_print_route(page, expected_url: str) -> None:
+    """Abort if the page was redirected away from the print route (e.g. to /login)."""
+    actual_path = page.url.split("?")[0].split("#")[0]
+    expected_path = expected_url.split("?")[0].split("#")[0]
+    if actual_path != expected_path:
+        raise PdfRenderError(
+            "PRINT_ROUTE_REDIRECTED",
+            f"打印页被重定向（期望 {expected_path}，实际 {actual_path}），导出中止",
+        )
+
+
 async def render_pdf_from_url(url: str, timeout: int = 35000) -> bytes:
     async with async_playwright() as p:
         launch_options = {
@@ -56,6 +77,7 @@ async def render_pdf_from_url(url: str, timeout: int = 35000) -> bytes:
             )
 
             await page.goto(url, wait_until="networkidle", timeout=timeout)
+            await _assert_on_print_route(page, url)
 
             try:
                 await page.wait_for_function(
@@ -63,7 +85,18 @@ async def render_pdf_from_url(url: str, timeout: int = 35000) -> bytes:
                     timeout=timeout,
                 )
             except (asyncio.TimeoutError, PlaywrightTimeoutError):
-                pass
+                page_error = await page.evaluate(
+                    "() => window.__REPORT_PRINT_ERROR__ || null"
+                )
+                if page_error and page_error.get("code"):
+                    raise PdfRenderError(
+                        page_error.get("code", "PRINT_PAGE_ERROR"),
+                        page_error.get("message", "打印页报告错误，导出中止"),
+                    )
+                raise PdfRenderError(
+                    "PRINT_READY_TIMEOUT",
+                    "打印页在限定时间内未就绪，导出中止",
+                )
 
             pdf_bytes = await page.pdf(
                 format="A4",

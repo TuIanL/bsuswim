@@ -428,6 +428,76 @@ class TestPdfExportRoutes:
         assert resp.status_code == 200
         assert resp.json()["pdf_status"] == "exported"
 
+    def test_export_render_error_marks_failed(self, client):
+        """渲染层抛 PdfRenderError → 500 pdf_export_failed，DB 置 export_failed 且 pdf_error 含错误码。"""
+        from app.services.playwright_renderer import PdfRenderError
+
+        report = _make_mock_report(
+            pdf_status="exported",
+            pdf_path="reports/1/report_v1.pdf",
+        )
+        self.mock_db.scalar.return_value = report
+        self.mock_db.execute.return_value.rowcount = 1
+
+        failed_report = _make_mock_report(pdf_status="exporting", pdf_path=None)
+        self.mock_db.get.return_value = failed_report
+
+        with (
+            patch(f"{self.ROUTE}.require_owned_session"),
+            patch(f"{self.ROUTE}.PdfExportService") as mock_svc,
+        ):
+            mock_instance = MagicMock()
+            mock_instance.export_report_pdf = AsyncMock(
+                side_effect=PdfRenderError(
+                    "PRINT_READY_TIMEOUT", "打印页在限定时间内未就绪，导出中止"
+                )
+            )
+            mock_svc.return_value = mock_instance
+            resp = client.post("/api/v1/sessions/101/report/export/pdf", json={"force": True})
+
+        assert resp.status_code == 500
+        assert resp.json()["detail"]["code"] == "pdf_export_failed"
+        assert failed_report.pdf_status == "export_failed"
+        assert "[PRINT_READY_TIMEOUT]" in failed_report.pdf_error
+
+    @pytest.mark.anyio
+    async def test_export_redirected_route_aborts_without_pdf(self):
+        """重定向场景：渲染失败异常向上传播，绝不生成/保存 PDF。"""
+        from app.services.pdf_export_service import PdfExportService
+        from app.services.playwright_renderer import PdfRenderError
+
+        mock_db = MagicMock()
+        mock_report = _make_mock_report(pdf_status="not_exported")
+        mock_db.get.return_value = mock_report
+
+        mock_storage = MagicMock()
+        mock_storage.save_bytes = AsyncMock()
+
+        service = PdfExportService(db=mock_db, storage=mock_storage)
+
+        with patch(
+            "app.services.pdf_export_service.render_pdf_from_url",
+            new=AsyncMock(
+                side_effect=PdfRenderError(
+                    "PRINT_ROUTE_REDIRECTED",
+                    "打印页被重定向（期望 /reports/101/print，实际 /login），导出中止",
+                )
+            ),
+        ), patch(
+            "app.services.pdf_export_service.generate_print_token",
+            return_value="test-token",
+        ):
+            with pytest.raises(PdfRenderError) as exc_info:
+                await service.export_report_pdf(
+                    report_id=1,
+                    session_id=101,
+                    user_id=42,
+                )
+
+        assert exc_info.value.code == "PRINT_ROUTE_REDIRECTED"
+        mock_storage.save_bytes.assert_not_called()
+        assert mock_report.pdf_status == "not_exported"  # 未置 exported，无假成功
+
     # ── Download endpoint ──
 
     def test_download_report_not_found(self, client):
