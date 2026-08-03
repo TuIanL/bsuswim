@@ -115,8 +115,11 @@ function normalizeSwimReportV1(report: Record<string, any>, aiInterpretation?: a
       value: m.value,
       unit: m.unit,
       level: m.level ?? m.evaluation,
+      availability: m.availability,
+      confidence: m.confidence,
     })),
     findings: (s.findings ?? []).map((f: any) => ({
+      key: f.code ?? f.rule_id ?? f.title,
       title: f.title,
       content: f.content ?? f.description,
       evidence: f.evidence,

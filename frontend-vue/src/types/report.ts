@@ -68,9 +68,11 @@ export interface ReportQualityNote {
 export interface ReportMetric {
   key: string
   label: string
-  value: string | number | Record<string, unknown>
+  value: string | number | Record<string, unknown> | null
   unit?: string
   level?: 'excellent' | 'good' | 'normal' | 'warning' | 'poor'
+  availability?: string
+  confidence?: number | null
 }
 
 export interface ReportFinding {

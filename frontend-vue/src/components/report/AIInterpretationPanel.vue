@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { AIInterpretationBlock, AIInterpretationEnvelope } from '../../types'
+import type { AIInterpretationEnvelope } from '../../types'
+import InterpretationBlockView from './InterpretationBlockView.vue'
 
 const props = defineProps<{
   interpretation?: AIInterpretationEnvelope | null
@@ -24,9 +25,6 @@ const stateText = computed(() => {
   return ''
 })
 
-function refs(block: AIInterpretationBlock): string[] {
-  return [...block.fact_refs, ...block.knowledge_refs, ...(block.evidence_refs || [])]
-}
 </script>
 
 <template>
@@ -49,41 +47,57 @@ function refs(block: AIInterpretationBlock): string[] {
     </header>
 
     <div v-if="isOverview" class="ai-interpretation__body">
-      <p>{{ content.plain_language_summary.text }}</p>
-      <details v-if="refs(content.plain_language_summary).length" class="ai-refs">
-        <summary>查看依据</summary>
-        <code v-for="ref in refs(content.plain_language_summary)" :key="ref">{{ ref }}</code>
-      </details>
+      <InterpretationBlockView
+        :block="content.plain_language_summary"
+        :references="interpretation?.references"
+        :print="print"
+      />
     </div>
 
     <div v-else-if="moduleExplanation" class="ai-interpretation__body">
-      <p>{{ moduleExplanation.text }}</p>
-      <details v-if="refs(moduleExplanation).length" class="ai-refs">
-        <summary>查看依据</summary>
-        <code v-for="ref in refs(moduleExplanation)" :key="ref">{{ ref }}</code>
-      </details>
+      <InterpretationBlockView
+        :block="moduleExplanation"
+        :references="interpretation?.references"
+        :print="print"
+      />
     </div>
 
     <div v-else-if="isReview" class="ai-review-grid">
       <div v-if="content.priority_focus.length" class="ai-review-block">
         <h4>优先关注</h4>
-        <p v-for="item in content.priority_focus" :key="item.text">{{ item.text }}</p>
+        <InterpretationBlockView
+          v-for="item in content.priority_focus"
+          :key="item.text"
+          :block="item"
+          :references="interpretation?.references"
+          :print="print"
+        />
       </div>
       <div v-if="content.training_suggestions.length" class="ai-review-block">
         <h4>条件式训练建议</h4>
         <article v-for="item in content.training_suggestions" :key="item.title">
           <strong>{{ item.title }}</strong>
-          <p>{{ item.text }}</p>
+          <InterpretationBlockView :block="item" :references="interpretation?.references" :print="print" />
+          <dl class="ai-suggestion-details">
+            <template v-if="item.goal"><dt>目标</dt><dd>{{ item.goal }}</dd></template>
+            <template v-if="item.drill"><dt>练习</dt><dd>{{ item.drill }}</dd></template>
+            <template v-if="item.dose_or_condition"><dt>执行条件</dt><dd>{{ item.dose_or_condition }}</dd></template>
+            <template v-if="item.stop_conditions?.length"><dt>停止条件</dt><dd>{{ item.stop_conditions.join('；') }}</dd></template>
+            <template v-if="item.success_criterion"><dt>复测标准</dt><dd>{{ item.success_criterion }}</dd></template>
+          </dl>
           <small>{{ item.applicability }}</small>
-          <details v-if="refs(item).length" class="ai-refs">
-            <summary>查看依据</summary>
-            <code v-for="ref in refs(item)" :key="ref">{{ ref }}</code>
-          </details>
+          <ul v-if="item.cautions?.length" class="ai-cautions">
+            <li v-for="caution in item.cautions" :key="caution">{{ caution }}</li>
+          </ul>
         </article>
       </div>
       <div v-if="content.retest_targets.length" class="ai-review-block">
         <h4>复测目标</h4>
-        <p v-for="item in content.retest_targets" :key="item.metric_key">{{ item.text }}</p>
+        <div v-for="item in content.retest_targets" :key="item.metric_key">
+          <strong>{{ item.metric_key }}</strong>
+          <InterpretationBlockView :block="item" :references="interpretation?.references" :print="print" />
+          <small v-if="item.success_criterion">复测标准：{{ item.success_criterion }}</small>
+        </div>
       </div>
       <div v-if="content.limitations.length" class="ai-review-block ai-review-block--limitations">
         <h4>使用边界</h4>
@@ -145,9 +159,10 @@ function refs(block: AIInterpretationBlock): string[] {
 .ai-review-block article + article { margin-top: 10px; }
 .ai-review-block--limitations { color: #6d5d35; }
 
-.ai-refs { margin-top: 8px; color: #647482; font-size: 11px; }
-.ai-refs summary { cursor: pointer; }
-.ai-refs code { display: block; overflow-wrap: anywhere; }
+.ai-suggestion-details { display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; margin: 8px 0; color: #435363; font-size: 12px; line-height: 1.5; }
+.ai-suggestion-details dt { color: #6d7a86; }
+.ai-suggestion-details dd { margin: 0; }
+.ai-cautions { margin: 8px 0; padding-left: 18px; color: #8a6116; font-size: 12px; line-height: 1.5; }
 
 .ai-interpretation-state {
   display: flex;
@@ -174,7 +189,4 @@ function refs(block: AIInterpretationBlock): string[] {
   .ai-review-grid { grid-template-columns: 1fr; }
 }
 
-@media print {
-  .ai-refs { display: none; }
-}
 </style>

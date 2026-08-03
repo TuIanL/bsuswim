@@ -38,7 +38,7 @@ function seekTarget() {
 </script>
 
 <template>
-  <article class="evidence-frame-card" :class="asset.status ? `frame--${asset.status}` : ''">
+  <article :id="`report-ref-asset-${asset.key}`" class="evidence-frame-card" :class="asset.status ? `frame--${asset.status}` : ''">
     <div v-if="asset.label || asset.value || asset.metric_label" class="frame-meta">
       <span v-if="asset.metric_label || asset.label" class="frame-label">
         {{ asset.metric_label || asset.label }}

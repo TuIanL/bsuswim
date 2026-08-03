@@ -153,4 +153,28 @@ describe('PrintReportView', () => {
     expect(String(fetchMock.mock.calls[0][0])).toContain('/print-data')
     expect(String(fetchMock.mock.calls[0][0])).not.toContain('/interpretation/generate')
   })
+
+  it('prints v3 layers and catalog labels from the persisted envelope', async () => {
+    const data = makeReport([1, 2, 3, 4, 5])
+    data.report_data.sections[0].page_type = 'analysis_overview'
+    data.report_data.sections[0].module_key = 'overview'
+    data.report_data.ai_interpretation = {
+      status: 'ready', can_regenerate: true,
+      trace: { generation_signature: 'ai-v3', base_report_generation_signature: 'sig-abc-123', provider: 'fake', model: 'test', prompt_version: 'v6', output_schema_version: 'swim-report-interpretation.v3', knowledge_base_version: 'v2', knowledge_ids: [] },
+      references: [{ reference_id: 'metric:body_angle_std_deg', reference_type: 'fact', label: '身体轴角波动', anchor: 'report-ref-metric-body_angle_std_deg', target_available: true }],
+      content: {
+        schema_version: 'swim-report-interpretation.v3',
+        plain_language_summary: { text: '打印 v3 总结', observation: '打印观察', possible_explanations: ['可能影响稳定性'], potential_impact: '打印影响', action: '打印复核', fact_refs: ['metric:body_angle_std_deg'], knowledge_refs: [] },
+        module_explanations: [], priority_focus: [], training_suggestions: [], retest_targets: [], limitations: ['打印边界'],
+      },
+    }
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => data })
+    vi.stubGlobal('fetch', fetchMock)
+    const wrapper = mount(PrintReportView, { props: { sessionId: '1', token: 't' } as any })
+    await settle()
+    expect(wrapper.text()).toContain('打印观察')
+    expect(wrapper.text()).toContain('身体轴角波动')
+    expect(wrapper.find('a[href="#report-ref-metric-body_angle_std_deg"]').exists()).toBe(true)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
 })

@@ -73,7 +73,7 @@ function levelText(level?: string) {
 <template>
   <div class="metric-overview">
     <div class="metric-overview__primary">
-      <div v-for="metric in primaryMetrics" :key="metric.key" class="overview-kpi" :class="metric.level ? `overview-kpi--${metric.level}` : ''">
+      <div v-for="metric in primaryMetrics" :id="`report-ref-metric-${metric.key}`" :key="metric.key" class="overview-kpi" :class="[metric.level ? `overview-kpi--${metric.level}` : '', metric.availability === 'unavailable' ? 'overview-kpi--unavailable' : '']">
         <span class="overview-kpi__label">{{ metric.label }}</span>
         <strong>{{ scalarValue(metric).value }}<small>{{ scalarValue(metric).unit }}</small></strong>
         <span v-if="metric.level" class="overview-kpi__level">{{ levelText(metric.level) }}</span>
@@ -81,7 +81,7 @@ function levelText(level?: string) {
     </div>
 
     <div v-if="comparisonMetrics.length" class="metric-overview__comparisons">
-      <div v-for="metric in comparisonMetrics" :key="metric.key" class="comparison-panel">
+        <div v-for="metric in comparisonMetrics" :id="`report-ref-metric-${metric.key}`" :key="metric.key" class="comparison-panel">
         <div class="comparison-panel__header">
           <span>{{ metric.label }}</span>
           <small>{{ comparisonDelta(metric) }}</small>
@@ -97,7 +97,7 @@ function levelText(level?: string) {
     <details v-if="secondaryMetrics.length" class="metric-details">
       <summary>查看完整指标 <span>{{ secondaryMetrics.length }} 项</span></summary>
       <div class="metric-details__grid">
-        <div v-for="metric in secondaryMetrics" :key="metric.key" class="detail-metric">
+        <div v-for="metric in secondaryMetrics" :id="`report-ref-metric-${metric.key}`" :key="metric.key" class="detail-metric" :class="{ 'detail-metric--unavailable': metric.availability === 'unavailable' }">
           <span>{{ metric.label }}</span>
           <strong v-for="line in metricValueLines(metric)" :key="line.label || String(line.value)">
             <em v-if="line.label">{{ line.label }}</em>{{ line.value }}<small>{{ line.unit }}</small>

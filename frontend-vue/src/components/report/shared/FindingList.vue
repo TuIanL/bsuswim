@@ -20,6 +20,7 @@ function severityClass(severity?: string): string {
       <li
         v-for="(item, i) in items"
         :key="item.key ?? i"
+        :id="item.key ? `report-ref-finding-${item.key}` : undefined"
         class="finding-item"
         :class="severityClass(item.severity)"
       >

@@ -80,6 +80,42 @@ describe('AIInterpretationPanel', () => {
     expect(wrapper.text()).toContain('body')
   })
 
+  it('renders v3 layers and only links resolvable catalog references', () => {
+    const interpretation = readyInterpretation()
+    interpretation.content!.schema_version = 'swim-report-interpretation.v3'
+    interpretation.content!.plain_language_summary = {
+      text: 'v3 总结',
+      observation: '观察到身体轴角波动。',
+      possible_explanations: ['可能受到机位影响'],
+      potential_impact: '作为复核线索。',
+      action: '查看对应指标。',
+      fact_refs: ['metric:body_angle_std_deg'],
+      knowledge_refs: ['body'],
+    }
+    interpretation.references = [
+      {
+        reference_id: 'metric:body_angle_std_deg',
+        reference_type: 'fact',
+        label: '身体轴角波动',
+        anchor: 'report-ref-metric-body_angle_std_deg',
+        target_available: true,
+      },
+      {
+        reference_id: 'body',
+        reference_type: 'knowledge',
+        label: '知识依据',
+        target_available: false,
+      },
+    ]
+    const wrapper = mount(AIInterpretationPanel, {
+      props: { interpretation, moduleKey: 'analysis_overview' },
+    })
+    expect(wrapper.text()).toContain('观察到身体轴角波动')
+    expect(wrapper.find('a[href="#report-ref-metric-body_angle_std_deg"]').exists()).toBe(true)
+    expect(wrapper.find('.ai-ref-link--unavailable').text()).toContain('知识依据')
+    expect(wrapper.find('.ai-ref-link--unavailable').element.tagName).toBe('SPAN')
+  })
+
   it.each(['pending', 'generating', 'failed', 'stale', 'not_configured'] as const)(
     'shows compact %s state without partial content',
     (status) => {

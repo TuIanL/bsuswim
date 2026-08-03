@@ -19,6 +19,9 @@ function formatNumber(value: unknown): string | number {
 }
 
 export function metricValueLines(metric: ReportMetric): MetricValueLine[] {
+  if (metric.availability === 'unavailable') {
+    return [{ value: '不可用' }]
+  }
   const value = metric.value
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return [{ value: Array.isArray(value) ? value.join(', ') : value ?? '-', unit: displayUnit(metric.unit) }]

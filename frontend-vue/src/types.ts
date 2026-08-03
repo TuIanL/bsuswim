@@ -274,6 +274,10 @@ export interface AIInterpretationBlock {
   fact_refs: string[]
   knowledge_refs: string[]
   evidence_refs?: string[]
+  observation?: string | null
+  possible_explanations?: string[]
+  potential_impact?: string | null
+  action?: string | null
 }
 
 export interface AIModuleExplanation extends AIInterpretationBlock {
@@ -284,10 +288,19 @@ export interface AITrainingSuggestion extends AIInterpretationBlock {
   title: string
   applicability: string
   cautions: string[]
+  goal?: string | null
+  drill?: string | null
+  dose_or_condition?: string | null
+  stop_conditions?: string[]
+  success_criterion?: string | null
 }
 
 export interface AIRetestTarget extends AIInterpretationBlock {
   metric_key: string
+  direction?: 'increase' | 'decrease' | 'stable' | 'compare' | 'review' | null
+  success_criterion?: string | null
+  current_value?: unknown
+  unit?: string | null
 }
 
 export interface AIInterpretationContent {
@@ -298,6 +311,20 @@ export interface AIInterpretationContent {
   training_suggestions: AITrainingSuggestion[]
   retest_targets: AIRetestTarget[]
   limitations: string[]
+}
+
+export interface AIReferenceCatalogItem {
+  reference_id: string
+  reference_type: 'fact' | 'knowledge' | 'evidence'
+  label: string
+  module_key?: string | null
+  source_key?: string | null
+  page_number?: number | null
+  anchor?: string | null
+  asset_key?: string | null
+  annotation_frame?: number | null
+  source_video_frame?: number | null
+  target_available: boolean
 }
 
 export interface AIInterpretationTrace {
@@ -321,6 +348,7 @@ export interface AIInterpretationEnvelope {
   trace?: AIInterpretationTrace | null
   error?: { code: string; message: string; retryable: boolean } | null
   can_regenerate: boolean
+  references?: AIReferenceCatalogItem[] | null
 }
 
 // ---- annotation file types ----
