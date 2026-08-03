@@ -6,7 +6,7 @@ state writer，与 model_service 的 legacy helper 完全隔离。
 """
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import select
@@ -82,7 +82,7 @@ def _persist_report_metadata(db: Session, task: AnalysisTask, report_data: dict)
         existing.task_id = task.id
         existing.source = "annotation_kinematics"
         existing.report_data = report_data
-        existing.generated_at = datetime.utcnow()
+        existing.generated_at = datetime.now(UTC)
         if existing.pdf_status and existing.pdf_status != "not_exported":
             existing.pdf_status = "stale"
         report = existing

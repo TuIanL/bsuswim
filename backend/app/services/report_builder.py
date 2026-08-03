@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from app.models import AnalysisResult, AnalysisTask
 from app.services.annotation_quality.models import AnalysisQualitySummary
@@ -77,7 +77,7 @@ def build_report_data(task: AnalysisTask, result: AnalysisResult | None = None) 
             "task_id": task.id,
             "session_id": task.session_id,
             "source": "model_service",
-            "generated_at": datetime.utcnow().isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
             "schema_version": result.schema_version if result else None,
         },
         "quality_notes": quality_notes,
@@ -187,7 +187,7 @@ def build_swim_report_data(
         "recommendation_items": structured_items,
         "provenance": {
             "source": "annotation_metrics",
-            "generated_at": datetime.utcnow().isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
         },
         "metric_sets": {
             "canonical": canonical_metrics,

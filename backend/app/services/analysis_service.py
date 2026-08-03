@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
@@ -420,7 +420,7 @@ def _set_task_state(
     task.progress = progress
     task.error_message = None
     if completed:
-        task.completed_at = datetime.utcnow()
+        task.completed_at = datetime.now(UTC)
     db.add(task)
     db.commit()
     db.refresh(task)

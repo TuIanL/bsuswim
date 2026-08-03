@@ -7,7 +7,7 @@ PendingRollbackError 卡在 processing。
 """
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -117,7 +117,7 @@ class PipelineTaskStateWriter:
         self.task.progress = 100
         self.task.error_code = None
         self.task.error_message = None
-        self.task.completed_at = datetime.utcnow()
+        self.task.completed_at = datetime.now(UTC)
         self._commit()
         refresh_session_analysis_status(self.db, self.task.session_id)
 

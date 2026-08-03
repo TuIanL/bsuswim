@@ -2,7 +2,7 @@
 
 These models describe the assembled report output — projection, not raw source data.
 """
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any, Literal, Optional
 
@@ -370,7 +370,7 @@ class FivePageKinematicsReport(BaseModel):
     status: AssemblyStatus = "partial"
     assembly_status: AssemblyStatus = "partial"
 
-    generated_at: datetime = Field(default_factory=datetime.utcnow)
+    generated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     generation_signature: str = ""
 
     summary: ReportSummary = Field(default_factory=ReportSummary)
