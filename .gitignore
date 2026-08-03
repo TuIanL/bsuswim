@@ -25,5 +25,7 @@ backend/.backend-dev.pid
 frontend-vue/.web-dev.pid
 *.mp4
 .workbuddy/
+frontend/
 frontend/node_modules/
 frontend/dist/
+frontend/.next/
