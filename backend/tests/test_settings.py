@@ -28,3 +28,12 @@ def test_ai_interpretation_is_opt_in_and_secret_is_redacted():
         ai_interpretation_model="deterministic-test",
     )
     assert fake.ai_interpretation_configured is True
+
+    rollback = Settings(
+        _env_file=None,
+        ai_interpretation_enabled=True,
+        ai_interpretation_v3_enabled=False,
+        ai_interpretation_provider="fake",
+        ai_interpretation_model="deterministic-test",
+    )
+    assert rollback.ai_interpretation_configured is False

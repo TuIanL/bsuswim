@@ -8,8 +8,14 @@ from app.models import AnalysisTask, ReportInterpretation, ReportMetadata
 from app.models import User
 from app.core.deps import get_current_user
 from app.main import app
-from app.schemas.report_interpretation import CurveSummary, EvidenceExclusion, EvidenceItem, ProviderRequest
-from app.services.report_interpretation.knowledge import KnowledgeRegistry
+from app.schemas.report_interpretation import (
+    CurveSummary,
+    EvidenceExclusion,
+    EvidenceItem,
+    InterpretationFact,
+    ProviderRequest,
+)
+from app.services.report_interpretation.knowledge import KnowledgeRegistry, KNOWLEDGE_PATH
 from app.services.report_interpretation.evidence import build_evidence_bundle
 from app.services.report_interpretation.projector import input_hash, project_report
 from app.services.report_interpretation.provider import (
@@ -110,6 +116,38 @@ def test_projector_is_stable_private_and_preserves_unavailable():
     assert next(f for f in first.facts if f.fact_id == "frame:body_axis_variation_review:0").value == 15
 
 
+def test_projector_focus_tiers_phase_summaries_and_missing_context_are_bounded():
+    report = sample_report()
+    report["sections"][1]["metrics"][0].update({
+        "availability": "low_confidence",
+        "confidence": 0.2,
+    })
+    report["sections"][1]["content"] = {
+        "phase_summaries": [{
+            "id": "phase-pull",
+            "label": "划水阶段",
+            "start_frame": 10,
+            "end_frame": 24,
+            "cycles": 2,
+            "repeatability": "moderate",
+            "metric_keys": ["body_angle_std_deg"],
+        }]
+    }
+    projected = project_report(report)
+    assert next(f for f in projected.facts if f.fact_id == "metric:body_angle_std_deg").interpretation_tier == "caution"
+    assert projected.focus_candidates
+    assert len(projected.focus_candidates) <= 3
+    assert [item.rank for item in projected.focus_candidates] == list(range(1, len(projected.focus_candidates) + 1))
+    assert projected.phase_cycle_availability == "available"
+    assert projected.phase_cycle_summaries[0].frame_start == 10
+    assert projected.phase_cycle_summaries[0].repeat_count == 2
+    assert "metric:body_angle_std_deg" in projected.phase_cycle_summaries[0].fact_refs
+
+    missing = project_report(sample_report())
+    assert missing.phase_cycle_availability == "not_available"
+    assert missing.phase_cycle_summaries == []
+
+
 def test_knowledge_registry_is_reviewed_stable_and_relevant():
     registry = KnowledgeRegistry()
     projected = project_report(sample_report())
@@ -117,8 +155,15 @@ def test_knowledge_registry_is_reviewed_stable_and_relevant():
     assert selected
     assert all(item.review_status == "active" for item in selected)
     assert selected == registry.retrieve(projected, limit=2)
-    assert selected[0].knowledge_id == "freestyle-body-line-observation"
+    # v2 知识库默认生效：sample_report 命中髋部波动卡 KB-005（hip_vertical_range_px）
+    assert selected[0].knowledge_id == "KB-005"
     assert len(registry.version) == 64
+
+    # v1 知识库保留为回退对照，显式路径仍可加载与检索
+    v1 = KnowledgeRegistry(path=KNOWLEDGE_PATH)
+    v1_selected = v1.retrieve(projected, limit=2)
+    assert v1_selected[0].knowledge_id == "freestyle-body-line-observation"
+    assert v1.version != registry.version
 
 
 def test_signature_changes_with_model_or_knowledge():
@@ -172,6 +217,88 @@ def test_fake_provider_contract_and_guardrails():
     with pytest.raises(InterpretationValidationError) as claim:
         validate_output(assertive, request.input)
     assert claim.value.code == "assertive_claim_forbidden"
+
+
+def test_fake_provider_adversarial_modes_and_legacy_output():
+    request = _provider_request()
+
+    no_candidates = parse_output(FakeProvider("no_candidates").generate(request).output)
+    assert no_candidates.priority_focus == []
+    assert validate_output(no_candidates, request.input)["valid"] is True
+
+    legacy = parse_output(FakeProvider("legacy").generate(request).output)
+    assert legacy.schema_version == "swim-report-interpretation.v1"
+    assert validate_output(legacy, request.input)["valid"] is True
+
+    quality_fact = request.input.facts[0].model_copy(update={
+        "fact_id": "quality:review_only",
+        "kind": "quality",
+        "source_key": "review_only",
+        "label": "需要复核",
+        "interpretation_tier": "review_only",
+    })
+    request.input.facts.append(quality_fact)
+    with pytest.raises(InterpretationValidationError) as unauthorized:
+        validate_output(
+            parse_output(FakeProvider("unauthorized_focus").generate(request).output),
+            request.input,
+        )
+    assert unauthorized.value.code == "focus_candidate_invalid"
+
+    with pytest.raises(InterpretationValidationError) as ungrounded:
+        validate_output(
+            parse_output(FakeProvider("ungrounded_training").generate(request).output),
+            request.input,
+        )
+    assert ungrounded.value.code == "training_fact_kind_required"
+
+
+def test_validator_rejects_caution_and_unavailable_facts_as_certain_conclusions():
+    report = sample_report()
+    report["sections"][1]["metrics"] = [{
+        "key": "body_angle_std_deg",
+        "label": "身体轴角波动",
+        "value": 4.2,
+        "unit": "deg",
+        "availability": "low_confidence",
+        "confidence": 0.2,
+    }]
+    request = _provider_request(report)
+    raw = FakeProvider().generate(request).output
+    for key in ("plain_language_summary",):
+        raw[key].update({
+            "observation": "当前结果明确说明动作控制问题。",
+            "possible_explanations": ["动作控制问题"],
+            "potential_impact": "需要立即改变训练方式。",
+            "action": "立即按该结论训练。",
+        })
+    with pytest.raises(InterpretationValidationError) as caution:
+        validate_output(parse_output(raw), request.input)
+    assert caution.value.code == "low_quality_fact_forbidden"
+
+    unavailable = request.input.facts[0].model_copy(update={
+        "fact_id": "metric:unavailable_metric",
+        "source_key": "unavailable_metric",
+        "label": "不可用指标",
+        "value": None,
+        "availability": "unavailable",
+        "interpretation_tier": "unavailable",
+    })
+    request.input.facts = [unavailable]
+    raw = FakeProvider("no_candidates").generate(request).output
+    raw["plain_language_summary"].update({
+        "text": "当前指标结果明确支持技术结论。",
+        "fact_refs": [unavailable.fact_id],
+        "observation": "当前指标结果明确支持技术结论。",
+        "possible_explanations": ["技术结论"],
+        "potential_impact": "应据此调整训练。",
+        "action": "按该指标结果执行训练。",
+    })
+    raw["module_explanations"] = []
+    raw["training_suggestions"] = []
+    with pytest.raises(InterpretationValidationError) as unavailable_error:
+        validate_output(parse_output(raw), request.input)
+    assert unavailable_error.value.code == "low_quality_fact_forbidden"
 
 
 def test_evidence_bundle_uses_current_report_assets_only(tmp_path):
@@ -355,6 +482,22 @@ def test_validator_rejects_unknown_refs_numbers_and_knowledge_free_training():
     assert knowledge_error.value.code == "training_knowledge_reference_required"
 
 
+def test_v3_validator_requires_structure_and_approved_focus():
+    request = _provider_request()
+    raw = FakeProvider().generate(request).output
+    parsed = parse_output(raw)
+    parsed.plain_language_summary.action = None
+    with pytest.raises(InterpretationValidationError) as incomplete:
+        validate_output(parsed, request.input)
+    assert incomplete.value.code == "structured_block_incomplete"
+
+    raw = FakeProvider().generate(request).output
+    raw["priority_focus"][0]["fact_refs"] = ["metric:hip_vertical_range_px"]
+    with pytest.raises(InterpretationValidationError) as focus:
+        validate_output(parse_output(raw), request.input)
+    assert focus.value.code == "focus_candidate_invalid"
+
+
 def test_validator_accepts_grounded_rounding_and_confidence_percentage():
     report = sample_report()
     report["sections"][1]["metrics"][0]["value"] = 4.234
@@ -520,6 +663,39 @@ def test_domain_service_reuses_ready_and_force_failure_does_not_replace_it(db_se
     envelope = resolve_interpretation_envelope(db_session, report_record, settings=settings)
     assert envelope.status == "ready"
     assert envelope.trace.generation_signature == ready.generation_signature
+
+
+def test_ready_envelope_exposes_current_catalog_and_reads_legacy_content(
+    db_session, report_record, test_coach
+):
+    settings = fake_settings()
+    record, _ = create_or_reuse_interpretation(
+        db_session, report_record, requested_by_user_id=test_coach.id, settings=settings
+    )
+    execute_interpretation(record.id, db=db_session, settings=settings, provider=FakeProvider())
+    envelope = resolve_interpretation_envelope(db_session, report_record, settings=settings)
+    assert envelope.status == "ready"
+    assert envelope.trace.generation_signature == record.generation_signature
+    assert any(item.reference_id == "metric:body_angle_std_deg" for item in envelope.references or [])
+    assert all("/tmp/" not in (item.source_key or "") for item in envelope.references or [])
+
+    legacy = parse_output(FakeProvider("legacy").generate(_provider_request()).output)
+    record.content = legacy.model_dump(mode="json")
+    record.output_schema_version = "swim-report-interpretation.v1"
+    record.reference_catalog = []
+    db_session.add(record)
+    db_session.commit()
+    legacy_envelope = resolve_interpretation_envelope(db_session, report_record, settings=settings)
+    assert legacy_envelope.status == "ready"
+    assert legacy_envelope.content.schema_version == "swim-report-interpretation.v1"
+    assert legacy_envelope.references == []
+
+    rollback_envelope = resolve_interpretation_envelope(
+        db_session,
+        report_record,
+        settings=fake_settings(ai_interpretation_v3_enabled=False),
+    )
+    assert rollback_envelope.status == "ready"
 
 
 def test_input_budget_downsamples_dense_curves_before_json_serialization():
@@ -876,3 +1052,325 @@ def test_observability_metrics_include_grounding_guardrails_latency_tokens_and_c
     assert summary["average_grounding_coverage"] == 1.0
     assert summary["total_tokens"] == 2
     assert summary["average_latency_ms"] >= 0
+
+
+# ── 本 Change 新增：px 归一化、知识库对齐、策略平衡测试 ──
+
+
+def test_projector_derives_normalized_px_facts():
+    report = sample_report()
+    report["context"]["annotation"] = {"reference_body_length_px": 100.0}
+    report["sections"][1]["metrics"] = [
+        {"key": "body_angle_std_deg", "label": "身体轴角波动", "value": 4.2, "unit": "deg", "availability": "available", "confidence": 0.91},
+        {"key": "hip_vertical_range_px", "label": "髋部垂直波动", "value": 12.0, "unit": "px", "availability": "available", "confidence": 0.85},
+    ]
+    projected = project_report(report)
+    norm = next(f for f in projected.facts if f.source_key == "hip_vertical_range_norm")
+    assert norm.value == 0.12
+    assert norm.unit == "ratio"
+    assert norm.derived_from == "metric:hip_vertical_range_px"
+    assert norm.provenance["reference_body_length_px"] == 100.0
+    px = next(f for f in projected.facts if f.source_key == "hip_vertical_range_px")
+    assert any("不得直接输出像素" in note for note in px.limitations)
+    # deg 指标不派生 norm
+    assert not any(f.derived_from == "metric:body_angle_std_deg" for f in projected.facts)
+
+
+def test_projector_derives_norm_for_dict_valued_px_metric():
+    report = sample_report()
+    report["context"]["annotation"] = {"reference_body_length_px": 100.0}
+    report["sections"][3]["metrics"] = [
+        {"key": "ankle_vertical_range_px", "label": "踝部摆动范围", "value": {"left": 27.76, "right": 37.92}, "unit": "px", "availability": "available"},
+    ]
+    projected = project_report(report)
+    norm = next(f for f in projected.facts if f.source_key == "ankle_vertical_range_norm")
+    assert norm.value["left"] == pytest.approx(0.2776)
+    assert norm.value["right"] == pytest.approx(0.3792)
+
+
+def test_projector_degrades_when_reference_body_length_missing():
+    report = sample_report()  # 无 context.annotation
+    report["sections"][1]["metrics"] = [
+        {"key": "hip_vertical_range_px", "label": "髋部垂直波动", "value": 12.0, "unit": "px", "availability": "available"},
+    ]
+    projected = project_report(report)
+    assert not any(f.source_key.endswith("_norm") for f in projected.facts)
+    px = next(f for f in projected.facts if f.source_key == "hip_vertical_range_px")
+    assert any("无法归一化" in note for note in px.limitations)
+
+
+def test_validator_rejects_raw_pixel_units():
+    request = _provider_request()
+    raw = FakeProvider().generate(request).output
+    raw["plain_language_summary"] = {
+        "text": "髋部垂直波动为12px。",
+        "fact_refs": ["metric:hip_vertical_range_px"],
+        "knowledge_refs": [],
+    }
+    with pytest.raises(InterpretationValidationError) as error:
+        validate_output(parse_output(raw), request.input)
+    assert error.value.code == "raw_pixel_unit_forbidden"
+
+
+def test_validator_rejects_pixel_units_even_with_norm_ref():
+    report = sample_report()
+    report["context"]["annotation"] = {"reference_body_length_px": 100.0}
+    report["sections"][1]["metrics"][1] = {
+        "key": "hip_vertical_range_px", "label": "髋部垂直波动", "value": 12.0,
+        "unit": "px", "availability": "available", "confidence": 0.85,
+    }
+    request = _provider_request(report)
+    raw = FakeProvider().generate(request).output
+    raw["plain_language_summary"] = {
+        "text": "髋部垂直波动约0.12（占体长比例，非12px）。",
+        "fact_refs": ["metric:hip_vertical_range_norm"],
+        "knowledge_refs": [],
+    }
+    with pytest.raises(InterpretationValidationError) as error:
+        validate_output(parse_output(raw), request.input)
+    assert error.value.code == "raw_pixel_unit_forbidden"
+
+
+def test_validator_accepts_norm_ratio_reference():
+    report = sample_report()
+    report["context"]["annotation"] = {"reference_body_length_px": 100.0}
+    report["sections"][1]["metrics"][1] = {
+        "key": "hip_vertical_range_px", "label": "髋部垂直波动", "value": 12.0,
+        "unit": "px", "availability": "available", "confidence": 0.85,
+    }
+    request = _provider_request(report)
+    raw = FakeProvider().generate(request).output
+    raw["plain_language_summary"] = {
+        "text": "髋部垂直波动约0.12（占体长比例）。",
+        "fact_refs": ["metric:hip_vertical_range_norm"],
+        "knowledge_refs": [],
+    }
+    assert validate_output(parse_output(raw), request.input)["valid"] is True
+
+
+def test_projector_derives_norm_for_px_per_frame_velocity():
+    report = sample_report()
+    report["context"]["annotation"] = {"reference_body_length_px": 100.0}
+    report["sections"][2]["metrics"] = [
+        {"key": "wrist_velocity_px_per_frame", "label": "腕部速度", "value": 36.808, "unit": "px/frame", "availability": "available"},
+    ]
+    projected = project_report(report)
+    norm = next(f for f in projected.facts if f.source_key == "wrist_velocity_norm")
+    assert norm.value == pytest.approx(0.36808)
+    assert norm.unit == "body_lengths_per_frame"
+    assert norm.derived_from == "metric:wrist_velocity_px_per_frame"
+
+
+def test_validator_rejects_px_per_frame_units():
+    report = sample_report()
+    report["sections"][2]["metrics"] = [
+        {"key": "wrist_velocity_px_per_frame", "label": "腕部速度", "value": 36.808, "unit": "px/frame", "availability": "available"},
+    ]
+    request = _provider_request(report)
+    raw = FakeProvider().generate(request).output
+    raw["plain_language_summary"] = {
+        "text": "腕部速度为36.8 px/frame。",
+        "fact_refs": ["metric:wrist_velocity_px_per_frame"],
+        "knowledge_refs": [],
+    }
+    with pytest.raises(InterpretationValidationError) as error:
+        validate_output(parse_output(raw), request.input)
+    assert error.value.code == "raw_pixel_unit_forbidden"
+
+
+def test_validator_exempts_training_dose_numbers():
+    request = _provider_request()
+    raw = FakeProvider().generate(request).output
+    raw["training_suggestions"][0]["text"] = (
+        "目标：改善身体轴角波动。练习：流线型滑行。执行条件：低强度、短距离（如4×25米），"
+        "由教练安排剂量。复测：相同机位复测身体轴角波动。"
+    )
+    assert validate_output(parse_output(raw), request.input)["valid"] is True
+
+
+def test_retrieval_uses_alias_for_renamed_metrics():
+    report = sample_report()
+    report["sections"][2]["metrics"] = [
+        {"key": "left_elbow_angle_deg", "label": "左肘角", "value": 120.0, "unit": "deg", "availability": "available"},
+        {"key": "right_elbow_angle_deg", "label": "右肘角", "value": 118.0, "unit": "deg", "availability": "available"},
+    ]
+    registry = KnowledgeRegistry()
+    selected = registry.retrieve(project_report(report), limit=3)
+    ids = [item.knowledge_id for item in selected]
+    assert "KB-008" in ids  # 卡声明 elbow_angle_deg，经别名命中 left/right_elbow_angle_deg
+
+
+def test_retrieval_applies_stroke_and_view_hard_filter(tmp_path):
+    kb = tmp_path / "kb.yaml"
+    kb.write_text(
+        "entries:\n"
+        "  - knowledge_id: front-only\n"
+        "    version: '1.0'\n"
+        "    title: 仅正面机位\n"
+        "    summary: 仅适用于正面机位。\n"
+        "    stroke_types: [freestyle]\n"
+        "    view_types: [front]\n"
+        "    metric_keys: [body_axis_angle_deg]\n"
+        "    source_title: test\n"
+        "    source_locator: test\n"
+        "    review_status: active\n"
+        "  - knowledge_id: breaststroke-only\n"
+        "    version: '1.0'\n"
+        "    title: 仅蛙泳\n"
+        "    summary: 仅适用于蛙泳。\n"
+        "    stroke_types: [breaststroke]\n"
+        "    view_types: [side]\n"
+        "    metric_keys: [body_axis_angle_deg]\n"
+        "    source_title: test\n"
+        "    source_locator: test\n"
+        "    review_status: active\n"
+        "  - knowledge_id: side-freestyle\n"
+        "    version: '1.0'\n"
+        "    title: 侧视自由泳\n"
+        "    summary: 适用。\n"
+        "    stroke_types: [freestyle]\n"
+        "    view_types: [side]\n"
+        "    metric_keys: [body_axis_angle_deg]\n"
+        "    source_title: test\n"
+        "    source_locator: test\n"
+        "    review_status: active\n",
+        encoding="utf-8",
+    )
+    registry = KnowledgeRegistry(path=kb)
+    report = sample_report()  # freestyle / side
+    report["sections"][1]["metrics"][0]["key"] = "body_axis_angle_deg"
+    selected = registry.retrieve(project_report(report), limit=3)
+    assert [item.knowledge_id for item in selected] == ["side-freestyle"]
+
+
+def test_retrieval_excludes_inactive_cards():
+    registry = KnowledgeRegistry()  # v2 默认
+    selected = registry.retrieve(project_report(sample_report()), limit=30)
+    ids = [item.knowledge_id for item in selected]
+    assert "KB-017" not in ids  # 生理类 inactive
+    assert "KB-001" not in ids
+    assert all(item.review_status == "active" for item in selected)
+
+
+def test_validator_evidence_gate_rejects_suggestion_citing_only_low_card():
+    request = _provider_request()
+    base = request.input.knowledge[0]
+    request.input.knowledge = [
+        base.model_copy(update={"knowledge_id": "usable-card", "evidence_level": "moderate"}),
+        base.model_copy(update={"knowledge_id": "low-card", "evidence_level": "low"}),
+    ]
+    raw = FakeProvider().generate(request).output
+    raw["training_suggestions"][0]["knowledge_refs"] = ["low-card"]
+    with pytest.raises(InterpretationValidationError) as error:
+        validate_output(parse_output(raw), request.input)
+    assert error.value.code == "training_knowledge_evidence_insufficient"
+
+
+def test_validator_allows_suggestion_when_only_low_cards_available():
+    request = _provider_request()
+    low = request.input.knowledge[0].model_copy(
+        update={"knowledge_id": "low-card", "evidence_level": "low"}
+    )
+    request.input.knowledge = [low]
+    raw = FakeProvider().generate(request).output
+    raw["training_suggestions"][0]["knowledge_refs"] = ["low-card"]
+    assert validate_output(parse_output(raw), request.input)["valid"] is True
+
+
+def test_validator_rejects_generic_training_suggestion():
+    request = _provider_request()
+    raw = FakeProvider().generate(request).output
+    raw["training_suggestions"][0]["text"] = "建议加强核心力量。"
+    with pytest.raises(InterpretationValidationError) as error:
+        validate_output(parse_output(raw), request.input)
+    assert error.value.code == "generic_training_suggestion"
+
+
+def test_validator_requires_training_fact_kind():
+    request = _provider_request()
+    request.input.facts.append(InterpretationFact(
+        fact_id="quality:test",
+        kind="quality",
+        module_key="analysis_overview",
+        source_key="test",
+        label="质量说明",
+        value=True,
+        availability="available",
+    ))
+    raw = FakeProvider().generate(request).output
+    raw["training_suggestions"][0]["fact_refs"] = ["quality:test"]
+    with pytest.raises(InterpretationValidationError) as error:
+        validate_output(parse_output(raw), request.input)
+    assert error.value.code == "training_fact_kind_required"
+
+
+def test_validator_accepts_knowledge_backed_interpretation():
+    request = _provider_request()
+    raw = FakeProvider().generate(request).output
+    raw["module_explanations"] = [{
+        "module_key": "body_posture_head_trunk",
+        "text": "观测：身体轴角波动明确。可能解释：该波动可能来自呼吸周期或镜头俯仰，也可能反映流线型控制变化。潜在影响：若伴随髋部下沉，可能提示迎水面积增大。",
+        "fact_refs": ["metric:body_angle_std_deg"],
+        "knowledge_refs": [request.input.knowledge[0].knowledge_id],
+    }]
+    result = validate_output(parse_output(raw), request.input)
+    assert result["valid"] is True
+    assert result["knowledge_reference_count"] >= 1
+
+
+def test_validator_records_structure_signals_for_assertive_blocks():
+    request = _provider_request()
+    raw = FakeProvider().generate(request).output
+    raw["module_explanations"] = [{
+        "module_key": "body_posture_head_trunk",
+        "text": "该模块存在客观测量，建议关注变化趋势。" * 4,  # 长文本且无不确定性语言
+        "fact_refs": ["metric:body_angle_std_deg"],
+        "knowledge_refs": [],
+    }]
+    result = validate_output(parse_output(raw), request.input)
+    assert any(
+        signal["signal"] == "missing_uncertainty_language"
+        for signal in result["structure_signals"]
+    )
+
+
+def test_end_to_end_interpretation_with_synthetic_report_fixture():
+    fixture_path = Path(__file__).parent / "fixtures" / "synthetic_five_page_report_contract.json"
+    report = json.loads(fixture_path.read_text(encoding="utf-8"))
+    settings = fake_settings()
+    projected, registry, signature, current_hash = prepare_input(report, settings)
+    # 参考体长在 fixture 中可用，px 指标已派生归一化事实
+    assert any(fact.source_key == "hip_vertical_range_norm" for fact in projected.facts)
+    assert any(fact.source_key == "ankle_vertical_range_norm" for fact in projected.facts)
+    # v2 知识库命中且均为 active
+    assert projected.knowledge
+    assert all(item.review_status == "active" for item in projected.knowledge)
+    # 端到端：fake provider 生成并通过护栏
+    output = parse_output(FakeProvider().generate(ProviderRequest(
+        policy=SYSTEM_POLICY, input=projected, output_schema={}
+    )).output)
+    result = validate_output(output, projected)
+    assert result["valid"] is True
+    assert signature and current_hash
+
+
+def test_validator_accepts_ratio_percentage_and_rejects_ungrounded():
+    report = sample_report()
+    report["context"]["annotation"] = {"reference_body_length_px": 100.0}
+    report["sections"][1]["metrics"][1] = {
+        "key": "hip_vertical_range_px", "label": "髋部垂直波动", "value": 12.0,
+        "unit": "px", "availability": "available", "confidence": 0.85,
+    }
+    request = _provider_request(report)
+    raw = FakeProvider().generate(request).output
+    raw["plain_language_summary"] = {
+        "text": "髋部垂直波动约占体长的12%。",  # 0.12 ratio → 12%
+        "fact_refs": ["metric:hip_vertical_range_norm"],
+        "knowledge_refs": [],
+    }
+    assert validate_output(parse_output(raw), request.input)["valid"] is True
+
+    raw["plain_language_summary"]["text"] = "髋部垂直波动约占体长的18.7%。"
+    with pytest.raises(InterpretationValidationError) as error:
+        validate_output(parse_output(raw), request.input)
+    assert error.value.code == "numeric_claim_ungrounded"

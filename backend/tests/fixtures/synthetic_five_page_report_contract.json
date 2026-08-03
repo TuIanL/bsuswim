@@ -19,14 +19,14 @@
   },
   "context": {
     "athlete": {
-      "id": 795,
+      "id": 1393,
       "name": "Fixture Athlete",
       "gender": null,
       "level": "一级运动员",
       "stroke_specialty": "200米自由泳"
     },
     "session": {
-      "id": 807,
+      "id": 1412,
       "title": "Fixture Session",
       "session_date": null,
       "venue": null,
@@ -35,8 +35,8 @@
       "pool_length_m": 25.0
     },
     "video": {
-      "session_video_id": 573,
-      "video_file_id": 581,
+      "session_video_id": 865,
+      "video_file_id": 873,
       "original_filename": "fixture.mp4",
       "playback_url": "/uploads/fixture_stored.mp4",
       "view_type": "side",
@@ -45,7 +45,7 @@
       "duration_sec": null
     },
     "annotation": {
-      "normalized_annotation_id": 537,
+      "normalized_annotation_id": 804,
       "source": "cvat_coco17",
       "revision": 3,
       "frame_count": 50,
@@ -178,14 +178,14 @@
       ],
       "content": {
         "athlete": {
-          "id": 795,
+          "id": 1393,
           "name": "Fixture Athlete",
           "gender": null,
           "level": "一级运动员",
           "stroke_specialty": "200米自由泳"
         },
         "session": {
-          "id": 807,
+          "id": 1412,
           "title": "Fixture Session",
           "session_date": null,
           "venue": null,
@@ -194,8 +194,8 @@
           "pool_length_m": 25.0
         },
         "video": {
-          "session_video_id": 573,
-          "video_file_id": 581,
+          "session_video_id": 865,
+          "video_file_id": 873,
           "original_filename": "fixture.mp4",
           "playback_url": "/uploads/fixture_stored.mp4",
           "view_type": "side",
@@ -204,7 +204,7 @@
           "duration_sec": null
         },
         "annotation": {
-          "normalized_annotation_id": 537,
+          "normalized_annotation_id": 804,
           "source": "cvat_coco17",
           "revision": 3,
           "frame_count": 50,
@@ -1301,7 +1301,7 @@
       "calculator_version": "1.0.0",
       "source_revision": 3,
       "revision_status": "current",
-      "payload_hash": "97a03d772ab8a8e0cce7eea0f1890b4144d00c5c9bd83081d3002975f6f82842"
+      "payload_hash": "8846835abccc5a35cf0e94714033023bd3f5aafbcf7db7c4fd2281786df5d67c"
     },
     "artifact_set": {
       "id": "<ARTIFACT_SET_ID>",
