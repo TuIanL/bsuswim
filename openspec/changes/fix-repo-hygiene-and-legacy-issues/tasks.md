@@ -23,22 +23,22 @@
 
 ## 4. 清理空壳与临时文件
 
-- [ ] 4.1 确认 `frontend/` 仅剩 node_modules 且无源码引用（旧前端已归档）
-- [ ] 4.2 删除 `frontend/` 目录（含 node_modules）
-- [ ] 4.3 删除工作区空日志文件：`.qwen-interpretation-304.log` 等 0 字节文件
-- [ ] 4.4 提交清理变更
+- [x] 4.1 确认 `frontend/` 仅剩 node_modules 且无源码引用（旧前端已归档）
+- [x] 4.2 删除 `frontend/` 目录（含 node_modules）
+- [x] 4.3 删除工作区空日志文件：`.qwen-interpretation-304.log` 等 0 字节文件
+- [x] 4.4 提交清理变更
 
 ## 5. 消除 utcnow 弃用告警
 
-- [ ] 5.1 定位全部 12 处 `datetime.utcnow()` 调用（`backend/app/`，含 `analysis_pipelines/checkpoints.py`、`analysis_pipelines/annotation_kinematics.py` 等）
-- [ ] 5.2 逐一替换为 `datetime.now(UTC)`（或 `datetime.now(timezone.utc)`），保持 UTC 语义不变
-- [ ] 5.3 运行全量测试确认无 DeprecationWarning、515 passed 保持
-- [ ] 5.4 提交 utcnow 修复
+- [x] 5.1 定位全部 12 处 `datetime.utcnow()` 调用（`backend/app/`，含 `analysis_pipelines/checkpoints.py`、`analysis_pipelines/annotation_kinematics.py` 等）
+- [x] 5.2 逐一替换为 `datetime.now(UTC)`（或 `datetime.now(timezone.utc)`），保持 UTC 语义不变
+- [x] 5.3 运行全量测试确认无 DeprecationWarning、515 passed 保持
+- [x] 5.4 提交 utcnow 修复
 
 ## 6. CI 卫生检查与最终验证
 
-- [ ] 6.1 在 `.github/workflows/ci.yml` 增加迁移文件完整性检查（head 迁移必须在 git 跟踪列表）
-- [ ] 6.2 在 CI 增加 `backend/uploads` 无跟踪产物检查（`git ls-files backend/uploads` 为空）
-- [ ] 6.3 运行全量后端测试 + 前端类型检查 + 前端 vitest 最终验证
-- [ ] 6.4 冒烟验证：本地 `alembic upgrade head` 幂等、后端应用可启动
-- [ ] 6.5 汇总提交 CI 变更并展示最终 `git status` / `git log` 结果
+- [x] 6.1 在 `.github/workflows/ci.yml` 增加迁移文件完整性检查（head 迁移必须在 git 跟踪列表）
+- [x] 6.2 在 CI 增加 `backend/uploads` 无跟踪产物检查（`git ls-files backend/uploads` 为空）
+- [x] 6.3 运行全量后端测试 + 前端类型检查 + 前端 vitest 最终验证
+- [x] 6.4 冒烟验证：本地 `alembic upgrade head` 幂等、后端应用可启动
+- [x] 6.5 汇总提交 CI 变更并展示最终 `git status` / `git log` 结果
