@@ -16,8 +16,16 @@ GUARDRAIL_ERROR_CODES = {
     "module_reference_mismatch",
     "numeric_claim_ungrounded",
     "output_schema_invalid",
+    "raw_pixel_unit_forbidden",
+    "generic_training_suggestion",
+    "training_fact_kind_required",
+    "training_knowledge_evidence_insufficient",
     "training_knowledge_reference_required",
     "visual_claim_ungrounded",
+    "structured_block_incomplete",
+    "low_quality_fact_forbidden",
+    "focus_candidate_invalid",
+    "reference_catalog_invalid",
 }
 
 
@@ -60,6 +68,8 @@ def success_validation_metrics(
         "evidence_catalog_count": len(interpretation_input.evidence),
         "evidence_reference_count": sum(len(block.evidence_refs) for block in blocks),
         "evidence_exclusion_count": len(interpretation_input.evidence_exclusions),
+        "focus_candidate_count": len(interpretation_input.focus_candidates),
+        "phase_cycle_summary_count": len(interpretation_input.phase_cycle_summaries),
         "guardrail_rejected": False,
     }
 

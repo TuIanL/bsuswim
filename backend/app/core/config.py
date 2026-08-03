@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     # AI report interpretation is opt-in. A configured API key alone never
     # enables external data transfer.
     ai_interpretation_enabled: bool = False
+    # Independent rollback switch: disabling v3 stops new generation while
+    # persisted historical interpretations remain readable.
+    ai_interpretation_v3_enabled: bool = True
     ai_interpretation_auto_generate: bool = False
     ai_interpretation_provider: str = "qwen"
     ai_interpretation_base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
@@ -50,11 +53,12 @@ class Settings(BaseSettings):
     ai_interpretation_max_evidence_bytes: int = 6_000_000
     ai_interpretation_max_evidence_image_pixels: int = 2_000_000
     ai_interpretation_max_curve_points: int = 48
-    ai_interpretation_max_input_chars: int = 24000
+    ai_interpretation_max_input_chars: int = 40000
     ai_interpretation_max_estimated_cost_usd: float = 0.02
     ai_interpretation_input_cost_per_million_tokens: float = 0.14
     ai_interpretation_output_cost_per_million_tokens: float = 0.28
     ai_interpretation_max_knowledge_items: int = 6
+    ai_interpretation_knowledge_source: str = "v2"
     ai_interpretation_debug_retention: bool = False
     ai_interpretation_stale_after_seconds: int = 600
     ai_interpretation_rate_limit_per_hour: int = 10
@@ -69,6 +73,7 @@ class Settings(BaseSettings):
         )
         return bool(
             self.ai_interpretation_enabled
+            and self.ai_interpretation_v3_enabled
             and self.ai_interpretation_provider
             and self.ai_interpretation_model
             and has_credentials

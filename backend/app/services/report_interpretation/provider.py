@@ -150,20 +150,49 @@ class FakeProvider:
             if fact.module_key in ("body_posture_head_trunk", "upper_limb", "lower_limb"):
                 module_facts.setdefault(fact.module_key, fact.fact_id)
         knowledge = request.input.knowledge
+        # 训练建议优先引用 high/moderate 证据等级知识卡；仅剩 low/governance 时才退而求其次。
+        usable_knowledge = [
+            item for item in knowledge
+            if getattr(item, "evidence_level", "moderate") in ("high", "moderate", "moderate_to_high")
+        ]
+        suggestion_knowledge = usable_knowledge or knowledge
         suggestion = []
-        if knowledge:
+        if suggestion_knowledge:
+            chosen = suggestion_knowledge[0]
+            refs = [primary.fact_id]
+            # 若 primary 是像素指标且存在归一化派生事实，演示"引用 *_norm 而非原始 px"。
+            norm_fact = next(
+                (fact for fact in facts if fact.derived_from == primary.fact_id),
+                None,
+            )
+            if norm_fact is not None:
+                refs.append(norm_fact.fact_id)
             suggestion = [{
-                "title": knowledge[0].title,
-                "text": f"可尝试在教练观察下进行{knowledge[0].title}相关练习，并结合原视频确认变化。",
-                "fact_refs": [primary.fact_id],
-                "knowledge_refs": [knowledge[0].knowledge_id],
+                "title": chosen.title,
+                "text": f"目标：改善{primary.label}相关表现。练习：可尝试在教练观察下进行{chosen.title}相关练习，并结合原视频确认变化。执行条件：低强度、短距离，由教练安排剂量。复测：相同机位复测{primary.source_key}。",
+                "observation": f"当前主要依据是{primary.label}，需要结合当前数据质量复核。",
+                "possible_explanations": ["可能反映动作控制变化", "也可能受到机位、呼吸或关键点可见性的影响"],
+                "potential_impact": "可能影响动作稳定性，但不能仅凭本次二维结果确定原因。",
+                "action": f"在教练观察下针对{primary.label}进行低强度技术练习。",
+                "fact_refs": refs,
+                "knowledge_refs": [chosen.knowledge_id],
                 "applicability": "仅在当前数据质量允许并经教练确认后采用。",
-                "cautions": knowledge[0].contraindications[:2],
+                "cautions": chosen.contraindications[:2] or chosen.forbidden[:2],
+                "goal": f"改善{primary.label}相关表现",
+                "drill": f"进行{chosen.title}相关技术练习",
+                "dose_or_condition": "低强度、短距离，由教练结合训练量安排剂量",
+                "stop_conditions": ["动作质量明显下降时停止"],
+                "success_criterion": f"相同机位复测{primary.source_key}，观察趋势是否改善",
             }]
+        candidate = request.input.focus_candidates[0] if request.input.focus_candidates else None
         output = {
-            "schema_version": "swim-report-interpretation.v1",
+            "schema_version": "swim-report-interpretation.v3",
             "plain_language_summary": {
                 "text": f"本次报告的重点是“{primary.label}”，需要结合原视频和教练观察复核。",
+                "observation": f"本次报告记录了{primary.label}这一主要事实。",
+                "possible_explanations": ["可能反映动作控制变化", "也可能受到机位或关键点质量影响"],
+                "potential_impact": "该结果可作为训练复核线索，但不能单独确定技术原因。",
+                "action": "结合原视频和教练观察复核后再安排训练。",
                 "fact_refs": [primary.fact_id],
                 "knowledge_refs": [],
             },
@@ -171,6 +200,10 @@ class FakeProvider:
                 {
                     "module_key": module,
                     "text": "该模块存在可供复核的客观测量，建议关注变化趋势而非单次定性。",
+                    "observation": "该模块存在可供复核的客观测量。",
+                    "possible_explanations": ["可能反映动作变化", "也可能受到视角和可见性影响"],
+                    "potential_impact": "可用于定位训练复核方向，但不构成确定性结论。",
+                    "action": "结合关键帧和同条件复测继续确认。",
                     "fact_refs": [fact_id],
                     "knowledge_refs": [],
                 }
@@ -178,6 +211,10 @@ class FakeProvider:
             ],
             "priority_focus": [{
                 "text": f"优先复核{primary.label}及其对应视频证据。",
+                "observation": f"{primary.label}被列为当前重点候选。",
+                "possible_explanations": ["可能是当前报告中最需要复核的变化", "仍需结合证据确认"],
+                "potential_impact": "可作为本次训练复核的优先方向。",
+                "action": "优先查看对应指标和关键帧。",
                 "fact_refs": [primary.fact_id],
                 "knowledge_refs": [],
             }],
@@ -189,6 +226,34 @@ class FakeProvider:
             output["overall_score"] = 92
         if self.mode == "assertive":
             output["plain_language_summary"]["text"] = "这证明运动员核心能力不足。"
+        if self.mode == "no_candidates":
+            output["priority_focus"] = []
+        if self.mode == "unauthorized_focus":
+            output["priority_focus"][0]["fact_refs"] = [
+                next(
+                    (fact.fact_id for fact in reversed(facts)
+                     if fact.fact_id not in {
+                         ref for candidate in request.input.focus_candidates
+                         for ref in candidate.fact_refs
+                     }),
+                    "metric:unauthorized",
+                )
+            ]
+        if self.mode == "ungrounded_training" and output["training_suggestions"]:
+            output["training_suggestions"][0]["fact_refs"] = [
+                next((fact.fact_id for fact in facts if fact.kind in ("quality", "boundary")), "quality:unknown")
+            ]
+        if self.mode == "legacy":
+            output["schema_version"] = "swim-report-interpretation.v1"
+            structured_fields = (
+                "observation", "possible_explanations", "potential_impact", "action",
+                "goal", "drill", "dose_or_condition", "stop_conditions", "success_criterion",
+            )
+            for key in ("plain_language_summary", "module_explanations", "priority_focus", "training_suggestions", "retest_targets"):
+                for block in output.get(key) or [] if isinstance(output.get(key), list) else [output.get(key)]:
+                    if isinstance(block, dict):
+                        for field in structured_fields:
+                            block.pop(field, None)
         return ProviderResponse(output=output, usage={"input_tokens": 1, "output_tokens": 1})
 
 

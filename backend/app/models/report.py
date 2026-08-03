@@ -73,6 +73,7 @@ class ReportInterpretation(Base):
     execution_mode: Mapped[str] = mapped_column(String(16), nullable=False, default="text")
     evidence_manifest: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     evidence_exclusions: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    reference_catalog: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
 
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="pending", index=True)
     content: Mapped[dict | None] = mapped_column(JSON, nullable=True)

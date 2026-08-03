@@ -32,6 +32,9 @@ def generation_signature(
         },
         "prompt_version": PROMPT_POLICY_VERSION,
         "output_schema_version": INTERPRETATION_OUTPUT_SCHEMA,
+        "focus_candidate_policy_version": "focus-candidates.v1",
+        "phase_cycle_projection_version": "phase-cycle-summary.v1",
+        "reference_catalog_version": "report-reference-catalog.v1",
         "knowledge_base_version": knowledge_base_version,
         "knowledge_ids": [f"{item.knowledge_id}@{item.version}" for item in interpretation_input.knowledge],
     }

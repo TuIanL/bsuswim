@@ -17,12 +17,14 @@ from app.schemas.report_interpretation import (
     InterpretationError,
     InterpretationInput,
     InterpretationOutput,
+    ReferenceCatalogItem,
     InterpretationTrace,
     ProviderRequest,
 )
 from .knowledge import KnowledgeRegistry
 from .evidence import build_evidence_bundle
 from .projector import project_report
+from .references import build_reference_catalog
 from .provider import InterpretationProvider, ProviderError, build_provider
 from .prompt import SYSTEM_POLICY
 from .signature import generation_signature
@@ -119,6 +121,7 @@ def prepare_input(
     bundle = build_evidence_bundle(report_data, projected, settings)
     projected.evidence = bundle.items
     projected.evidence_exclusions = bundle.exclusions
+    projected.focus_candidates = projected.focus_candidates[:3]
     _fit_evidence_to_input_budget(projected, settings.ai_interpretation_max_input_chars)
     serialized = _serialized_input(projected)
     if len(serialized) > settings.ai_interpretation_max_input_chars:
@@ -240,6 +243,10 @@ def create_or_reuse_interpretation(
         execution_mode="visual" if settings.ai_interpretation_visual_configured and projected.evidence else "text",
         evidence_manifest=[item.model_dump(mode="json") for item in projected.evidence],
         evidence_exclusions=[item.model_dump(mode="json") for item in projected.evidence_exclusions],
+        reference_catalog=[
+            item.model_dump(mode="json")
+            for item in build_reference_catalog(locked.report_data or {}, projected)
+        ],
         status="pending",
         validation_result={},
         usage={},
@@ -353,6 +360,10 @@ def execute_interpretation(
         record.execution_mode = "visual" if visual_mode else "text"
         record.evidence_manifest = [item.model_dump(mode="json") for item in projected.evidence]
         record.evidence_exclusions = [item.model_dump(mode="json") for item in projected.evidence_exclusions]
+        record.reference_catalog = [
+            item.model_dump(mode="json")
+            for item in build_reference_catalog(report.report_data or {}, projected)
+        ]
         record.completed_at = _utcnow()
         db.add(record)
         db.commit()
@@ -418,6 +429,10 @@ def _trace(record: ReportInterpretation) -> InterpretationTrace:
     )
 
 
+def _references(record: ReportInterpretation) -> list[ReferenceCatalogItem]:
+    return [ReferenceCatalogItem.model_validate(item) for item in (record.reference_catalog or [])]
+
+
 def resolve_interpretation_envelope(
     db: Session,
     report: ReportMetadata,
@@ -442,7 +457,13 @@ def resolve_interpretation_envelope(
                 error=InterpretationError(code="persisted_output_invalid", message="已保存的 AI 解读无效"),
                 can_regenerate=settings.ai_interpretation_configured,
             )
-        return InterpretationEnvelope(status="ready", content=content, trace=_trace(ready), can_regenerate=True)
+        return InterpretationEnvelope(
+            status="ready",
+            content=content,
+            trace=_trace(ready),
+            references=_references(ready),
+            can_regenerate=True,
+        )
 
     active = next((item for item in current if item.status in ("generating", "pending")), None)
     if active is not None:

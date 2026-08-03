@@ -1,0 +1,1626 @@
+schema_version: swim-knowledge.v2
+source: /Users/tuian/Documents/大学/竞赛/大创/游泳/swim_knowledge_base_v1/swimming_knowledge_base_v1.jsonl
+entries:
+- knowledge_id: KB-001
+  version: '1.0'
+  title: 速度、划频与划幅必须联合解释
+  summary: 游速可分解为划频与划幅的组合。速度提高可能来自划频增加、划幅增加或两者共同变化；不存在对所有距离和所有运动员都适用的单一“最佳划频”或“最佳划幅”。
+  stroke_types:
+  - freestyle
+  metric_keys:
+  - speed
+  - stroke_length
+  - stroke_rate
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Stroke rate–stroke length dynamics in elite freestyle swimming (2025), Factors
+    Relating to Sprint Swimming Performance: A Systematic Review (2024), Kinematic, arm-stroke efficiency,
+    coordination, and energetic parameters of the 400-m front crawl: systematic review and meta-analysis
+    (2023)'
+  source_locator: swim_knowledge_base_v1#KB-001
+  review_status: inactive
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: measurement_governance
+  view_types: []
+  distance_contexts: []
+  evidence_level: high
+  forbidden:
+  - 仅凭划频高就下结论“动作急促”
+  - 仅凭划幅低就下结论“力量不足”
+  coach_text: 本次速度变化主要由{dominant_factor}驱动。建议将划频和划幅放在同一速度区间内联合观察，而不是单独追求某一个数值。
+  actions:
+  - 在固定配速下比较不同划频
+  - 在固定划频下比较速度和划幅
+  - 按速度区间建立个人基线
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines: []
+  interpretations:
+  - 同一速度下，较低划频与较大划幅通常代表不同的技术策略，不应自动判定优劣。
+  - 短距离、长距离、疲劳阶段和战术目标会改变合理组合。
+  alternatives:
+  - 身高与臂展
+  - 比赛距离
+  - 转身与水下段比例
+  - 疲劳程度
+  - 技术水平
+  required_evidence:
+  - 准确的距离和时间
+  - 统一的划水计数口径
+  - 相同泳姿、泳池长度和强度
+  source_records:
+  - title: Stroke rate–stroke length dynamics in elite freestyle swimming (2025)
+    type: peer_reviewed
+    url: https://www.frontiersin.org/journals/sports-and-active-living/articles/10.3389/fspor.2025.1656633/full
+  - title: 'Factors Relating to Sprint Swimming Performance: A Systematic Review (2024)'
+    type: systematic_review
+    url: https://link.springer.com/article/10.1007/s40279-024-02172-4
+  - title: 'Kinematic, arm-stroke efficiency, coordination, and energetic parameters of the 400-m front
+      crawl: systematic review and meta-analysis (2023)'
+    type: systematic_review_meta_analysis
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC9909090/
+  - title: U.S. Masters Swimming — Balancing Stroke Rate and Stroke Efficiency
+    type: official_coaching
+    url: https://www.usms.org/fitness-and-training/articles-and-videos/articles/balancing-stroke-rate-and-stroke-efficiency
+- knowledge_id: KB-002
+  version: '1.0'
+  title: SWOLF只适合严格同条件纵向比较
+  summary: SWOLF把单趟用时与划水次数相加，可作为训练反馈，但受到泳池长度、计数方式、身高、出发转身和水下段影响。它更适合比较同一运动员在相同泳池、距离、泳姿和强度下的变化。
+  stroke_types: []
+  metric_keys:
+  - swolf
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: 游泳表现分析知识库 v1：U.S. Masters Swimming — Balancing Stroke Rate and Stroke Efficiency, Validation
+    of Automatically Quantified Swim Stroke Mechanics Using an IMU (2024)
+  source_locator: swim_knowledge_base_v1#KB-002
+  review_status: inactive
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: measurement_governance
+  view_types: []
+  distance_contexts: []
+  evidence_level: moderate
+  forbidden:
+  - 跨运动员直接排名
+  - 跨泳池长度直接比较
+  - 将较低SWOLF等同于绝对技术更好
+  coach_text: 本次SWOLF{trend}，但应结合用时和划水次数拆分原因；该值仅与本人相同条件历史记录比较。
+  actions:
+  - 固定条件复测
+  - 同时显示时间与划水次数
+  - 记录计数口径
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines: []
+  interpretations:
+  - SWOLF下降可能来自更快速度、较少划水或两者共同作用。
+  - 过度滑行也可能减少划水次数却损害速度，因此仍需同时看用时。
+  alternatives:
+  - 25米与50米泳池
+  - 手表按单臂或完整周期计数
+  - 出发/转身距离
+  - 训练强度
+  required_evidence:
+  - 泳池长度
+  - 计数定义
+  - 单趟用时
+  - 泳姿与强度
+  source_records:
+  - title: U.S. Masters Swimming — Balancing Stroke Rate and Stroke Efficiency
+    type: official_coaching
+    url: https://www.usms.org/fitness-and-training/articles-and-videos/articles/balancing-stroke-rate-and-stroke-efficiency
+  - title: Validation of Automatically Quantified Swim Stroke Mechanics Using an IMU (2024)
+    type: validation_study
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10813451/
+- knowledge_id: KB-003
+  version: '1.0'
+  title: 二维侧视角不能直接代表真实三维技术
+  summary: 二维侧视视频把三维动作投影到画面平面，身体滚转、前后深度、遮挡和镜头运动都会改变测得角度与轨迹。所有结论必须注明“二维侧视代理指标”。
+  stroke_types: []
+  metric_keys:
+  - all_2d
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Numerical and experimental methods used to evaluate active drag in swimming:
+    a review (2022), Movement evaluation of front crawl swimming: Technical skill versus aesthetic quality
+    (2017), Validation of Automatically Quantified Swim Stroke Mechanics Using an IMU (2024)'
+  source_locator: swim_knowledge_base_v1#KB-003
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: data_quality
+  view_types:
+  - side
+  distance_contexts: []
+  evidence_level: high
+  forbidden:
+  - 把画面水平角写成水面夹角
+  - 用侧视单机位判断左右真实对称性
+  - 用二维角度直接计算三维关节力矩
+  coach_text: 该结果来自二维侧视画面，适合识别趋势和代表帧，不等同于完整三维生物力学结论。
+  actions:
+  - 优先做同条件复测
+  - 保存置信度和可见性
+  - 必要时增加正面或水下机位
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 角度变化可能来自真实动作，也可能来自滚转、透视或摄像机移动。
+  - 同一运动员同一机位的纵向比较通常比跨人横向比较更可靠。
+  alternatives:
+  - 身体滚转
+  - 镜头平移/俯仰
+  - 广角畸变
+  - 关键点遮挡
+  - 泳道位置变化
+  required_evidence:
+  - 机位与镜头参数
+  - 运动补偿状态
+  - 关键点可见性
+  - 测量基准说明
+  source_records:
+  - title: 'Numerical and experimental methods used to evaluate active drag in swimming: a review (2022)'
+    type: review
+    url: https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2022.938658/full
+  - title: 'Movement evaluation of front crawl swimming: Technical skill versus aesthetic quality (2017)'
+    type: peer_reviewed
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC5590880/
+  - title: Validation of Automatically Quantified Swim Stroke Mechanics Using an IMU (2024)
+    type: validation_study
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10813451/
+- knowledge_id: KB-004
+  version: '1.0'
+  title: 身体轴角用于描述姿态趋势，不应单独判断阻力大小
+  summary: 身体更接近水平通常有助于减小迎水面积，但真实主动阻力还受到速度、形态、姿态变化和流体条件影响。身体轴角应与髋位、头部动作、速度和关键帧一起解释。
+  stroke_types:
+  - freestyle
+  metric_keys:
+  - body_axis_angle_deg
+  - torso_axis_angle_deg
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Numerical and experimental methods used to evaluate active drag in swimming:
+    a review (2022), U.S. Masters Swimming — Freestyle Body Position and Rotation, U.S. Masters Swimming
+    — Freestyle Complete Guide'
+  source_locator: swim_knowledge_base_v1#KB-004
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: body_position
+  view_types:
+  - side
+  distance_contexts: []
+  evidence_level: moderate
+  forbidden:
+  - 由身体轴角直接计算阻力
+  - 由角度偏大直接诊断核心力量不足
+  coach_text: 在{phase}阶段，身体轴相对画面水平角{trend}，同时髋部位置{hip_trend}。这提示身体流线型控制可能{assessment}，建议结合呼吸周期和速度复核。
+  actions:
+  - 流线型滑行
+  - 侧身打腿与身体对齐练习
+  - 在固定配速下比较呼吸与非呼吸周期
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 角度增大且髋部明显下沉时，可提示流线型控制可能下降。
+  - 高速度下角度改善可能来自更强推进、打腿或浮力/姿态变化，不能单独归因。
+  alternatives:
+  - 呼吸抬头
+  - 打腿节奏变化
+  - 镜头俯仰
+  - 转身后加速
+  - 身体滚转投影
+  required_evidence:
+  - 基准线定义
+  - 速度或阶段
+  - 髋部位置
+  - 呼吸/非呼吸周期
+  source_records:
+  - title: 'Numerical and experimental methods used to evaluate active drag in swimming: a review (2022)'
+    type: review
+    url: https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2022.938658/full
+  - title: U.S. Masters Swimming — Freestyle Body Position and Rotation
+    type: official_coaching
+    url: https://www.usms.org/fitness-and-training/guides/freestyle/body-position
+  - title: U.S. Masters Swimming — Freestyle Complete Guide
+    type: official_coaching
+    url: https://www.usms.org/fitness-and-training/guides/freestyle
+- knowledge_id: KB-005
+  version: '1.0'
+  title: 髋部垂直波动反映姿态稳定，但必须先去除镜头运动
+  summary: 髋部上下波动过大可能增加姿态变化和迎水面积，但移动摄像机、泳道波浪、呼吸和身体滚转也会造成表观波动。
+  stroke_types:
+  - freestyle
+  metric_keys:
+  - hip_vertical_range_norm
+  - hip_vertical_range_px
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Numerical and experimental methods used to evaluate active drag in swimming:
+    a review (2022), Underwater Stroke Kinematics During Breathing and Breath-holding Front Crawl Swimming
+    (2013), U.S. Masters Swimming — Freestyle Body Position and Rotation'
+  source_locator: swim_knowledge_base_v1#KB-005
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: body_position
+  view_types:
+  - side
+  distance_contexts: []
+  evidence_level: moderate
+  forbidden:
+  - 用原始像素跨视频比较
+  - 由髋部波动直接判断下肢力量不足
+  coach_text: 去除镜头运动后，髋部垂直波动在多个周期中仍{level}。建议优先检查呼吸时头部动作和身体对齐，而不是直接归因于力量。
+  actions:
+  - 固定头位的轻松游
+  - 侧身打腿
+  - 呼吸与非呼吸周期对照
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 完成相机运动补偿后，若多周期持续出现较大髋部波动，可作为姿态稳定性待复核信号。
+  - 应使用身体长度归一化或相对肩/水线位置，避免直接比较像素。
+  alternatives:
+  - 摄像机上下抖动
+  - 呼吸周期
+  - 滚转投影
+  - 关键点误检
+  required_evidence:
+  - 运动补偿
+  - 连续多个周期
+  - 归一化基准
+  - 可见性质量
+  source_records:
+  - title: 'Numerical and experimental methods used to evaluate active drag in swimming: a review (2022)'
+    type: review
+    url: https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2022.938658/full
+  - title: Underwater Stroke Kinematics During Breathing and Breath-holding Front Crawl Swimming (2013)
+    type: peer_reviewed
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC3778700/
+  - title: U.S. Masters Swimming — Freestyle Body Position and Rotation
+    type: official_coaching
+    url: https://www.usms.org/fitness-and-training/guides/freestyle/body-position
+- knowledge_id: KB-006
+  version: '1.0'
+  title: 头部抬升应与呼吸和躯干滚转共同判断
+  summary: 自由泳呼吸会产生预期的头部运动；关键不是头部完全不动，而是头部是否与身体滚转协调，以及是否出现额外抬头、延迟回正或突变。
+  stroke_types:
+  - freestyle
+  metric_keys:
+  - head_motion_spike_frames
+  - head_torso_sync
+  - head_vertical_range_px
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: 游泳表现分析知识库 v1：Underwater Stroke Kinematics During Breathing and Breath-holding Front Crawl
+    Swimming (2013), U.S. Masters Swimming — Freestyle Breathing Guide
+  source_locator: swim_knowledge_base_v1#KB-006
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: head_trunk
+  view_types:
+  - side
+  distance_contexts: []
+  evidence_level: moderate
+  forbidden:
+  - 将所有头部波动判为错误
+  - 仅凭头部上移诊断颈肩问题
+  coach_text: 头部变化主要出现在{breathing_context}。若同时伴随髋位下降或节奏中断，可优先优化呼吸时机和回头速度。
+  actions:
+  - 单侧呼吸对照
+  - 侧踢转头呼吸
+  - 呼吸后快速回正练习
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 呼吸周期中短暂变化可以是正常动作。
+  - 若头部明显上抬并伴随髋位下降或节奏中断，可提示呼吸动作干扰身体线。
+  alternatives:
+  - 波浪遮挡
+  - 泳帽/水花误检
+  - 镜头运动
+  - 非呼吸周期与呼吸周期混合
+  required_evidence:
+  - 呼吸事件或周期标签
+  - 头部与肩/躯干相对位置
+  - 关键帧证据
+  source_records:
+  - title: Underwater Stroke Kinematics During Breathing and Breath-holding Front Crawl Swimming (2013)
+    type: peer_reviewed
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC3778700/
+  - title: U.S. Masters Swimming — Freestyle Breathing Guide
+    type: official_coaching
+    url: https://www.usms.org/fitness-and-training/guides/freestyle/breathing
+- knowledge_id: KB-007
+  version: '1.0'
+  title: 头躯干同步性高并不必然代表技术更好
+  summary: 高相关可能表示头部与躯干协调，也可能只是两者共同受到镜头运动或整体升降影响；低相关也可能来自合理的相对运动。
+  stroke_types:
+  - freestyle
+  metric_keys:
+  - head_torso_sync
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Underwater Stroke Kinematics During Breathing and Breath-holding Front Crawl
+    Swimming (2013), Front crawl swimming coordination: a systematic review'
+  source_locator: swim_knowledge_base_v1#KB-007
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: head_trunk
+  view_types:
+  - side
+  distance_contexts: []
+  evidence_level: low_to_moderate
+  forbidden:
+  - 单凭相关系数输出“协调性优秀/较差”
+  coach_text: 头部与躯干的同步性为{value}，该指标仅表示时序关联。需结合呼吸帧和相机补偿结果判断是否属于有效协调。
+  actions:
+  - 展示同步曲线和关键帧
+  - 比较呼吸/非呼吸周期
+  - 按个人基线追踪
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 同步性指标必须与运动补偿、呼吸周期和关键帧联合解释。
+  - 更适合作为个人复测趋势，不宜设通用优劣阈值。
+  alternatives:
+  - 共享相机运动
+  - 整体身体升降
+  - 呼吸策略
+  - 检测噪声
+  required_evidence:
+  - 相机运动补偿
+  - 周期分段
+  - 可视化曲线
+  source_records:
+  - title: Underwater Stroke Kinematics During Breathing and Breath-holding Front Crawl Swimming (2013)
+    type: peer_reviewed
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC3778700/
+  - title: 'Front crawl swimming coordination: a systematic review'
+    type: systematic_review
+    url: https://research.uaeu.ac.ae/en/publications/front-crawl-swimming-coordination-a-systematic-review/
+- knowledge_id: KB-008
+  version: '1.0'
+  title: 侧视肘角不能单独等同于“高肘抱水”
+  summary: 早期垂直前臂和抱水形态是三维动作，受肩部滚转、前臂方向和水下深度影响。侧视肘角只能作为代理证据，不能单独确认高肘技术。
+  stroke_types:
+  - freestyle
+  metric_keys:
+  - elbow_angle_deg
+  - elbow_rom_deg
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Factors Relating to Sprint Swimming Performance: A Systematic Review (2024),
+    Front crawl swimming coordination: a systematic review, U.S. Masters Swimming — Freestyle Complete
+    Guide'
+  source_locator: swim_knowledge_base_v1#KB-008
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: upper_limb
+  view_types:
+  - side
+  distance_contexts: []
+  evidence_level: moderate
+  forbidden:
+  - 肘角超过某固定值就诊断高肘不足
+  - 由肘角直接判断上肢力量不足
+  coach_text: 在{phase}阶段，侧视肘角呈现{pattern}。这提示抱水形态可能需要复核，但二维侧视不足以单独确认“高肘不足”。
+  actions:
+  - 水下侧视复核
+  - 单臂划水
+  - 前臂建立迎水面的技术练习
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 在相同动作阶段、相同机位下，肘角和前臂方向的重复变化可用于个人对比。
+  - 需要事件标签或水下关键帧确认入水、抓水和推水阶段。
+  alternatives:
+  - 身体滚转
+  - 手臂前后深度
+  - 事件识别错误
+  - 左右臂遮挡
+  required_evidence:
+  - 动作阶段
+  - 肩-肘-腕可见性
+  - 水下或补充机位
+  - 前臂方向
+  source_records:
+  - title: 'Factors Relating to Sprint Swimming Performance: A Systematic Review (2024)'
+    type: systematic_review
+    url: https://link.springer.com/article/10.1007/s40279-024-02172-4
+  - title: 'Front crawl swimming coordination: a systematic review'
+    type: systematic_review
+    url: https://research.uaeu.ac.ae/en/publications/front-crawl-swimming-coordination-a-systematic-review/
+  - title: U.S. Masters Swimming — Freestyle Complete Guide
+    type: official_coaching
+    url: https://www.usms.org/fitness-and-training/guides/freestyle
+- knowledge_id: KB-009
+  version: '1.0'
+  title: 手腕轨迹用于描述路径与稳定性，不直接代表推进力
+  summary: 手腕轨迹和速度可显示前伸、下压、后划及回臂路径，但水动力推进还取决于手掌/前臂姿态、相对水流和三维速度。
+  stroke_types:
+  - freestyle
+  metric_keys:
+  - wrist_trajectory
+  - wrist_velocity_px_per_frame
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Numerical and experimental methods used to evaluate active drag in swimming:
+    a review (2022), Validation of Automatically Quantified Swim Stroke Mechanics Using an IMU (2024)'
+  source_locator: swim_knowledge_base_v1#KB-009
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: upper_limb
+  view_types:
+  - side
+  distance_contexts: []
+  evidence_level: moderate
+  forbidden:
+  - 用二维手腕速度直接估算推进功率
+  - 将路径偏移直接解释为肩部代偿
+  coach_text: 手腕路径在{phase}阶段表现为{pattern}。该结果描述动作轨迹，不等同于实际推进力，建议结合肘角与速度变化复核。
+  actions:
+  - 轨迹叠加回看
+  - 单臂节奏练习
+  - 稳定入水与前伸练习
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 轨迹突变或周期间不一致可作为动作稳定性证据。
+  - 应在动作阶段内比较，并使用身体长度归一化。
+  alternatives:
+  - 关键点抖动
+  - 遮挡
+  - 镜头运动
+  - 滚转投影
+  required_evidence:
+  - 轨迹平滑与质量标记
+  - 动作阶段
+  - 运动补偿
+  - 归一化
+  source_records:
+  - title: 'Numerical and experimental methods used to evaluate active drag in swimming: a review (2022)'
+    type: review
+    url: https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2022.938658/full
+  - title: Validation of Automatically Quantified Swim Stroke Mechanics Using an IMU (2024)
+    type: validation_study
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10813451/
+- knowledge_id: KB-010
+  version: '1.0'
+  title: 前伸距离应结合速度、身材和节奏解释
+  summary: 较大前伸可能增加有效长度，也可能形成停顿或过度滑行；较小前伸可能来自高划频策略。合理值依赖距离、速度、身体尺寸和协调模式。
+  stroke_types:
+  - freestyle
+  metric_keys:
+  - arm_extension_ratio
+  - front_reach_distance_norm
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Stroke rate–stroke length dynamics in elite freestyle swimming (2025), Kinematic,
+    arm-stroke efficiency, coordination, and energetic parameters of the 400-m front crawl: systematic
+    review and meta-analysis (2023), U.S. Masters Swimming — Balancing Stroke Rate and Stroke Efficiency'
+  source_locator: swim_knowledge_base_v1#KB-010
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: upper_limb
+  view_types:
+  - side
+  distance_contexts: []
+  evidence_level: moderate
+  forbidden:
+  - 把更长前伸一律判为更好
+  - 用固定厘米阈值跨人比较
+  coach_text: 前伸比例在{context}下{trend}。应结合划频、速度和是否出现前端停顿共同判断。
+  actions:
+  - 固定配速下比较前伸
+  - 节奏器训练
+  - 避免为减少划数而刻意停顿
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 若前伸减少同时速度下降、划频上升和节奏紊乱，可提示疲劳或技术保持下降。
+  - 仅凭前伸较短不能判断动作错误。
+  alternatives:
+  - 短距离策略
+  - 身高臂展
+  - 入水点投影
+  - 滚转
+  required_evidence:
+  - 身体长度归一化
+  - 速度
+  - 划频
+  - 阶段标签
+  source_records:
+  - title: Stroke rate–stroke length dynamics in elite freestyle swimming (2025)
+    type: peer_reviewed
+    url: https://www.frontiersin.org/journals/sports-and-active-living/articles/10.3389/fspor.2025.1656633/full
+  - title: 'Kinematic, arm-stroke efficiency, coordination, and energetic parameters of the 400-m front
+      crawl: systematic review and meta-analysis (2023)'
+    type: systematic_review_meta_analysis
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC9909090/
+  - title: U.S. Masters Swimming — Balancing Stroke Rate and Stroke Efficiency
+    type: official_coaching
+    url: https://www.usms.org/fitness-and-training/articles-and-videos/articles/balancing-stroke-rate-and-stroke-efficiency
+- knowledge_id: KB-011
+  version: '1.0'
+  title: 膝关节屈曲不存在单一“越大越好”标准
+  summary: 自由泳打腿推进机制复杂，膝关节角度过大可能增加迎水面积，但完全僵直也不利于形成有效波动。系统综述并不支持用一个固定膝角作为普遍最佳值。
+  stroke_types:
+  - freestyle
+  metric_keys:
+  - knee_angle_deg
+  - knee_rom_deg
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: 游泳表现分析知识库 v1：A systematic review of propulsion from the flutter kick (2018), U.S. Masters
+    Swimming — Freestyle Kick Guide
+  source_locator: swim_knowledge_base_v1#KB-011
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: lower_limb
+  view_types:
+  - side
+  distance_contexts: []
+  evidence_level: high
+  forbidden:
+  - 声称膝角越大推进力越大
+  - 由膝角偏小直接诊断力量问题
+  coach_text: 膝关节活动范围为{value}，需结合髋部驱动、踝部轨迹和打腿节奏判断；不宜依据单一角度判定优劣。
+  actions:
+  - 髋部发起的小幅打腿
+  - 侧身打腿
+  - 踝跖屈与放松练习
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 应看髋-膝-踝的连续时序、脚背方向、打腿幅度和速度，而非只看最大/最小角。
+  - 比较应限定在相同速度和相同周期阶段。
+  alternatives:
+  - 髋部驱动差异
+  - 踝柔韧性
+  - 短距离高频打腿
+  - 二维投影
+  required_evidence:
+  - 连续时序
+  - 周期相位
+  - 踝部轨迹
+  - 速度
+  source_records:
+  - title: A systematic review of propulsion from the flutter kick (2018)
+    type: systematic_review
+    url: https://pubmed.ncbi.nlm.nih.gov/29431581/
+  - title: U.S. Masters Swimming — Freestyle Kick Guide
+    type: official_coaching
+    url: https://www.usms.org/fitness-and-training/guides/freestyle/kick
+- knowledge_id: KB-012
+  version: '1.0'
+  title: 踝部摆动范围只是打腿能力的代理指标
+  summary: 踝部轨迹可反映打腿幅度和规律性，但有效推进还受踝跖屈、足部方向、频率和相位影响。
+  stroke_types:
+  - freestyle
+  metric_keys:
+  - ankle_vertical_range_norm
+  - ankle_vertical_range_px
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: 游泳表现分析知识库 v1：A systematic review of propulsion from the flutter kick (2018), U.S. Masters
+    Swimming — Freestyle Kick Guide
+  source_locator: swim_knowledge_base_v1#KB-012
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: lower_limb
+  view_types:
+  - side
+  distance_contexts: []
+  evidence_level: moderate
+  forbidden:
+  - 把踝部范围直接当作踝柔韧性测试
+  - 仅凭范围推荐高强度踝部训练
+  coach_text: 踝部摆动幅度在本次速度下{assessment}，其意义需要与打腿频率和脚背方向一起判断。
+  actions:
+  - 流线型打腿
+  - 侧身打腿
+  - 陆上踝关节活动度评估
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 幅度过大可能增加阻力，过小可能无法维持节奏；合理范围具有个体和速度差异。
+  - 应联合踝角或足部方向，而不是只看垂直范围。
+  alternatives:
+  - 镜头运动
+  - 膝屈曲变化
+  - 脚部遮挡
+  - 泳姿策略
+  required_evidence:
+  - 归一化幅度
+  - 周期频率
+  - 可见性
+  - 速度
+  source_records:
+  - title: A systematic review of propulsion from the flutter kick (2018)
+    type: systematic_review
+    url: https://pubmed.ncbi.nlm.nih.gov/29431581/
+  - title: U.S. Masters Swimming — Freestyle Kick Guide
+    type: official_coaching
+    url: https://www.usms.org/fitness-and-training/guides/freestyle/kick
+- knowledge_id: KB-013
+  version: '1.0'
+  title: 打腿周期性用于观察稳定性，不代表推进贡献大小
+  summary: 稳定周期可以说明节奏重复性，但不能单独说明打腿产生了多少推进。不同距离和策略可采用不同打腿配合。
+  stroke_types:
+  - freestyle
+  metric_keys:
+  - kick_frequency
+  - kick_periodicity
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：A systematic review of propulsion from the flutter kick (2018), U.S. Masters
+    Swimming — Freestyle Kick Guide, Front crawl swimming coordination: a systematic review'
+  source_locator: swim_knowledge_base_v1#KB-013
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: lower_limb
+  view_types:
+  - side
+  distance_contexts: []
+  evidence_level: moderate
+  forbidden:
+  - 将两次腿判为低水平
+  - 将高频打腿一律判为更高效
+  coach_text: 打腿节奏在{phase}阶段{trend}。应先确认采用的配合模式，再判断其是否稳定支撑当前配速。
+  actions:
+  - 记录配合模式
+  - 节拍器或分段打腿
+  - 在目标配速下复测
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 低速长距离的两次腿与短距离六次腿具有不同目的。
+  - 周期性下降且伴随速度下降或身体姿态波动时，可提示技术保持下降。
+  alternatives:
+  - 两次腿/四次腿/六次腿策略
+  - 呼吸模式
+  - 疲劳
+  - 关键点漏检
+  required_evidence:
+  - 上肢周期
+  - 速度区间
+  - 周期识别质量
+  source_records:
+  - title: A systematic review of propulsion from the flutter kick (2018)
+    type: systematic_review
+    url: https://pubmed.ncbi.nlm.nih.gov/29431581/
+  - title: U.S. Masters Swimming — Freestyle Kick Guide
+    type: official_coaching
+    url: https://www.usms.org/fitness-and-training/guides/freestyle/kick
+  - title: 'Front crawl swimming coordination: a systematic review'
+    type: systematic_review
+    url: https://research.uaeu.ac.ae/en/publications/front-crawl-swimming-coordination-a-systematic-review/
+- knowledge_id: KB-014
+  version: '1.0'
+  title: 上下肢协调应按周期和相位分析
+  summary: 协调不是“越同步越好”，而是上肢、下肢和身体滚转在目标速度下形成稳定相位关系。速度、疲劳和器材都会改变协调模式。
+  stroke_types:
+  - freestyle
+  metric_keys:
+  - left_right_kick_timing
+  - stroke_kick_phase
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Front crawl swimming coordination: a systematic review, Kinematic, arm-stroke
+    efficiency, coordination, and energetic parameters of the 400-m front crawl: systematic review and
+    meta-analysis (2023)'
+  source_locator: swim_knowledge_base_v1#KB-014
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: coordination
+  view_types:
+  - side
+  distance_contexts: []
+  evidence_level: high
+  forbidden:
+  - 用简单相关系数定义“协调好坏”
+  - 忽略速度条件设置统一阈值
+  coach_text: 上下肢相位关系在多个周期中{stability}。建议以目标比赛配速为条件评估，而不是脱离速度判断。
+  actions:
+  - 按配速分组分析
+  - 周期相位图
+  - 分解练习后回到完整配合
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 相位稳定但与个人策略不匹配可能仍需调整。
+  - 相位漂移可作为疲劳或动作控制变化的证据。
+  alternatives:
+  - 速度改变
+  - 呼吸侧
+  - 泳镜/水花遮挡
+  - 周期识别错误
+  required_evidence:
+  - 可靠周期边界
+  - 左右侧标签
+  - 连续多个周期
+  source_records:
+  - title: 'Front crawl swimming coordination: a systematic review'
+    type: systematic_review
+    url: https://research.uaeu.ac.ae/en/publications/front-crawl-swimming-coordination-a-systematic-review/
+  - title: 'Kinematic, arm-stroke efficiency, coordination, and energetic parameters of the 400-m front
+      crawl: systematic review and meta-analysis (2023)'
+    type: systematic_review_meta_analysis
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC9909090/
+- knowledge_id: KB-015
+  version: '1.0'
+  title: 疲劳应看连续趋势，而不是单一代表帧
+  summary: 疲劳常表现为速度、划频、划幅、协调和周期内波动的组合变化。单帧角度异常不足以证明疲劳。
+  stroke_types:
+  - freestyle
+  metric_keys:
+  - body_angle_std_deg
+  - kick_periodicity
+  - speed
+  - stroke_length
+  - stroke_rate
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Kinematic, arm-stroke efficiency, coordination, and energetic parameters
+    of the 400-m front crawl: systematic review and meta-analysis (2023), Interplay of Biomechanical,
+    Energetic, Coordinative, and Muscular Factors in a 200 m Front Crawl (2013), Front crawl swimming
+    coordination: a systematic review'
+  source_locator: swim_knowledge_base_v1#KB-015
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: fatigue
+  view_types: []
+  distance_contexts: []
+  evidence_level: moderate_to_high
+  forbidden:
+  - 由一个异常帧诊断疲劳
+  - 把所有后程变化都归因于体能不足
+  coach_text: 后程出现{combined_changes}。该组合更符合技术保持下降的趋势，但仍需结合配速任务和主观用力程度确认。
+  actions:
+  - 前后段对比
+  - 固定配速技术保持组
+  - 记录RPE与训练任务
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 常见模式包括速度下降、划幅缩短、划频代偿上升或协调变化，但个体策略不同。
+  - 应比较前后段、不同重复组或同一配速下的变化。
+  alternatives:
+  - 战术配速
+  - 转身质量
+  - 呼吸节奏
+  - 测量噪声
+  required_evidence:
+  - 时间序列
+  - 分段速度
+  - 多个周期
+  - 训练任务信息
+  source_records:
+  - title: 'Kinematic, arm-stroke efficiency, coordination, and energetic parameters of the 400-m front
+      crawl: systematic review and meta-analysis (2023)'
+    type: systematic_review_meta_analysis
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC9909090/
+  - title: Interplay of Biomechanical, Energetic, Coordinative, and Muscular Factors in a 200 m Front
+      Crawl (2013)
+    type: peer_reviewed
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC3613086/
+  - title: 'Front crawl swimming coordination: a systematic review'
+    type: systematic_review
+    url: https://research.uaeu.ac.ae/en/publications/front-crawl-swimming-coordination-a-systematic-review/
+- knowledge_id: KB-016
+  version: '1.0'
+  title: 阻力是结果变量，不能从单个二维指标直接计算
+  summary: 主动阻力受速度、横截面积、形态、姿态和水流相互作用影响。二维姿态指标只能提供“可能增加/减少阻力”的间接证据。
+  stroke_types: []
+  metric_keys:
+  - body_axis_angle_deg
+  - frontal_area_proxy
+  - speed
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Numerical and experimental methods used to evaluate active drag in swimming:
+    a review (2022)'
+  source_locator: swim_knowledge_base_v1#KB-016
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: drag
+  view_types:
+  - side
+  distance_contexts: []
+  evidence_level: high
+  forbidden:
+  - 从身体角度直接计算阻力大小
+  - 声称某动作一定降低X%阻力
+  coach_text: 姿态变化可能改变迎水面积和主动阻力，但当前视频只能提供间接证据，不能量化实际阻力。
+  actions:
+  - 将“阻力”改写为“流线型/迎水面积风险”
+  - 必要时使用牵引或水动力测试
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 姿态更平、迎水面积代理减少可支持“阻力风险降低”的表述。
+  - 若没有流体测量或可靠模型，不应给出牛顿、瓦特或百分比阻力变化。
+  alternatives:
+  - 速度平方效应
+  - 体型
+  - 泳衣与水流
+  - 推进产生的非定常流
+  required_evidence:
+  - 速度
+  - 姿态代理
+  - 明确假设
+  source_records:
+  - title: 'Numerical and experimental methods used to evaluate active drag in swimming: a review (2022)'
+    type: review
+    url: https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2022.938658/full
+- knowledge_id: KB-017
+  version: '1.0'
+  title: 200米自由泳是有氧与无氧共同参与的项目
+  summary: 200米自由泳表现由生物力学、供能、力量与协调共同决定；不能把一个生理指标单独当作成绩原因。
+  stroke_types:
+  - freestyle
+  metric_keys:
+  - blood_lactate
+  - race_pace
+  - vo2peak
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: 游泳表现分析知识库 v1：Interplay of Biomechanical, Energetic, Coordinative, and Muscular Factors
+    in a 200 m Front Crawl (2013), Verifying Physiological and Biomechanical Parameters during Continuous
+    Swimming at Lactate Threshold (2020), The Influence of Sex, Stroke and Distance on Lactate Characteristics
+    in High Performance Swimming (2013)
+  source_locator: swim_knowledge_base_v1#KB-017
+  review_status: inactive
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: physiology
+  view_types: []
+  distance_contexts: []
+  evidence_level: high
+  forbidden:
+  - 由一次乳酸值直接判断“乳酸能力优秀/差”
+  - 将VO2peak直接转换为比赛成绩
+  coach_text: 该项目需要有氧与无氧系统共同支撑。生理指标应与配速、技术保持和分段表现联合解释。
+  actions:
+  - 标准化递增测试
+  - 分段技术与乳酸同步观察
+  - 建立个人纵向基线
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines: []
+  interpretations:
+  - 较高有氧能力有助于维持后程供能和技术。
+  - 乳酸峰值反映高强度代谢反应，但不能单独等同于乳酸耐受或清除能力。
+  alternatives:
+  - 配速策略
+  - 技术效率
+  - 起跳转身
+  - 成熟度与训练状态
+  required_evidence:
+  - 标准化测试协议
+  - 采血时间
+  - 速度/配速
+  - 个人历史
+  source_records:
+  - title: Interplay of Biomechanical, Energetic, Coordinative, and Muscular Factors in a 200 m Front
+      Crawl (2013)
+    type: peer_reviewed
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC3613086/
+  - title: Verifying Physiological and Biomechanical Parameters during Continuous Swimming at Lactate
+      Threshold (2020)
+    type: peer_reviewed
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7404638/
+  - title: The Influence of Sex, Stroke and Distance on Lactate Characteristics in High Performance Swimming
+      (2013)
+    type: peer_reviewed
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC3805569/
+  - title: Modelling the 200 m Front-Crawl Performance Predictors (2020)
+    type: peer_reviewed
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7142514/
+- knowledge_id: KB-018
+  version: '1.0'
+  title: 乳酸清除必须明确采样时间与恢复方式
+  summary: 血乳酸峰值出现时间因项目、个体和采样间隔而异；所谓清除率必须说明峰值采样时点、后续时点以及主动/被动恢复。
+  stroke_types: []
+  metric_keys:
+  - lactate_clearance
+  - lactate_peak
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: 游泳表现分析知识库 v1：Verifying Physiological and Biomechanical Parameters during Continuous Swimming
+    at Lactate Threshold (2020), The Influence of Sex, Stroke and Distance on Lactate Characteristics
+    in High Performance Swimming (2013)
+  source_locator: swim_knowledge_base_v1#KB-018
+  review_status: inactive
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: physiology
+  view_types: []
+  distance_contexts: []
+  evidence_level: high
+  forbidden:
+  - 省略采样时点只报告“清除率差”
+  - 用一次结果下长期体能结论
+  coach_text: 乳酸变化应按完整时间线解释。当前清除率仅在相同采样和恢复协议下具有可比性。
+  actions:
+  - 记录每次采样分钟数
+  - 固定恢复方式
+  - 重复测试确认
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines: []
+  interpretations:
+  - 不同协议得到的清除率不可直接比较。
+  - 清除较慢不自动等于训练状态差，需结合测试可靠性和目标项目。
+  alternatives:
+  - 采样误差
+  - 峰值尚未出现
+  - 恢复方式
+  - 前一训练负荷
+  - 饮食和水合
+  required_evidence:
+  - 完整采样时间线
+  - 恢复协议
+  - 重复测试
+  source_records:
+  - title: Verifying Physiological and Biomechanical Parameters during Continuous Swimming at Lactate
+      Threshold (2020)
+    type: peer_reviewed
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7404638/
+  - title: The Influence of Sex, Stroke and Distance on Lactate Characteristics in High Performance Swimming
+      (2013)
+    type: peer_reviewed
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC3805569/
+- knowledge_id: KB-019
+  version: '1.0'
+  title: 体成分是背景变量，不是技术问题的直接原因
+  summary: 体成分与游泳表现的关系受到性别、年龄、成熟度、项目距离和训练水平影响。体脂率或瘦体重不能单独解释某个技术动作。
+  stroke_types: []
+  metric_keys:
+  - body_fat_percent
+  - lean_mass
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Physical performance determinants in competitive youth swimmers: a systematic
+    review (2023), Young Swimmers’ Anthropometrics, Biomechanics, Energetics and Efficiency: Systematic
+    Review (2021)'
+  source_locator: swim_knowledge_base_v1#KB-019
+  review_status: inactive
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: physiology
+  view_types: []
+  distance_contexts: []
+  evidence_level: moderate
+  forbidden:
+  - 把体脂偏高直接写成身体下沉原因
+  - 依据单次数值给出激进减重建议
+  coach_text: 体成分是长期训练背景之一，不能由该指标直接解释某个技术问题。建议由体能与营养专业人员结合成长阶段评估。
+  actions:
+  - 纵向追踪
+  - 结合健康与营养评估
+  - 避免单次排名
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines: []
+  interpretations:
+  - 青少年应结合生长发育和健康背景。
+  - 体成分更适合用于长期趋势和体能计划，而不是单次视频诊断。
+  alternatives:
+  - 生物成熟度
+  - 营养状态
+  - 项目特征
+  - 测量方法差异
+  required_evidence:
+  - 年龄性别与成熟度
+  - 测量方法
+  - 个人历史
+  - 专业人员评估
+  source_records:
+  - title: 'Physical performance determinants in competitive youth swimmers: a systematic review (2023)'
+    type: systematic_review
+    url: https://link.springer.com/article/10.1186/s13102-023-00767-4
+  - title: 'Young Swimmers’ Anthropometrics, Biomechanics, Energetics and Efficiency: Systematic Review
+      (2021)'
+    type: systematic_review
+    url: https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2021.691919/full
+- knowledge_id: KB-020
+  version: '1.0'
+  title: 陆上力量训练可能提升表现，但技术迁移不是自动发生
+  summary: 系统综述支持合理的力量与功率训练可改善游泳表现，但效果取决于训练方法、专项性、周期安排和水中技术整合。
+  stroke_types: []
+  metric_keys:
+  - dryland_strength
+  - power
+  - pull_power
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Biomechanical Evaluation of Strength and Conditioning Training Programs
+    on Front Crawl Performance: Systematic Review and Meta-analysis (2021), The methodology of resistance
+    training is crucial for improving swimming performance (2024), Physical Preparation — Athlete365'
+  source_locator: swim_knowledge_base_v1#KB-020
+  review_status: inactive
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: strength_conditioning
+  view_types: []
+  distance_contexts: []
+  evidence_level: high
+  forbidden:
+  - 从视频角度直接诊断某肌群不足
+  - 把所有技术问题都推荐为力量训练
+  coach_text: 若要验证力量因素，需结合陆上或水中专项力量测试。视频结果只能提出“需要复核”的假设。
+  actions:
+  - 专项拉力/功率测试
+  - 力量训练与水中技术同步
+  - 周期化安排
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines: []
+  interpretations:
+  - 力量增加可能通过划频、起跳转身、推进能力等路径发挥作用。
+  - 单次动作变形不能自动归因于力量不足。
+  alternatives:
+  - 技术时序
+  - 灵活性
+  - 疲劳
+  - 训练任务
+  required_evidence:
+  - 标准化体能测试
+  - 训练史
+  - 水中表现
+  - 教练评估
+  source_records:
+  - title: 'Biomechanical Evaluation of Strength and Conditioning Training Programs on Front Crawl Performance:
+      Systematic Review and Meta-analysis (2021)'
+    type: systematic_review_meta_analysis
+    url: https://www.jssm.org/jssm-20-564.xml-Fulltext
+  - title: The methodology of resistance training is crucial for improving swimming performance (2024)
+    type: systematic_review_meta_analysis
+    url: https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2024.1406518/full
+  - title: Physical Preparation — Athlete365
+    type: official_athlete_education
+    url: https://www.olympics.com/athlete365/learning/physical-preparation
+- knowledge_id: KB-021
+  version: '1.0'
+  title: 技术报告不得进行伤病诊断
+  summary: 肩痛和颈痛是多因素问题，训练量、活动度、力量、组织状态和技术均可能相关。视频系统只能提示需要关注的动作模式，不能诊断撞击、肌腱病或其他疾病。
+  stroke_types: []
+  metric_keys:
+  - neck_motion
+  - pain
+  - shoulder_asymmetry
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Swimmer’s Shoulder: An Update on Pathogenesis, Risk Factors, and Clinical
+    Management (2025), The Relationship Between Training Load and Injury in Competitive Swimming (2024)'
+  source_locator: swim_knowledge_base_v1#KB-021
+  review_status: inactive
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: injury_safety
+  view_types: []
+  distance_contexts: []
+  evidence_level: high
+  forbidden:
+  - 输出疾病名称
+  - 根据单个角度判定受伤风险等级
+  - 提供医疗治疗方案
+  coach_text: 该动作模式可能增加局部负担，但本系统不能进行伤病诊断。若伴随疼痛或功能下降，请由运动医学或康复专业人员评估。
+  actions:
+  - 降低不适动作负荷
+  - 记录疼痛与训练量
+  - 专业评估
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines: []
+  interpretations:
+  - 若运动员报告疼痛、麻木、无力或症状持续，应建议停止自行纠错并由合格医疗人员评估。
+  - 高严重度但低证据的问题应标记为待复核。
+  alternatives:
+  - 既往伤病
+  - 训练负荷
+  - 活动度与力量
+  - 恢复状态
+  required_evidence:
+  - 症状问卷
+  - 医疗史
+  - 临床评估
+  source_records:
+  - title: 'Swimmer’s Shoulder: An Update on Pathogenesis, Risk Factors, and Clinical Management (2025)'
+    type: clinical_review
+    url: https://link.springer.com/article/10.1007/s40141-025-00506-5
+  - title: The Relationship Between Training Load and Injury in Competitive Swimming (2024)
+    type: longitudinal_study
+    url: https://www.mdpi.com/2076-3417/14/22/10411
+- knowledge_id: KB-022
+  version: '1.0'
+  title: 训练建议必须结合当前负荷和恢复状态
+  summary: 同一技术练习在不同疲劳和训练负荷下效果不同。系统不应只根据一次技术报告自动增加大量专项练习。
+  stroke_types: []
+  metric_keys:
+  - intensity
+  - recovery
+  - session_rpe
+  - volume
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: 游泳表现分析知识库 v1：The Relationship Between Training Load and Injury in Competitive Swimming
+    (2024), Physical Preparation — Athlete365
+  source_locator: swim_knowledge_base_v1#KB-022
+  review_status: inactive
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: training_load
+  view_types: []
+  distance_contexts: []
+  evidence_level: moderate
+  forbidden:
+  - 自动生成高强度训练处方
+  - 忽略已有训练计划叠加负荷
+  coach_text: 该建议应由教练结合本周训练量和恢复状态安排，优先小剂量技术练习并复测效果。
+  actions:
+  - 记录sRPE和训练量
+  - 技术练习先低负荷
+  - 设复测节点
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines: []
+  interpretations:
+  - 训练量与伤病之间是复杂关联，个体化负荷管理比简单阈值更合理。
+  - 建议应给出目的、剂量范围和停止条件，并由教练纳入计划。
+  alternatives:
+  - 睡眠
+  - 比赛周期
+  - 既往负荷
+  - 伤病状态
+  required_evidence:
+  - 近期训练量
+  - RPE
+  - 恢复与疼痛
+  - 训练阶段
+  source_records:
+  - title: The Relationship Between Training Load and Injury in Competitive Swimming (2024)
+    type: longitudinal_study
+    url: https://www.mdpi.com/2076-3417/14/22/10411
+  - title: Physical Preparation — Athlete365
+    type: official_athlete_education
+    url: https://www.olympics.com/athlete365/learning/physical-preparation
+- knowledge_id: KB-023
+  version: '1.0'
+  title: 从观测到结论必须分四层表达
+  summary: 报告应严格区分：客观观测、可能解释、潜在影响、训练建议。证据不足时使用“提示、可能、建议复核”，而不是确定性因果语言。
+  stroke_types: []
+  metric_keys:
+  - all
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Movement evaluation of front crawl swimming: Technical skill versus aesthetic
+    quality (2017), Validation of Automatically Quantified Swim Stroke Mechanics Using an IMU (2024)'
+  source_locator: swim_knowledge_base_v1#KB-023
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: language_policy
+  view_types: []
+  distance_contexts: []
+  evidence_level: governance
+  forbidden:
+  - 把相关性写成因果
+  - 省略不确定性
+  - 没有证据仍输出确定诊断
+  coach_text: 观测：{observation}。可能解释：{interpretation}。潜在影响：{impact}。建议：{action}。置信度：{confidence}。
+  actions:
+  - 固定五段式模板
+  - 显示证据来源
+  - 低置信度进入待复核区
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 观测层只描述数值和帧。
+  - 解释层列出至少一个替代原因。
+  - 建议层与证据强度匹配。
+  alternatives:
+  - 数据质量
+  - 个体策略
+  - 测试条件
+  required_evidence:
+  - 证据帧
+  - 质量等级
+  - 来源指标
+  source_records:
+  - title: 'Movement evaluation of front crawl swimming: Technical skill versus aesthetic quality (2017)'
+    type: peer_reviewed
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC5590880/
+  - title: Validation of Automatically Quantified Swim Stroke Mechanics Using an IMU (2024)
+    type: validation_study
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10813451/
+- knowledge_id: KB-024
+  version: '1.0'
+  title: 训练建议应与发现一一对应并可复测
+  summary: 建议必须说明目标指标、练习目的、执行条件和复测标准，避免泛化的“加强核心、加强力量”。
+  stroke_types: []
+  metric_keys:
+  - all
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: 游泳表现分析知识库 v1：USA Swimming — Training & Technique, U.S. Masters Swimming — Swimming Guides
+  source_locator: swim_knowledge_base_v1#KB-024
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: language_policy
+  view_types: []
+  distance_contexts: []
+  evidence_level: governance
+  forbidden:
+  - 无剂量和无目标的泛化建议
+  - 把所有问题都推荐同一组练习
+  coach_text: 目标：改善{metric}。练习：{drill}。建议剂量：{dose}。复测：在{condition}下观察{success_criterion}。
+  actions:
+  - 建议结构化
+  - 定义成功标准
+  - 保留教练调整权
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 每条建议最多针对一个主要问题。
+  - 动作练习优先于未经验证的体能归因。
+  alternatives:
+  - 教练已有计划
+  - 学员水平
+  - 训练环境
+  required_evidence:
+  - 目标发现
+  - 建议剂量
+  - 复测指标
+  source_records:
+  - title: USA Swimming — Training & Technique
+    type: official_coaching
+    url: https://www.usaswimming.org/swimmers-parents/swimmers/training-techniques
+  - title: U.S. Masters Swimming — Swimming Guides
+    type: official_coaching
+    url: https://www.usms.org/fitness-and-training/guides
+- knowledge_id: KB-025
+  version: '1.0'
+  title: 左右差异必须先排除机位、遮挡和标注偏差
+  summary: 单侧侧视、身体滚转和移动摄像机容易造成左右肢体投影不同。左右差异指标必须在左右都清晰可见、相同阶段和相同机位条件下使用。
+  stroke_types:
+  - freestyle
+  metric_keys:
+  - asymmetry_index
+  - left_right_difference
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Front crawl swimming coordination: a systematic review, Validation of Automatically
+    Quantified Swim Stroke Mechanics Using an IMU (2024)'
+  source_locator: swim_knowledge_base_v1#KB-025
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: data_quality
+  view_types:
+  - side
+  distance_contexts: []
+  evidence_level: high
+  forbidden:
+  - 用侧视单机位直接诊断左右肌力不平衡
+  - 低质量差异进入首页主要问题
+  coach_text: 检测到左右差异，但当前侧视投影与可见性可能影响结果。建议先进行同阶段、多周期复核，必要时增加正面机位。
+  actions:
+  - 正面机位复核
+  - 提高标注质量
+  - 按周期对齐比较
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 稳定、重复且跨周期存在的差异可作为复核线索。
+  - 单次或低可见性差异应降置信度。
+  alternatives:
+  - 遮挡
+  - 滚转
+  - 镜头位置
+  - 左右事件不同步
+  - 标注误差
+  required_evidence:
+  - 双侧可见性
+  - 阶段对齐
+  - 多周期重复
+  - 运动补偿
+  source_records:
+  - title: 'Front crawl swimming coordination: a systematic review'
+    type: systematic_review
+    url: https://research.uaeu.ac.ae/en/publications/front-crawl-swimming-coordination-a-systematic-review/
+  - title: Validation of Automatically Quantified Swim Stroke Mechanics Using an IMU (2024)
+    type: validation_study
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10813451/
+- knowledge_id: KB-026
+  version: '1.0'
+  title: 最有价值的是个人纵向趋势，而非一次绝对评分
+  summary: 游泳技术和生理指标具有明显个体差异。稳定的测试协议、重复测量和个人基线通常比一次性通用评分更能指导训练。
+  stroke_types: []
+  metric_keys:
+  - all
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：Stroke rate–stroke length dynamics in elite freestyle swimming (2025), Factors
+    Relating to Sprint Swimming Performance: A Systematic Review (2024), Physical performance determinants
+    in competitive youth swimmers: a systematic review (2023)'
+  source_locator: swim_knowledge_base_v1#KB-026
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: monitoring
+  view_types: []
+  distance_contexts: []
+  evidence_level: high
+  forbidden:
+  - 用不透明总分替代原始证据
+  - 跨协议比较趋势
+  coach_text: 本次结果应优先与个人同条件历史记录比较。变化方向比单次绝对等级更有训练意义。
+  actions:
+  - 建立个人基线
+  - 保留协议和版本
+  - 显示效应大小与置信度
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 报告应显示与本人上次、近期平均和目标区间的变化。
+  - 评分需要保留原始指标和测试条件，避免黑箱。
+  alternatives:
+  - 训练阶段
+  - 设备和机位变化
+  - 成长发育
+  - 测试强度
+  required_evidence:
+  - 相同协议
+  - 版本与数据追溯
+  - 历史记录
+  source_records:
+  - title: Stroke rate–stroke length dynamics in elite freestyle swimming (2025)
+    type: peer_reviewed
+    url: https://www.frontiersin.org/journals/sports-and-active-living/articles/10.3389/fspor.2025.1656633/full
+  - title: 'Factors Relating to Sprint Swimming Performance: A Systematic Review (2024)'
+    type: systematic_review
+    url: https://link.springer.com/article/10.1007/s40279-024-02172-4
+  - title: 'Physical performance determinants in competitive youth swimmers: a systematic review (2023)'
+    type: systematic_review
+    url: https://link.springer.com/article/10.1186/s13102-023-00767-4
+  - title: 'Young Swimmers’ Anthropometrics, Biomechanics, Energetics and Efficiency: Systematic Review
+      (2021)'
+    type: systematic_review
+    url: https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2021.691919/full
+- knowledge_id: KB-027
+  version: '1.0'
+  title: 综合评分不能掩盖模块不可用与低置信度
+  summary: 总分只能汇总可用模块；被阻断或低置信度模块必须单独显示，不得用默认中位分补齐。
+  stroke_types: []
+  metric_keys:
+  - overall_score
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: 游泳表现分析知识库 v1：Validation of Automatically Quantified Swim Stroke Mechanics Using an IMU
+    (2024)
+  source_locator: swim_knowledge_base_v1#KB-027
+  review_status: inactive
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: report_composition
+  view_types: []
+  distance_contexts: []
+  evidence_level: governance
+  forbidden:
+  - 缺失指标按0分或60分填充
+  - 仅显示总分不显示证据
+  coach_text: 综合评分基于{available_modules}个可用模块；{blocked_modules}未参与评分，请结合模块详情阅读。
+  actions:
+  - 显示分母和可用性
+  - 保留权重版本
+  - 低置信度不进入主要结论
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines: []
+  interpretations:
+  - 相同总分可能来自完全不同的问题组合。
+  - 首页应显示主要发现、证据质量和不可用模块。
+  alternatives:
+  - 缺失数据
+  - 不同权重
+  - 不同泳姿和速度
+  required_evidence:
+  - 模块可用性
+  - 权重版本
+  - 置信度
+  source_records:
+  - title: Validation of Automatically Quantified Swim Stroke Mechanics Using an IMU (2024)
+    type: validation_study
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10813451/
+- knowledge_id: KB-028
+  version: '1.0'
+  title: 泳姿和项目距离必须作为知识检索的硬过滤条件
+  summary: 自由泳、仰泳、蛙泳和蝶泳在规则、推进方式、节奏和合理技术表现上不同；同一泳姿的50米与1500米策略也不同。知识库检索必须先按泳姿、距离、机位和水平过滤。
+  stroke_types: []
+  metric_keys:
+  - all
+  finding_codes: []
+  athlete_levels: []
+  training_goals: []
+  contraindications: []
+  source_title: '游泳表现分析知识库 v1：World Aquatics Swimming Rules, Factors Relating to Sprint Swimming Performance:
+    A Systematic Review (2024), U.S. Masters Swimming — Swimming Guides'
+  source_locator: swim_knowledge_base_v1#KB-028
+  review_status: active
+  reviewed_by: swim-knowledge-base-v1-authors
+  reviewed_at: '2026-07-31'
+  domain: stroke_scope
+  view_types: []
+  distance_contexts: []
+  evidence_level: high
+  forbidden:
+  - 跨泳姿复用同一阈值
+  - 忽略项目距离生成通用结论
+  coach_text: 本结论适用于{stroke}/{distance}/{view}条件，不应直接外推到其他泳姿或项目距离。
+  actions:
+  - 元数据硬过滤
+  - 泳姿独立规则包
+  - 距离分层基线
+  audience:
+  - coach
+  - athlete
+  applicable_pipelines:
+  - side_2d_kinematics_5page
+  interpretations:
+  - 自由泳侧视知识不能直接迁移到蛙泳或蝶泳。
+  - 短距离的高划频策略不应被长距离知识规则判为错误。
+  alternatives:
+  - 混合泳规则
+  - 公开水域条件
+  - 年龄组
+  required_evidence:
+  - 泳姿
+  - 距离
+  - 机位
+  - 水平
+  - 训练任务
+  source_records:
+  - title: World Aquatics Swimming Rules
+    type: official_rule
+    url: https://www.worldaquatics.com/swimming/rules
+  - title: 'Factors Relating to Sprint Swimming Performance: A Systematic Review (2024)'
+    type: systematic_review
+    url: https://link.springer.com/article/10.1007/s40279-024-02172-4
+  - title: U.S. Masters Swimming — Swimming Guides
+    type: official_coaching
+    url: https://www.usms.org/fitness-and-training/guides
