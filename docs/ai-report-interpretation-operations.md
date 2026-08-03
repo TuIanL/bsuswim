@@ -8,6 +8,10 @@ AI 解读是可选增强，`AI_INTERPRETATION_ENABLED=false` 和
 调用并要求 `json_object` 输出；返回后仍经过本地严格 schema 和事实护栏。测试环境使用
 `fake` provider。替换模型后必须重新执行固定评测与教练试运行。
 
+`AI_INTERPRETATION_V3_ENABLED=true` 是独立的 v3 发布开关。关闭它会阻止新的
+AI 解读生成和自动调度，但不会删除或隐藏已经持久化的 v1/v2/v3 历史解读；基础
+报告和五页 PDF 仍可正常读取。重新开启后，新生成继续使用 v3 schema。
+
 `qwen-plus` 当前按文本模型配置。仅当部署者同时确认目标 Qwen 模型支持图片输入和
 结构化 JSON 输出，并设置 `AI_INTERPRETATION_VISUAL_ENABLED=true`、
 `AI_INTERPRETATION_MODEL_SUPPORTS_VISION=true`、
@@ -84,6 +88,14 @@ fact consistency 和 guardrail rejection；`usage` 保存延迟、重试、输�
 - 前端生产构建：`vue-tsc --noEmit && vite build` 通过。
 - pipeline、PDF 与对抗性用例包含在后端/前端全量结果中；固定 AI 评测覆盖正常、低置信度、缺失数据、空 findings 和风险措辞。
 - 非阻断警告：既有 pipeline 仍有 `datetime.utcnow()` 弃用提示；既有 Vue 测试存在组件 stub/lifecycle 警告；主 bundle 超过 500 kB。这些不改变本期 AI 解读行为，但应进入后续技术债计划。
+
+### 2026-07-31 v3 变更验证记录
+
+- 后端全量：515 passed、1 skipped；包含 v3 schema、focus candidate、低质量事实门控、reference catalog、API 权限、历史 v1 读取和回滚开关测试。
+- 前端全量：11 个文件、49 个测试通过；生产构建通过，包含 Web/PDF v3 结构化内容和引用锚点测试。
+- 开发冒烟：正常、低置信度、不可用指标、无资产、阶段缺失和视觉请求模式共 4 组定向用例通过；视觉用例使用请求构造测试，不向真实 provider 发送数据。
+- 回滚验证：`AI_INTERPRETATION_V3_ENABLED=false` 阻止新 v3 生成，已保存历史解读仍可读取，基础报告和五页打印路径不依赖 provider。
+- OpenSpec 严格校验：`enhance-report-ai-interpretation` valid。
 
 ## 故障排查
 
