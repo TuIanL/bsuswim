@@ -65,6 +65,31 @@ jobs:
         env:
           DATABASE_URL: postgresql+psycopg://swim:swim@localhost:5432/swim_analysis
 
+  repo-hygiene:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: All alembic migrations tracked
+        run: |
+          HEAD_REV=$(cd backend && grep -h "^revision" alembic/versions/*.py | sed -E 's/.*"([^"]+)".*/\1/' | sort -u | tail -1)
+          git ls-files backend/alembic/versions/ | grep -q "$HEAD_REV" || { echo "head migration $HEAD_REV not tracked"; exit 1; }
+          echo "head migration $HEAD_REV tracked"
+
+      - name: No runtime artifacts tracked under backend/uploads
+        run: |
+          COUNT=$(git ls-files backend/uploads | wc -l)
+          if [ "$COUNT" -ne 0 ]; then echo "found $COUNT tracked files under backend/uploads"; exit 1; fi
+          echo "backend/uploads clean ($COUNT tracked)"
+
+      - name: No deprecated utcnow usage
+        run: |
+          if grep -rn "utcnow" backend/app --include="*.py" | grep -v "_utcnow" | grep -q .; then
+            echo "deprecated utcnow usage found"; exit 1
+          fi
+          echo "no deprecated utcnow usage"
+
   frontend:
     runs-on: ubuntu-latest
     defaults:
