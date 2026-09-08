@@ -8,6 +8,7 @@ import SessionUploadView from './views/SessionUploadView.vue'
 import TasksView from './views/TasksView.vue'
 import WorkspaceView from './views/WorkspaceView.vue'
 import ReportView from './views/ReportView.vue'
+import ManualLabelingView from './views/ManualLabelingView.vue'
 import { demoMode } from './services/api'
 import { useAuthStore } from './stores/auth'
 
@@ -27,6 +28,11 @@ export const router = createRouter({
     { path: '/tasks', component: TasksView },
     { path: '/workspace/:taskId', component: WorkspaceView, props: true },
     { path: '/reports/:sessionId', component: ReportView, props: true },
+    {
+      path: '/sessions/:sessionId/videos/:sessionVideoId/labels',
+      component: ManualLabelingView,
+      props: true
+    },
     {
       path: '/reports/:sessionId/print',
       component: () => import('./views/PrintReportView.vue'),

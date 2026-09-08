@@ -26,7 +26,20 @@ users
 
 teams
   └── athletes
+
+# 人工时序参考标注（manual temporal reference labels）
+session_videos
+  └── manual_annotation_sets           # 一套逻辑标注谱系（lineage）
+        └── manual_annotation_revisions # 不可变版本 + 可复现快照
+              └── manual_phase_segments # 一条时间区间（仅 revision_id 归属）
+analysis_tasks
+  └── reference_annotation_revision_id # FK → manual_annotation_revisions.id（显式引用）
 ```
+
+> 设计要点：标注归属挂在 `session_video_id`，分析任务只消费某一版 revision，不拥有标注。
+> `manual_phase_segments` 不冗余 `set_id`，只通过 `revision_id` FK 归属；`cycle_id` 是跨
+> revision 稳定的逻辑周期标识（fork 继承、新增才生成、删除不复用）。详见 Change
+> `add-manual-temporal-reference-labeling-workspace`。
 
 ## 3. 核心表说明
 
@@ -143,6 +156,45 @@ teams
 - `source`
 - `report_data`
 - `generated_at`
+
+### 3.9 `manual_annotation_sets` / `manual_annotation_revisions` / `manual_phase_segments`
+
+人工时序参考标注（reference labels）三层模型（Change `add-manual-temporal-reference-labeling-workspace`）。
+
+`manual_annotation_sets`（谱系）：
+
+- `session_video_id`
+- `phase_profile_id`
+- `head_revision_id`
+- `created_by` / `created_at` / `updated_at` / `deleted_at`
+
+`manual_annotation_revisions`（不可变版本 + 可复现快照）：
+
+- `set_id` / `revision_no`（`UNIQUE(set_id, revision_no)`，revision_no 由 revision 自身维护，不靠组合键承担引用完整性）
+- `forked_from_revision_id`（fork  lineage；**不强制新建 set**）
+- `video_checksum_sha256` / `video_fps_snapshot` / `video_duration_snapshot` / `frame_basis`（快照落在 revision，不只在 set）
+- `phase_profile_id` / `phase_profile_version` / `phase_profile_hash`
+- `content_hash`（canonical JSON → sha256；**非去重键**，fork 同内容合法）
+- `status`（`draft` 可变；`in_review` / `reviewed` / `frozen` / `rejected` 锁内容）
+- `segment_count` / `cycle_count`
+- `edit_version`（draft 乐观锁）
+- provenance：`created_by` / `updated_by` / `reviewed_by` / `review_status` / `reviewed_at`
+
+`manual_phase_segments`（区间行）：
+
+- `revision_id`（NOT NULL，唯一归属）
+- `cycle_id`（UUID，跨 revision 稳定；`UNIQUE(revision_id, cycle_id, side, phase_code)`）
+- `cycle_index`（派生展示序号）
+- `side`（`left` / `right` / `both` / `unknown`；`both` / `unknown` 仅 draft）
+- `phase_code`（`entry` / `catch` / `push` / `recovery`）
+- `start_time_sec` / `end_time_sec`（**canonical**）；`start_frame` / `end_frame`（派生快照）
+- `confidence`（nullable，与 review_status 正交）
+- `note` / `derivation` / provenance / soft delete
+
+`analysis_tasks` 新增：
+
+- `reference_annotation_revision_id`：可空 FK → `manual_annotation_revisions.id`（ondelete SET NULL）。
+  下游 metrics / diagnostics 经 resolver 取此值，MUST NOT 按 session 查 latest。
 
 ## 4. Migration
 

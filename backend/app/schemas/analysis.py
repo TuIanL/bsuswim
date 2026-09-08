@@ -23,6 +23,9 @@ class AnalysisSubmit(BaseModel):
     session_id: int
     normalized_annotation_id: int | None = None
     acknowledge_quality_warnings: bool = False
+    # 显式引用某个不可变人工标注 revision。NULL = 回退 legacy imported events。
+    # 下游 MUST 经 resolver 取本值，MUST NOT 重新按 session 查询 latest。
+    reference_annotation_revision_id: int | None = None
 
     pipeline_type: Literal[
         "model_service",

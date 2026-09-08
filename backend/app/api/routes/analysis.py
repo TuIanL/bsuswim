@@ -20,6 +20,7 @@ from app.services.analysis_service import (
     AnnotationInputUnavailableError,
     AnnotationQualityBlockedError,
     AnnotationSelectionRequiredError,
+    ReferenceRevisionInvalidError,
     create_analysis_task,
     read_analysis_status,
     read_analysis_task,
@@ -81,6 +82,16 @@ async def submit_analysis(
                     "code": "ANNOTATION_INPUT_UNAVAILABLE",
                     "message": str(exc),
                     "reason": exc.reason,
+                }
+            },
+        )
+    except ReferenceRevisionInvalidError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": {
+                    "code": "REFERENCE_REVISION_INVALID",
+                    "message": str(exc),
                 }
             },
         )

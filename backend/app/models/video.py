@@ -47,3 +47,6 @@ class SessionVideo(Base):
     video_file = relationship("VideoFile", back_populates="session_links")
     annotations = relationship("AnnotationFile", back_populates="session_video", cascade="all, delete-orphan")
     normalized_annotations = relationship("NormalizedAnnotation", back_populates="session_video", cascade="all, delete-orphan")
+    manual_annotation_sets = relationship(
+        "ManualAnnotationSet", back_populates="session_video", cascade="all, delete-orphan"
+    )

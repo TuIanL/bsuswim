@@ -28,6 +28,10 @@ from app.services.annotation_quality.models import AnalysisQualitySummary, Metri
 from app.services.diagnostics.adapter import DiagnosticsMetricsAdapter
 from app.services.diagnostics.engine import RuleBasedDiagnosticsEngine
 from app.services.diagnostics.models import DiagnosticsOutput
+from app.services.reference_labels.resolver import (
+    STATUS_REFERENCE_INVALID,
+    resolve_for_analysis_task,
+)
 from app.services.diagnostics.registry import RuleRegistry
 
 DEFAULT_RULE_SET = "side_freestyle_v1"
@@ -81,6 +85,31 @@ def run_diagnostics_for_analysis_result(
             quality_snapshot = norm.quality
 
     annotation_quality = normalize_quality_payload(quality_snapshot)
+
+    # ── T2b: 显式参考标注 revision 解析（NULL = legacy imported events）──
+    # 经 resolver 取 revision；若显式引用失效 MUST 阻断，MUST NOT 回退到
+    # imported events 或别的 revision。
+    reference_resolution = resolve_for_analysis_task(db, task)
+    if reference_resolution.status == STATUS_REFERENCE_INVALID:
+        raise DiagnosticsBridgeError(
+            409,
+            f"参考标注输入无效（{reference_resolution.warnings}），分析不可继续",
+        )
+    # 人工区间优先级最高；segments 已可供后续 metrics 派生消费。
+    # 完整 metrics 接线（segments → events → rhythm_metrics）为 follow-up，
+    # 此处仅记录 source_of_truth 与引用标识，保证可溯源、不静默漂移。
+    reference_meta: dict = {}
+    if reference_resolution.status == "ready":
+        rev = reference_resolution.revision
+        reference_meta = {
+            "source_of_truth": "manual_segments",
+            "reference_revision_id": rev.id,
+            "reference_content_hash": rev.content_hash,
+            "phase_profile_id": rev.phase_profile_id,
+            "phase_profile_version": rev.phase_profile_version,
+            "phase_profile_hash": rev.phase_profile_hash,
+            "segment_count": rev.segment_count,
+        }
 
     # ── quality gate ──
     if annotation_quality.status == "invalid" and not force:
@@ -154,6 +183,11 @@ def run_diagnostics_for_analysis_result(
 
     # ── write back ──
     result.diagnostics = [_dump(d) for d in output.diagnostics]
+
+    if reference_meta:
+        qs = result.quality_summary if isinstance(result.quality_summary, dict) else {}
+        qs["reference_labels"] = reference_meta
+        result.quality_summary = qs
 
     raw = dict(result.raw_result) if result.raw_result else {}
     raw["diagnostics_meta"] = {

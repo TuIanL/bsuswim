@@ -1,0 +1,90 @@
+# freestyle_arm_phase_v1 — 自由泳手臂动作周期阶段定义
+#
+# 本 profile 是「人工区间标注 ↔ 现有点事件」共享的唯一动作定义来源。
+# 机器契约（code / boundaries）与人工判据（boundary_definitions）共存于此。
+#
+# 重要：boundary_definitions 为必填。缺少 operational_definition 的 profile
+# MUST 被 loader 拒绝加载（见 services/reference_labels/profile.py）。
+# 不同标注员必须依据 boundary_definitions 中的同一判据标注，否则数据模型再完美
+# 也只是「结构化的不一致标签」。
+
+id: freestyle_arm_phase_v1
+version: "1.0.0"
+
+cycle_definition:
+  partition_by: side          # 按左右臂分区
+  boundary: hand_entry        # 同侧 hand_entry → 下一次同侧 hand_entry
+
+# 四阶段：相邻 phase 的 end 必须等于下一 phase 的 start（除 recovery 收尾于下一
+# 同侧 hand_entry）。中文 display 仅作展示，存储/API 一律用 code。
+phases:
+  - code: entry
+    display: 入水
+    start: hand_entry
+    end: catch_start
+  - code: catch
+    display: 抱水
+    start: catch_start
+    end: pull_end
+  - code: push
+    display: 推水
+    start: pull_end
+    end: hand_exit
+  - code: recovery
+    display: 移臂
+    start: hand_exit
+    end: hand_entry           # 逻辑上 = 下一同侧 hand_entry
+
+# 完整四阶段必须的边界。hand_exit 在本 Change 提为必选（旧 imported-event
+# pipeline 暂未强制，属已知兼容遗留，见 Change follow-up 9.1）。
+required_boundaries:
+  - hand_entry
+  - catch_start
+  - pull_end
+  - hand_exit
+
+# 预留：未来若需区分 抱水/拉水/推水，引入 catch_end（≡ pull_start），profile 升 v2。
+optional_boundaries:
+  - catch_end
+
+# ── 人工操作定义（operational definitions）──
+# 每个边界必须明确：判据、参考关节、标注指引。
+boundary_definitions:
+  hand_entry:
+    display: 手部入水
+    operational_definition: >-
+      指尖（fingertip）首次刺破静止水面、出现明显水花/波纹的瞬间。以「指尖入水」
+      为界，不以手掌或腕关节整体入水为准。
+    reference_joint: fingertip
+    annotation_guidance: >-
+      在视频中定位手掌最前缘（指尖）触水的一帧；若入水有轻微前伸滑入，取水花
+      首次出现的帧，而非手指完全没入的帧。
+
+  catch_start:
+    display: 抱水开始
+    operational_definition: >-
+      前臂由前伸转为向后下方抓水、手相对身体开始向后运动的瞬间。判据为腕关节
+      前伸速度明显衰减、前臂—手平面开始建立迎水面（不要求肘角达到特定阈值）。
+    reference_joint: wrist
+    annotation_guidance: >-
+      不要等肘部明显屈曲才标；catch 是「迎水面建立」的起始，早于最大肘屈。
+      以手相对身体由向前转为向后的拐点帧为准。
+
+  pull_end:
+    display: 拉水结束 / 推水开始
+    operational_definition: >-
+      肘部经过身体正下方最低点、上臂与躯干夹角最小的瞬间；此后手由后向下转为
+      向上向前加速，即推水（push）开始。catch_end（≡ pull_start）若未来启用，
+      落在本边界与 catch_start 之间。
+    reference_joint: elbow
+    annotation_guidance: >-
+      以肘部最低点（身体下方）为界；该帧前后手的运动方向由「后下」转为「前上」。
+
+  hand_exit:
+    display: 手部出水
+    operational_definition: >-
+      手掌（palm）完全离开水面的瞬间。以「手掌下缘离开水面」为界，腕关节离水即
+      判定 hand_exit 发生。
+    reference_joint: wrist
+    annotation_guidance: >-
+      取手掌最后接触水面的帧之后的第一帧（手掌已离水）。移臂（recovery）自本帧开始。

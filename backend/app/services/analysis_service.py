@@ -8,6 +8,7 @@ from app.models import (
     AnalysisResult,
     AnalysisTask,
     AnalysisTaskStatus,
+    ManualAnnotationRevision,
     NormalizedAnnotation,
     ReportMetadata,
     SessionVideo,
@@ -21,6 +22,8 @@ from app.services.annotation_quality.models import AnalysisQualitySummary
 from app.services.annotation_quality.validator import AnnotationQualityValidator
 from app.services.annotation_quality.provider import YamlQualityProfileProvider
 from app.services.model_client import ModelServiceError
+from app.services.reference_labels.errors import ResolutionError
+from app.services.reference_labels.resolver import assert_reference_revision_referenceable
 from app.services.report_builder import build_report_data
 from app.services.storage import playback_url
 
@@ -56,6 +59,13 @@ class AnalysisTaskAlreadyActiveError(Exception):
     def __init__(self, existing_task_id: int):
         self.existing_task_id = existing_task_id
         super().__init__("当前训练记录已有二维运动学分析任务正在执行")
+
+
+class ReferenceRevisionInvalidError(Exception):
+    """显式引用的人工标注 revision 不可用（draft / 不存在 / 校验失败）。"""
+
+    def __init__(self, message: str):
+        super().__init__(message)
 
 
 def _get_validator() -> AnnotationQualityValidator:
@@ -178,6 +188,32 @@ def create_analysis_task(db: Session, payload: AnalysisSubmit) -> AnalysisTask:
     # ── resolve pipeline type / version ──
     pipeline_type, pipeline_version = _resolve_pipeline_type(payload)
 
+    # ── resolve 显式引用的参考标注 revision（NULL = legacy imported events）──
+    reference_revision_id = payload.reference_annotation_revision_id
+    reference_revision = None
+    reference_mirror: dict = {}
+    if reference_revision_id is not None:
+        reference_revision = db.get(ManualAnnotationRevision, reference_revision_id)
+        if reference_revision is None:
+            raise ReferenceRevisionInvalidError(f"reference revision {reference_revision_id} 不存在")
+        try:
+            assert_reference_revision_referenceable(reference_revision)
+        except ResolutionError as exc:
+            raise ReferenceRevisionInvalidError(
+                f"reference revision {reference_revision_id} 不可作为分析引用：{exc.status}"
+            )
+        reference_mirror = {
+            "reference_annotation_set_id": reference_revision.set_id,
+            "reference_annotation_revision_id": reference_revision.id,
+            "revision_no": reference_revision.revision_no,
+            "content_hash": reference_revision.content_hash,
+            "video_checksum_sha256": reference_revision.video_checksum_sha256,
+            "phase_profile_id": reference_revision.phase_profile_id,
+            "phase_profile_version": reference_revision.phase_profile_version,
+            "phase_profile_hash": reference_revision.phase_profile_hash,
+            "source_of_truth": "manual_segments",
+        }
+
     # ── resolve annotation ──
     annotation: NormalizedAnnotation | None = None
     if payload.normalized_annotation_id:
@@ -237,6 +273,7 @@ def create_analysis_task(db: Session, payload: AnalysisSubmit) -> AnalysisTask:
             "steps": {},
             "warnings": [],
         },
+        reference_annotation_revision_id=reference_revision_id,
     )
     db.add(task)
     db.flush()
@@ -255,6 +292,7 @@ def create_analysis_task(db: Session, payload: AnalysisSubmit) -> AnalysisTask:
         "video_file_id": video_file_id,
         "annotation_quality_snapshot": quality_snapshot,
         "quality_warning_acknowledged": payload.acknowledge_quality_warnings,
+        **reference_mirror,
     }
     if quality_snapshot:
         report = normalize_quality_payload(quality_snapshot)

@@ -32,6 +32,14 @@ class AnalysisTask(Base):
     pipeline_type: Mapped[str] = mapped_column(String(40), default="model_service", nullable=False)
     pipeline_version: Mapped[str] = mapped_column(String(50), default="model_service_v1", nullable=False)
     execution_state: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+
+    # 显式引用某个不可变人工标注 revision。NULL = 回退 legacy imported events。
+    # 下游 metrics / diagnostics MUST 经 resolver 取本 FK 指向的 revision，
+    # MUST NOT 重新按 session 查询 latest。
+    reference_annotation_revision_id: Mapped[int | None] = mapped_column(
+        ForeignKey("manual_annotation_revisions.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    reference_revision = relationship("ManualAnnotationRevision", foreign_keys=[reference_annotation_revision_id])
     attempt_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     failed_stage: Mapped[str | None] = mapped_column(String(80))
     error_code: Mapped[str | None] = mapped_column(String(100))

@@ -682,3 +682,116 @@ export interface FivePageKinematicsReport {
     overall_level?: string
   }
 }
+
+// ─── 人工时序参考标注（manual temporal reference labels）───
+
+export type RevisionStatus = 'draft' | 'in_review' | 'reviewed' | 'frozen' | 'rejected'
+export type SegmentSide = 'left' | 'right' | 'both' | 'unknown'
+export type PhaseCode = 'entry' | 'catch' | 'push' | 'recovery'
+export type SegmentDerivation = 'manual' | 'event_derived' | 'model_suggested'
+
+export interface ManualAnnotationSet {
+  id: number
+  session_video_id: number
+  phase_profile_id: string
+  head_revision_id: number | null
+  created_by: number | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ManualAnnotationRevision {
+  id: number
+  set_id: number
+  revision_no: number
+  forked_from_revision_id: number | null
+  video_checksum_sha256: string
+  video_fps_snapshot: number | null
+  video_duration_snapshot: number | null
+  frame_basis: Record<string, unknown> | null
+  phase_profile_id: string
+  phase_profile_version: string
+  phase_profile_hash: string
+  content_hash: string
+  status: RevisionStatus
+  segment_count: number
+  cycle_count: number
+  edit_version: number
+  created_by: number | null
+  updated_by: number | null
+  reviewed_by: number | null
+  review_status: string | null
+  reviewed_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ManualPhaseSegment {
+  id: number
+  revision_id: number
+  cycle_id: string
+  cycle_index: number | null
+  side: SegmentSide
+  phase_code: PhaseCode
+  start_time_sec: number
+  end_time_sec: number
+  start_frame: number | null
+  end_frame: number | null
+  confidence: number | null
+  note: string | null
+  derivation: SegmentDerivation
+  created_by: number | null
+  updated_by: number | null
+  reviewed_by: number | null
+  review_status: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface PhaseDef {
+  code: PhaseCode
+  display: string
+  start: string
+  end: string
+}
+
+export interface BoundaryDef {
+  name: string
+  display: string
+  operational_definition: string
+  reference_joint: string
+  annotation_guidance: string
+}
+
+export interface PhaseProfile {
+  id: string
+  version: string
+  cycle_partition_by: string
+  cycle_boundary: string
+  phases: PhaseDef[]
+  required_boundaries: string[]
+  optional_boundaries: string[]
+  boundary_definitions: Record<string, BoundaryDef>
+}
+
+export interface SegmentCreateInput {
+  cycle_id: string
+  side: SegmentSide
+  phase_code: PhaseCode
+  start_time_sec: number
+  end_time_sec: number
+  confidence?: number | null
+  note?: string | null
+  edit_version: number
+}
+
+export interface SegmentUpdateInput {
+  cycle_id?: string
+  side?: SegmentSide
+  phase_code?: PhaseCode
+  start_time_sec?: number
+  end_time_sec?: number
+  confidence?: number | null
+  note?: string | null
+  edit_version: number
+}

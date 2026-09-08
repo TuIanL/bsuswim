@@ -3,6 +3,15 @@ from app.models.annotation import AnnotationFile, AnnotationFileStatus, Annotati
 from app.models.annotation_metric import AnnotationMetric
 from app.models.kinematic_artifact import KinematicArtifact, KinematicArtifactSet
 from app.models.kinematic_review_finding import KinematicReviewFindingSet
+from app.models.manual_reference_label import (
+    ManualAnnotationSet,
+    ManualAnnotationRevision,
+    ManualPhaseSegment,
+    ManualRevisionStatus,
+    SegmentSide,
+    PhaseCode,
+    SegmentDerivation,
+)
 from app.models.athlete import Athlete
 from app.models.normalized_annotation import NormalizedAnnotation
 from app.models.report import ReportInterpretation, ReportMetadata
@@ -23,6 +32,13 @@ __all__ = [
     "KinematicArtifact",
     "KinematicReviewFindingSet",
     "KinematicArtifactSet",
+    "ManualAnnotationSet",
+    "ManualAnnotationRevision",
+    "ManualPhaseSegment",
+    "ManualRevisionStatus",
+    "SegmentSide",
+    "PhaseCode",
+    "SegmentDerivation",
     "Athlete",
     "NormalizedAnnotation",
     "ReportMetadata",

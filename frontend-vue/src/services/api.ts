@@ -671,3 +671,109 @@ export async function assembleFivePageReport(annotationMetricId: number): Promis
   )
   return response.data
 }
+
+// ---- 人工时序参考标注 API ----
+
+import type {
+  ManualAnnotationSet,
+  ManualAnnotationRevision,
+  ManualPhaseSegment,
+  PhaseProfile,
+  SegmentCreateInput,
+  SegmentUpdateInput
+} from '../types'
+
+const DEFAULT_PROFILE = 'freestyle_arm_phase_v1'
+
+export async function listManualAnnotationSets(sessionVideoId: number): Promise<ManualAnnotationSet[]> {
+  const response = await client.get<ManualAnnotationSet[]>(
+    `/session-videos/${sessionVideoId}/manual-annotation-sets`
+  )
+  return response.data
+}
+
+export async function createManualAnnotationSet(
+  sessionVideoId: number,
+  phaseProfileId: string = DEFAULT_PROFILE
+): Promise<ManualAnnotationSet> {
+  const response = await client.post<ManualAnnotationSet>(
+    `/session-videos/${sessionVideoId}/manual-annotation-sets`,
+    { phase_profile_id: phaseProfileId }
+  )
+  return response.data
+}
+
+export async function getManualAnnotationRevision(revisionId: number): Promise<ManualAnnotationRevision> {
+  const response = await client.get<ManualAnnotationRevision>(`/manual-annotation-revisions/${revisionId}`)
+  return response.data
+}
+
+export async function listManualPhaseSegments(revisionId: number): Promise<ManualPhaseSegment[]> {
+  const response = await client.get<ManualPhaseSegment[]>(
+    `/manual-annotation-revisions/${revisionId}/segments`
+  )
+  return response.data
+}
+
+export async function createManualPhaseSegment(
+  revisionId: number,
+  input: SegmentCreateInput
+): Promise<ManualPhaseSegment> {
+  const response = await client.post<ManualPhaseSegment>(
+    `/manual-annotation-revisions/${revisionId}/segments`,
+    input
+  )
+  return response.data
+}
+
+export async function updateManualPhaseSegment(
+  segmentId: number,
+  input: SegmentUpdateInput
+): Promise<ManualPhaseSegment> {
+  const response = await client.patch<ManualPhaseSegment>(`/manual-phase-segments/${segmentId}`, input)
+  return response.data
+}
+
+export async function deleteManualPhaseSegment(segmentId: number, editVersion: number): Promise<void> {
+  await client.delete(`/manual-phase-segments/${segmentId}`, { params: { edit_version: editVersion } })
+}
+
+export async function forkManualAnnotationRevision(revisionId: number): Promise<ManualAnnotationRevision> {
+  const response = await client.post<ManualAnnotationRevision>(
+    `/manual-annotation-revisions/${revisionId}/fork`
+  )
+  return response.data
+}
+
+export async function submitReviewManualRevision(revisionId: number): Promise<ManualAnnotationRevision> {
+  const response = await client.post<ManualAnnotationRevision>(
+    `/manual-annotation-revisions/${revisionId}/submit-review`
+  )
+  return response.data
+}
+
+export async function reviewPassManualRevision(revisionId: number): Promise<ManualAnnotationRevision> {
+  const response = await client.post<ManualAnnotationRevision>(
+    `/manual-annotation-revisions/${revisionId}/review-pass`
+  )
+  return response.data
+}
+
+export async function rejectManualRevision(revisionId: number): Promise<ManualAnnotationRevision> {
+  const response = await client.post<ManualAnnotationRevision>(
+    `/manual-annotation-revisions/${revisionId}/reject`
+  )
+  return response.data
+}
+
+export async function freezeManualRevision(revisionId: number): Promise<ManualAnnotationRevision> {
+  const response = await client.post<ManualAnnotationRevision>(
+    `/manual-annotation-revisions/${revisionId}/freeze`
+  )
+  return response.data
+}
+
+export async function getPhaseProfile(phaseProfileId: string = DEFAULT_PROFILE): Promise<PhaseProfile> {
+  const response = await client.get<PhaseProfile>(`/phase-profiles/${phaseProfileId}`)
+  return response.data
+}
