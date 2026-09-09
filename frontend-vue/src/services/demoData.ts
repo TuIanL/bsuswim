@@ -416,6 +416,28 @@ export function bindDemoSessionVideo(
   return link
 }
 
+export function replaceDemoSessionVideo(
+  sessionId: number,
+  sessionVideoId: number,
+  video: VideoFile,
+  input: { view_type: SessionVideo['view_type']; fps?: number | null; resolution?: string | null; sync_offset_ms: number }
+) {
+  const existing = sessionVideos.find((item) => item.session_id === sessionId && item.id === sessionVideoId)
+  if (!existing) return bindDemoSessionVideo(sessionId, video, input)
+  const replacement: SessionVideo = {
+    ...existing,
+    video_file_id: video.id,
+    view_type: input.view_type,
+    fps: input.fps ?? null,
+    resolution: input.resolution ?? null,
+    sync_offset_ms: input.sync_offset_ms,
+    video,
+    upload_status: 'success'
+  }
+  sessionVideos = sessionVideos.map((item) => (item.id === sessionVideoId ? replacement : item))
+  return replacement
+}
+
 export function getDemoSessionVideos(sessionId: number) {
   return sessionVideos.filter((item) => item.session_id === sessionId)
 }

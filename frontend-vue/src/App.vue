@@ -1,5 +1,5 @@
 <template>
-  <router-view v-if="isAuthRoute" />
+  <router-view v-if="isAuthRoute || isPrintRoute" />
   <el-container v-else class="app-shell">
     <el-aside width="236px" class="side-nav">
       <div class="brand">
@@ -40,6 +40,7 @@ const router = useRouter()
 const auth = useAuthStore()
 
 const isAuthRoute = computed(() => route.path === '/login' || route.path === '/register')
+const isPrintRoute = computed(() => route.path.endsWith('/print'))
 const roleLabel = computed(() => {
   if (auth.user?.role === 'admin') return '管理员'
   if (auth.user?.role === 'athlete') return '运动员'

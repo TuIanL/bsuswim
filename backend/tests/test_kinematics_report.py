@@ -1333,18 +1333,16 @@ class TestPersistedFixture:
             data["source_trace"]["annotation_metric"]["id"] = "<METRIC_ID>"
             data["source_trace"]["artifact_set"]["id"] = "<ARTIFACT_SET_ID>"
 
-            # Save synthetic structure contract snapshot (DEMOTED: 15.x —
-            # this is a controlled synthetic structure contract, NOT the
-            # real-video golden baseline which is owned by the golden E2E gate).
+            # The synthetic structure contract is a read-only baseline. Updating
+            # it must happen through an explicit approval script, never as a
+            # side effect of normal pytest execution.
             import os as _os
             snap_dir = _os.path.join(_os.path.dirname(__file__), "fixtures")
-            _os.makedirs(snap_dir, exist_ok=True)
             snap_path = _os.path.join(snap_dir, "synthetic_five_page_report_contract.json")
-            with open(snap_path, "w", encoding="utf-8") as f:
-                _json = __import__("json")
-                _json.dump(data, f, ensure_ascii=False, indent=2)
-
-            assert _os.path.exists(snap_path)
+            assert _os.path.exists(snap_path), (
+                "Synthetic structure contract is missing; generate and approve it "
+                "explicitly instead of allowing pytest to rewrite the baseline."
+            )
         finally:
             app.dependency_overrides.pop(get_current_user, None)
 

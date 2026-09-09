@@ -144,7 +144,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useKinematicsWorkflow } from '../../composables/useKinematicsWorkflow'
-import { bindUploadedSessionVideo, uploadVideo, getReportPdfStatus, exportReportPdf } from '../../services/api'
+import { bindUploadedSessionVideo, replaceUploadedSessionVideo, uploadVideo, getReportPdfStatus, exportReportPdf } from '../../services/api'
 import KinematicsWorkflowStepper from './KinematicsWorkflowStepper.vue'
 import SideVideoStep from './SideVideoStep.vue'
 import CvatAnnotationStep from './CvatAnnotationStep.vue'
@@ -214,13 +214,30 @@ async function onUploadVideo(file: File) {
   }
 }
 
-function onReplaceVideo() {
-  ElMessageBox.confirm('替换侧面视频将解除当前绑定，是否继续？', '替换视频', {
-    confirmButtonText: '继续', cancelButtonText: '取消', type: 'warning'
-  }).then(() => {
-    // 用户需在文件选择后上传；此处仅提示
-    ElMessage.info('请选择新的侧面视频文件')
-  })
+async function onReplaceVideo(file: File) {
+  if (!sideVideo.value) return
+  try {
+    await ElMessageBox.confirm('替换侧面视频将保留当前绑定记录并更新其视频文件，是否继续？', '替换视频', {
+      confirmButtonText: '继续', cancelButtonText: '取消', type: 'warning'
+    })
+  } catch {
+    return
+  }
+
+  videoUploading.value = true
+  try {
+    const video = await uploadVideo(file)
+    await replaceUploadedSessionVideo(sessionId, sideVideo.value.id, video, {
+      view_type: 'side',
+      sync_offset_ms: sideVideo.value.sync_offset_ms ?? 0
+    })
+    await wf.refresh()
+    ElMessage.success('侧面视频已替换')
+  } catch (e: any) {
+    ElMessage.error(e?.response?.data?.detail?.message || e?.response?.data?.detail || e?.message || '替换失败')
+  } finally {
+    videoUploading.value = false
+  }
 }
 
 async function onAnnotationFile(file: File) {

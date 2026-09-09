@@ -34,6 +34,7 @@ import type {
 import type { AIInterpretationEnvelope } from '../types'
 import {
   bindDemoSessionVideo,
+  replaceDemoSessionVideo,
   createDemoAthlete,
   createDemoSession,
   createDemoVideo,
@@ -244,6 +245,26 @@ export async function bindUploadedSessionVideo(
   const resolution = input.resolution ?? video.resolution ?? null
   if (demoMode) return bindDemoSessionVideo(sessionId, video.video, { ...input, view_type: input.view_type, fps, resolution })
   return bindSessionVideo(sessionId, { ...input, video_file_id: video.video.id, fps, resolution })
+}
+
+export async function replaceUploadedSessionVideo(
+  sessionId: number,
+  sessionVideoId: number,
+  video: VideoUploadResponse,
+  input: Omit<SessionVideoCreateInput, 'video_file_id'>
+): Promise<SessionVideo> {
+  const fps = input.fps ?? video.probed_fps ?? null
+  const resolution = input.resolution ?? video.resolution ?? null
+  if (demoMode) {
+    return replaceDemoSessionVideo(sessionId, sessionVideoId, video.video, { ...input, fps, resolution })
+  }
+  const response = await client.put<SessionVideo>(`/sessions/${sessionId}/videos/${sessionVideoId}`, {
+    ...input,
+    video_file_id: video.video.id,
+    fps,
+    resolution
+  })
+  return response.data
 }
 
 export async function listSessionVideos(sessionId: number): Promise<SessionVideo[]> {

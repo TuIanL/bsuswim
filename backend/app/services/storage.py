@@ -11,6 +11,15 @@ class UnsafeStoragePath(Exception):
     """Raised when a relative storage path attempts to escape the upload root."""
 
 
+class UploadTooLargeError(Exception):
+    """Raised when a streamed upload exceeds its configured byte limit."""
+
+    def __init__(self, max_bytes: int, observed_bytes: int) -> None:
+        self.max_bytes = max_bytes
+        self.observed_bytes = observed_bytes
+        super().__init__(f"upload exceeds configured limit of {max_bytes} bytes")
+
+
 def _validate_relative_path(upload_dir: Path, relative_path: str) -> Path:
     if not relative_path:
         raise UnsafeStoragePath("empty relative path")
@@ -33,18 +42,30 @@ class StorageService:
         self.upload_dir = self.settings.upload_dir
         self.upload_dir.mkdir(parents=True, exist_ok=True)
 
-    async def save_upload(self, file: UploadFile) -> dict[str, str | int | None]:
+    async def save_upload(
+        self,
+        file: UploadFile,
+        *,
+        max_bytes: int | None = None,
+    ) -> dict[str, str | int | None]:
         suffix = Path(file.filename or "video").suffix.lower()
         stored_filename = f"{uuid4().hex}{suffix}"
         destination = self.upload_dir / stored_filename
         digest = hashlib.sha256()
         size = 0
 
-        with destination.open("wb") as output:
-            while chunk := await file.read(1024 * 1024):
-                size += len(chunk)
-                digest.update(chunk)
-                output.write(chunk)
+        try:
+            with destination.open("wb") as output:
+                while chunk := await file.read(1024 * 1024):
+                    next_size = size + len(chunk)
+                    if max_bytes is not None and next_size > max_bytes:
+                        raise UploadTooLargeError(max_bytes, next_size)
+                    size = next_size
+                    digest.update(chunk)
+                    output.write(chunk)
+        except BaseException:
+            destination.unlink(missing_ok=True)
+            raise
 
         return {
             "original_filename": file.filename or stored_filename,

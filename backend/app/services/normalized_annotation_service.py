@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from app.models import SessionVideo
 from app.models.annotation import AnnotationFile, AnnotationFileStatus, AnnotationSource
 from app.models.normalized_annotation import NormalizedAnnotation
 from app.repositories.annotation_repository import get_with_ownership_check
@@ -114,8 +115,8 @@ def create_normalized_annotation(
     created_by: int,
 ) -> NormalizedAnnotation:
     validator = _get_validator()
-    session_video = db.get(type(data), session_video_id) if hasattr(data, 'id') else None
-    video_fps = float(session_video.fps) if session_video and hasattr(session_video, 'fps') and session_video.fps else None
+    session_video = db.get(SessionVideo, session_video_id)
+    video_fps = float(session_video.fps) if session_video and session_video.fps else None
     quality_report = validator.validate(
         events=[e.model_dump() for e in data.events],
         keypoint_frames=[k.model_dump() for k in data.keypoint_frames],

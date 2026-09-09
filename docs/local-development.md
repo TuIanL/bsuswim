@@ -17,6 +17,8 @@
 DATABASE_URL='postgresql+psycopg://swim:swim@localhost:5432/swim_analysis'
 MODEL_SERVICE_URL='http://127.0.0.1:8100'
 UPLOAD_DIR='uploads'
+VIDEO_UPLOAD_MAX_BYTES='524288000'
+ANNOTATION_UPLOAD_MAX_BYTES='52428800'
 JWT_SECRET_KEY='please-change-this-secret'
 ```
 
@@ -67,3 +69,29 @@ VITE_API_BASE_URL=http://127.0.0.1:8000 npm run dev
 ```
 
 业务后端数据库表通过 Alembic 管理；修改模型后应生成新的 migration，再执行 `alembic upgrade head`。
+
+## 测试命令
+
+以下命令均可从仓库根目录执行；后端 pytest 不依赖先进入 `backend/`：
+
+```bash
+# 快速质量检查
+python -m pytest -q --tb=short
+cd frontend-vue && npm test -- --run && npm run build
+cd .. && openspec validate --specs --strict --json
+
+# Golden fixture contract（需要本地 fixture）
+python -m pytest -q backend/tests/golden -m golden_contract
+
+# 完整浏览器/PDF E2E（需要 PostgreSQL、Chromium、FFmpeg 和完整 fixture）
+GOLDEN_E2E_ENABLED=1 \
+GOLDEN_E2E_BACKEND_URL=http://127.0.0.1:8001 \
+GOLDEN_E2E_FRONTEND_URL=http://127.0.0.1:5174 \
+PDF_RENDER_BASE_URL=http://127.0.0.1:5174 \
+BACKEND_PUBLIC_BASE_URL=http://127.0.0.1:8001 \
+python -m pytest -q backend/tests/e2e -m golden_e2e
+```
+
+Golden fixture 缺失或校验和不匹配时测试会直接失败，不会自动回退到 synthetic 数据。当前视频采用约 20MB 的仓库内压缩 fixture，保持原始分辨率、帧率和帧数，方便开发环境与 CI 直接使用；生产级文件鉴权和私有对象存储另行处理。
+完整 E2E 会创建临时教练、运动员和训练记录，通过真实 HTTP 上传并绑定视频、ingest CVAT XML、提交 `annotation_kinematics` pipeline，最后由真实 Playwright/Chromium 打开前端 print route 并生成 PDF。失败日志使用 `E2E_INFRA_ERROR:<code>` 区分服务/fixture/浏览器环境问题，使用 `E2E_PRODUCT_ASSERTION:<code>` 标识产品契约失败；未配置 `GOLDEN_E2E_ENABLED=1` 时会明确失败，不会静默跳过。
+GitHub Actions 的 `.github/workflows/golden-e2e.yml` 只在手动触发或定时任务中运行完整检查，普通 PR 不上传任何私有 fixture 凭证；仓库内 fixture 缺失、损坏或服务未启动时均会失败并输出稳定错误标识。`expected/` 仍是待显式批准的候选契约，不会被普通测试自动改写。

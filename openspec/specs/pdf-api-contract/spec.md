@@ -1,4 +1,8 @@
-## ADDED Requirements
+## Purpose
+
+定义 PDF 报告导出、下载、状态查询和内部打印数据接口的路径、错误响应、鉴权方式以及前后端调用一致性契约，覆盖用户请求、后台渲染和文件下载的完整交互边界。
+
+## Requirements
 
 ### Requirement: PDF export uses session-level public API path
 

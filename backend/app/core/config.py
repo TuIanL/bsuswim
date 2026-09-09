@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     api_prefix: str = "/api/v1"
     database_url: str = "postgresql+psycopg://swim:swim@localhost:5432/swim_analysis"
     upload_dir: Path = Path("uploads")
+    video_upload_max_bytes: int = 500 * 1024 * 1024
+    annotation_upload_max_bytes: int = 50 * 1024 * 1024
     model_service_url: str = "http://127.0.0.1:8100"
     model_service_timeout_seconds: float = 120.0
     jwt_secret_key: str = "change-me-in-production"

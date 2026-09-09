@@ -2,9 +2,9 @@
 
 ## Purpose
 
-定义自动诊断关键帧在游泳技术分析报告中的语义、分组、降级和跨 Web/PDF 展示契约。
+定义自动诊断关键帧在游泳技术分析报告中的语义、证据分组、降级行为以及跨 Web/PDF 展示一致性契约，保证关键帧来源、指标事实、报告页面和导出结果可以稳定追溯。
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Report exposes semantic diagnostic keyframe metadata
 

@@ -24,6 +24,7 @@ backend/.backend-dev.log
 backend/.backend-dev.pid
 frontend-vue/.web-dev.pid
 *.mp4
+!backend/tests/fixtures/kinematics_golden_v1/source/side_view_golden.mp4
 .workbuddy/
 frontend/
 frontend/node_modules/

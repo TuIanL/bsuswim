@@ -1,6 +1,6 @@
 ## Purpose
 
-定义原始标注文件的摄取、解析、质量检查和刷新后恢复能力。
+定义原始标注文件的上传摄取、解析、质量检查、状态持久化和刷新后恢复能力，确保前端可以稳定获得可分析的标准化标注结果。
 ## Requirements
 ### Requirement: One-step annotation ingestion
 
@@ -60,4 +60,3 @@ AnnotationFile.status SHALL 与 quality.status 独立。
 - **WHEN** 用户选择文件并点击上传
 - **THEN** 前端 MUST 调用 `POST .../annotations/ingest`
 - **AND** MUST NOT 拆分为 upload + parse 两次调用
-

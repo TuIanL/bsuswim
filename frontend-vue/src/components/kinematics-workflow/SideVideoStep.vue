@@ -11,7 +11,8 @@
           · 已绑定
         </small>
       </div>
-      <el-button size="small" text type="warning" @click="$emit('replace')">替换</el-button>
+      <el-button size="small" text type="warning" @click="replaceInput?.click()">替换</el-button>
+      <input ref="replaceInput" type="file" accept="video/*" hidden @change="onReplaceFile" />
     </div>
     <el-upload
       v-else
@@ -38,14 +39,22 @@ import type { UploadFile } from 'element-plus'
 import type { SessionVideo } from '../../types'
 
 defineProps<{ video: SessionVideo | null; uploading?: boolean }>()
-const emit = defineEmits<{ (e: 'file', file: File): void; (e: 'upload', file: File): void; (e: 'replace'): void }>()
+const emit = defineEmits<{ (e: 'file', file: File): void; (e: 'upload', file: File): void; (e: 'replace', file: File): void }>()
 const file = ref<File | null>(null)
+const replaceInput = ref<HTMLInputElement | null>(null)
 
 function onFile(f: UploadFile) {
   if (f.raw) {
     file.value = f.raw
     emit('file', f.raw)
   }
+}
+
+function onReplaceFile(event: Event) {
+  const input = event.target as HTMLInputElement
+  const replacement = input.files?.[0]
+  input.value = ''
+  if (replacement) emit('replace', replacement)
 }
 function formatSize(bytes?: number) {
   if (!bytes) return '-'

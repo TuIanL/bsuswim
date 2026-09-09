@@ -1,4 +1,8 @@
-## ADDED Requirements
+## Purpose
+
+定义从前端打印页面生成 PDF 报告时的浏览器渲染、资源就绪状态、失败处理、状态持久化和最终结果校验契约，确保错误页面、资源异常和布局溢出不会生成错误报告。
+
+## Requirements
 
 ### Requirement: PDF export uses frontend print route
 

@@ -19,12 +19,14 @@
         <span class="print-page-marker" aria-hidden="true">
           P{{ section.page_number }} | {{ section.page_type }}
         </span>
-        <ReportSectionRenderer :section="section" :video="viewModel.video" />
-        <AIInterpretationPanel
-          :interpretation="viewModel.aiInterpretation"
-          :module-key="section.module_key || section.page_type || ''"
-          print
-        />
+        <div class="print-page-content">
+          <ReportSectionRenderer :section="section" :video="viewModel.video" />
+          <AIInterpretationPanel
+            :interpretation="viewModel.aiInterpretation"
+            :module-key="section.module_key || section.page_type || ''"
+            print
+          />
+        </div>
       </section>
 
       <div class="no-print" style="display:none" />
@@ -71,7 +73,11 @@ onMounted(async () => {
     generationSignature.value = vm.generation_signature || ''
     viewModel.value = vm
 
-    await nextTick()
+    // ReportSectionRenderer is a dynamic component and may need several render
+    // passes before nested image/chart elements exist in the DOM. Inspect
+    // resources only after those passes so an image cannot appear after the
+    // registry has been marked ready.
+    for (let i = 0; i < 5; i += 1) await nextTick()
 
     // Layout overflow pre-check: a page whose content exceeds its box must
     // block export rather than be silently truncated.
@@ -91,10 +97,16 @@ onMounted(async () => {
     const images = document.querySelectorAll<HTMLImageElement>('.print-report img')
     images.forEach((img) => {
       const done = registry.addTask(`img:${img.src}`)
-      if (img.complete && img.naturalWidth > 0) {
-        done()
+      if (img.complete) {
+        if (img.naturalWidth > 0) {
+          done()
+        } else {
+          fail('PRINT_IMAGE_DECODE_FAILED', `报告图片加载失败：${img.alt || img.src}`)
+        }
       } else {
-        img.decode().then(done).catch(() => done())
+        img.decode().then(done).catch(() => {
+          fail('PRINT_IMAGE_DECODE_FAILED', `报告图片加载失败：${img.alt || img.src}`)
+        })
       }
     })
 
@@ -154,6 +166,10 @@ onMounted(async () => {
   break-after: auto;
 }
 
+.print-page-content {
+  width: 100%;
+}
+
 .print-page-marker {
   position: absolute;
   bottom: 4mm;
@@ -181,8 +197,18 @@ onMounted(async () => {
     width: 100%;
   }
   .print-page {
+    height: 190mm;
+    min-height: 190mm;
     break-after: page;
     break-inside: avoid;
+    overflow: hidden;
+  }
+  .print-page-content {
+    /* The screen report is intentionally spacious. Print uses a stable,
+       deterministic scale so every contract section remains one physical
+       page without browser-generated spill pages. */
+    zoom: 0.72;
+    width: 138.89%;
   }
   .print-page:last-child {
     break-after: auto;

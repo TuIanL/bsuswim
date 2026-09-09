@@ -14,6 +14,7 @@ import pytest
 from app.services.parsers.cvat_xml import parse_cvat_xml
 
 FIXTURE_DIR = Path(__file__).resolve().parent.parent.parent / "tests" / "fixtures" / "kinematics_golden_v1"
+pytestmark = pytest.mark.golden_contract
 
 
 def _load_manifest() -> dict:

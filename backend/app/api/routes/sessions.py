@@ -141,6 +141,50 @@ def bind_session_video(
     return _read_session_video(link)
 
 
+@router.put("/{session_id}/videos/{session_video_id}", response_model=SessionVideoRead)
+def replace_session_video(
+    session_id: int,
+    session_video_id: int,
+    payload: SessionVideoCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> SessionVideoRead:
+    """Replace the file behind an existing session binding.
+
+    Keeping the binding row stable is important: annotations, normalized data,
+    and downstream provenance point at ``session_videos.id``. A replacement
+    therefore updates the linked file instead of creating a second binding
+    that the frontend may accidentally ignore.
+    """
+    session = _get_owned_session(db, session_id, current_user)
+    link = db.scalar(
+        select(SessionVideo).where(
+            SessionVideo.id == session_video_id,
+            SessionVideo.session_id == session.id,
+        )
+    )
+    if not link:
+        raise HTTPException(status_code=404, detail="当前训练记录未绑定该视频")
+
+    video = db.get(VideoFile, payload.video_file_id)
+    if not video:
+        raise HTTPException(status_code=404, detail="视频不存在")
+
+    for field, value in payload.model_dump().items():
+        setattr(link, field, value)
+    session.status = TrainingSessionStatus.VIDEO_UPLOADED
+    db.add(link)
+    db.add(session)
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="该视频已绑定到此训练记录") from exc
+    db.refresh(link)
+    link.video_file = video
+    return _read_session_video(link)
+
+
 @router.get("/{session_id}/videos", response_model=list[SessionVideoRead])
 def list_session_videos(
     session_id: int,

@@ -6,7 +6,7 @@
 
   "video": {
     "relative_path": "source/side_view_golden.mp4",
-    "sha256": "c06e7176598cc4e33e8e21957da6f4d69e17c374214187add2c1d832936da428",
+    "sha256": "d2addb2b9ea15211a4b49b40c59134a48d20cdfe6bcab815326a29b885dfeb66",
     "fps": 60,
     "fps_fraction": "60/1",
     "fps_source": "ffprobe",
@@ -31,20 +31,20 @@
     "total_images": 105,
     "active_frames": 104,
     "annotation_frame_range": [0, 104],
-    "missing_skeleton_frame": 55,
-    "note": "image id=56 (original frame 490) 缺少 skeleton，跳过"
+    "missing_skeleton_frame": 94,
+    "missing_skeleton_source_original_frame": 650,
+    "note": "image id=95 (original frame 650) 缺少 skeleton，跳过"
   },
 
   "frame_mapping": {
-    "mode": "affine",
-    "source_frame_offset": 0,
-    "source_frame_stride": 4,
+    "mode": "explicit",
+    "mapping_file": "source/frame_mapping.json",
     "source_original_offset": 270,
     "annotation_fps_effective": 15,
     "confirmed": true,
     "verified": true,
-    "verification_reason": "user_confirmed",
-    "verification_evidence": "annotations.xml 中 image name 包含 frame_NNNNNN，逐帧匹配确认 annotation_frame = image_id - 1 对应 source_video_frame = (image_id - 1) * stride + offset"
+    "verification_reason": "user_confirmed_source_frame_manifest",
+    "verification_evidence": "source/frame_mapping.json 逐条记录 XML image id 对应的原始帧号、裁剪视频帧号及 skeleton 是否存在；该序列包含一次 490→498 的非等距跳变，因此不使用单一 affine stride"
   },
 
   "expected_contracts": {
@@ -61,7 +61,14 @@
   },
 
   "integrity": {
-    "manifest_sha256": "TBD",
+    "manifest_sha256": "84ea3bd8d09879bd174576e23955317cae4ce076f1fb5c1f5cfb2102c4533b81",
+    "files": {
+      "source/frame_mapping.json": "dc378b37a0b01d3f57a267c43946ca18e34f9fa54da65bb08547d0c4dcc1c734",
+      "expected/ingest_contract.json": "9ea958a40d761b5ceba6f280aa4f29d46883bd397f98881a20df20b4a603fce9",
+      "expected/metric_contract.json": "e5bc0321beeed5ecdf145af06059955400169f473e685d71b913c17546ce9d42",
+      "expected/report_contract.json": "6973df3a064af4639d0dccb7f5e6b9469863c0c85abca01659a8242725d3259f",
+      "mutations/missing_right_wrist.recipe.json": "66a52cb1d961af4ca1bee1a00801dcbdc21fbda7bf0bb052ad0394029a4109b3"
+    },
     "last_verified": "2026-07-26"
   }
 }

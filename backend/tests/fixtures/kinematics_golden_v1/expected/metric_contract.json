@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "status": "pending_runtime_approval",
+  "source": "annotation_kinematics",
+  "metrics": {
+    "finite": true,
+    "time_series_monotonic": true,
+    "canonical_keys_source": "side_2d_kinematics.CANONICAL_KEYS"
+  }
+}

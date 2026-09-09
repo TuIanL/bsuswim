@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "status": "pending_runtime_approval",
+  "report_profile": "side_2d_kinematics_5page_v1",
+  "sections": {
+    "count": 5,
+    "ordered": true,
+    "pdf_page_count": 5
+  }
+}

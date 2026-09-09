@@ -247,7 +247,7 @@ Parse endpoint SHALL 返回 `ParseResponse` 实例，由 service 层提供 `Pars
 - **THEN** 现有 `normalized_annotations` 记录的这三个字段 MUST 默认为空/Null，旧记录仍可正常读取
 
 ### Requirement: Quality checker aware of new fields
-quality checker SHALL 在缺 `waterline` 时将 `hip_depth_cm` 相关模块标记为不可用（warning 级），不因新字段缺失而整体 error。
+The quality checker MUST mark `hip_depth_cm` related modules unavailable at warning level when `waterline` is missing, and MUST NOT classify the whole annotation as an error solely because the new fields are absent.
 
 #### Scenario: Waterline missing is warning not error
 - **WHEN** fps、scale、关键点、事件均完整但缺 `reference_lines.waterline`
@@ -255,7 +255,7 @@ quality checker SHALL 在缺 `waterline` 时将 `hip_depth_cm` 相关模块标�
 
 
 ### Requirement: Quality checker scope remains structural
-旧 requirement 删去"不新增游泳专项语义检查"的限制，改由 profile 定义 swim 语义要求。
+系统 SHALL 将旧 requirement 中“不新增游泳专项语义检查”的限制移除，并 SHALL 由质量 profile 定义具体的 swim 语义要求。
 
 #### Scenario: Profile defines semantic requirements
 - **WHEN** `side_technical_v1` profile 要求 hand_entry 事件

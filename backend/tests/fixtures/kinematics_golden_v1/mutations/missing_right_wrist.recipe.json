@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0",
+  "operation": "set_visibility",
+  "joint": "right_wrist",
+  "frames": "all_active",
+  "visibility": "missing",
+  "source": "source/annotations.xml",
+  "deterministic": true
+}

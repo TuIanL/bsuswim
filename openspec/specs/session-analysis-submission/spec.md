@@ -1,4 +1,8 @@
-## MODIFIED Requirements
+## Purpose
+
+定义训练会话提交分析时的标注选择、质量状态过滤和 video-only 回退规则，确保分析输入来源明确且可追溯。
+
+## Requirements
 
 ### Requirement: Analysis submission requires explicit annotation selection
 

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from fastapi import HTTPException
 
@@ -33,8 +35,9 @@ def test_merge_events_deduplicates_and_sorts():
 
 
 def test_quality_issue_contains_repair_action():
+    profiles_dir = Path(__file__).resolve().parents[3] / "app/services/annotation_quality/profiles"
     validator = AnnotationQualityValidator(
-        profile_provider=YamlQualityProfileProvider("app/services/annotation_quality/profiles")
+        profile_provider=YamlQualityProfileProvider(str(profiles_dir))
     )
     report = validator.validate(
         events=[],

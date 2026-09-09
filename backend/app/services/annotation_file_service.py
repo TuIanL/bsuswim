@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.annotation import AnnotationFile, AnnotationFileStatus, AnnotationSource
 from app.repositories.annotation_repository import get_max_version, get_with_ownership_check
+from app.core.config import get_settings
 from app.services.storage import StorageService
 
 ALLOWED_FILE_EXTENSIONS: dict[str, str] = {
@@ -14,9 +15,6 @@ ALLOWED_FILE_EXTENSIONS: dict[str, str] = {
     ".txt": "txt",
     ".kva": "kva",
 }
-
-MAX_ANNOTATION_FILE_SIZE_BYTES: int = 50 * 1024 * 1024  # 50 MB
-
 
 def detect_file_type(original_filename: str) -> str:
     """根据文件扩展名推断 file_type。"""
@@ -51,7 +49,10 @@ async def create_annotation(
     validate_annotation_file(file)
 
     # 复用现有存储服务
-    saved = await StorageService().save_upload(file)
+    saved = await StorageService().save_upload(
+        file,
+        max_bytes=get_settings().annotation_upload_max_bytes,
+    )
 
     file_type = detect_file_type(saved["original_filename"])
 

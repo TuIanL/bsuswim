@@ -4,7 +4,7 @@
 
 Define the capability to convert an exact `swim-side-kinematics.v1` AnnotationMetric and its corresponding side-view video and COCO17 annotation into persistent, traceable visual assets for later HTML, PDF and longitudinal-report reuse.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Generate artifacts from an exact metric record
 

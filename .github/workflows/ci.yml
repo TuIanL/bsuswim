@@ -60,6 +60,11 @@ jobs:
         env:
           PGPASSWORD: swim
 
+      - name: Run golden fixture contract tests
+        run: python -m pytest -q tests/golden -m golden_contract --tb=short
+        env:
+          DATABASE_URL: postgresql+psycopg://swim:swim@localhost:5432/swim_analysis
+
       - name: Run tests
         run: python -m pytest -q --tb=short
         env:
@@ -111,3 +116,23 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Run frontend tests
+        run: npm test -- --run
+
+  openspec:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install OpenSpec CLI
+        run: npm install --global @fission-ai/openspec
+
+      - name: Validate OpenSpec specifications
+        run: openspec validate --specs --strict --json

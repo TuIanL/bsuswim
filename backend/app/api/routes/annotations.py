@@ -43,6 +43,7 @@ from app.services.annotation_ingestion_service import (
     ingest_annotation,
 )
 from app.services.annotation_quality.readiness import derive_analysis_readiness
+from app.services.storage import UploadTooLargeError
 
 router = APIRouter()
 
@@ -151,15 +152,25 @@ async def upload_annotation(
         except json.JSONDecodeError:
             raise HTTPException(status_code=400, detail="metadata 不是合法的 JSON")
 
-    annotation = await create_annotation(
-        db,
-        file=file,
-        session_video_id=link.id,
-        source=source_enum,
-        annotation_fps=annotation_fps,
-        metadata=meta_dict,
-        uploaded_by=current_user.id,
-    )
+    try:
+        annotation = await create_annotation(
+            db,
+            file=file,
+            session_video_id=link.id,
+            source=source_enum,
+            annotation_fps=annotation_fps,
+            metadata=meta_dict,
+            uploaded_by=current_user.id,
+        )
+    except UploadTooLargeError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail={
+                "code": "UPLOAD_TOO_LARGE",
+                "message": "标注文件超过开发环境上传大小限制",
+                "max_bytes": exc.max_bytes,
+            },
+        ) from exc
 
     return {
         "annotation_file_id": annotation.id,

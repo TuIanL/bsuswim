@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "status": "pending_runtime_approval",
+  "source": "source/annotations.xml",
+  "expected": {
+    "source": "cvat",
+    "joint_schema": "coco17",
+    "joint_count": 17,
+    "total_images": 105,
+    "active_frames": 104,
+    "annotation_frame_range": [0, 104],
+    "missing_skeleton_frames": [94],
+    "frame_mapping_mode": "explicit"
+  }
+}
