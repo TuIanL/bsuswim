@@ -38,7 +38,7 @@ The system SHALL assemble a `swim-report.v1` document using report profile
 `side_2d_kinematics_5page_v1`.
 
 The document SHALL contain exactly five sections with `page_number` values
-`[1, 2, 3, 4, 5]`, including when pages 2 through 4 contain diagnostic keyframe evidence.
+`[1, 2, 3, 4, 5]`.
 
 #### Scenario: Complete current inputs are available
 
@@ -50,13 +50,16 @@ The document SHALL contain exactly five sections with `page_number` values
 - **AND** their `page_number` values SHALL be `[1, 2, 3, 4, 5]`
 - **AND** the report `assembly_status` SHALL be `ready`
 
-#### Scenario: Keyframe evidence is available
+#### Scenario: Video metadata provenance uses SessionVideo, not VideoFile
 
-- **GIVEN** a current metric, artifact set and finding set are available
-- **WHEN** the report is assembled
-- **THEN** the report SHALL contain exactly five sections
-- **AND** its page numbers SHALL remain `[1, 2, 3, 4, 5]`
-- **AND** keyframe evidence SHALL be included inside the category pages rather than an additional page
+- **WHEN** `side_2d_kinematics_5page_v1` 报告构建 video context
+- **THEN** FPS SHALL 取自 `SessionVideo.fps`
+- **AND** resolution SHALL 取自 `SessionVideo.resolution`
+- **AND** VideoFile 仅用于文件身份（`id` 与 `original_filename`）
+- **AND** 无权威持久化时长时 `duration_sec` SHALL 为 null
+- **AND** 报告构建器 MUST NOT 读取未声明的 `VideoFile.fps` / `VideoFile.width` / `VideoFile.height` / `VideoFile.duration_sec`
+- **AND** `report.context.video.fps` SHALL 等于绑定 SessionVideo 的 FPS
+- **AND** `report.context.video.resolution` SHALL 等于 SessionVideo 的 resolution
 
 ### Requirement: Report-page module keys are profile-specific
 
@@ -119,34 +122,25 @@ and explicit analysis boundaries before any technical metrics are shown.
 Pages 2, 3 and 4 SHALL group content by analysis module category: page 2 covers
 `body_posture` and `head_trunk`, page 3 covers `upper_limb`, page 4 covers
 `lower_limb`, each drawing metrics, assets and findings from its category.
-Within each category, ready `annotated_keyframe` assets SHALL be presented as
-diagnostic evidence before or alongside chart assets, retaining artifact identity,
-frame references, metric values and source annotation revision. A keyframe SHALL
-NOT be interpreted as an action-phase label.
 
 #### Scenario: Body and head-trunk data are available
 
 - **THEN** page 2 SHALL contain `body_posture` and `head_trunk`
   metrics, assets and findings
-- **AND** ready keyframe assets SHALL be grouped under their originating module
-- **AND** each displayed keyframe SHALL retain its annotation frame and source revision when available
 
 #### Scenario: Upper-limb data are available
 
 - **THEN** page 3 SHALL contain `upper_limb` metrics, assets and findings
-- **AND** ready upper-limb keyframes SHALL be displayed with their metric meaning and frame references
 
 #### Scenario: Lower-limb data are available
 
 - **THEN** page 4 SHALL contain `lower_limb` metrics, assets and findings
-- **AND** ready lower-limb keyframes SHALL be displayed with their metric meaning and frame references
 
-#### Scenario: A category has no ready keyframe
+#### Scenario: Artifact quality notes are scoped to the page source modules
 
-- **WHEN** a category has no ready annotated keyframe asset
-- **THEN** its page SHALL remain renderable
-- **AND** the page SHALL show a structured quality note when keyframes were skipped or unavailable
-- **AND** chart and metric content SHALL not be removed solely because keyframes are unavailable
+- **WHEN** an artifact is skipped or degraded and produces a quality note
+- **THEN** the note SHALL carry `module_key`, `artifact_key` and `metric_keys`
+- **AND** the note SHALL be shown only on pages whose `source_module_keys` contain that `module_key`
 
 ### Requirement: Page five remains a review page
 

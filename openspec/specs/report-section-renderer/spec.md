@@ -1,7 +1,8 @@
 # report-section-renderer Specification
 
 ## Purpose
-TBD - created by change refactor-report-frontend-section-renderer. Update Purpose after archive.
+前端通过 normalizeReportData 统一消费 legacy report_data 与 swim-report.v1 两种格式，并按 section 渲染。
+
 
 ## Requirements
 

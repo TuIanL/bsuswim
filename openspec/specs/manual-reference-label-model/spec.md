@@ -1,7 +1,8 @@
 # manual-reference-label-model Specification
 
 ## Purpose
-TBD - created by archiving change add-manual-temporal-reference-labeling-workspace. Update Purpose after archive.
+人工参考标注的 set / revision / segment 三层数据模型，以及以 revision 主键保证的引用完整性。
+
 ## Requirements
 ### Requirement: 三层数据模型与 revision 引用完整性
 

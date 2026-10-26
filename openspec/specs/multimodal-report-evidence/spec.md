@@ -1,7 +1,8 @@
 # multimodal-report-evidence Specification
 
 ## Purpose
-TBD - created by archiving change add-qwen-multimodal-report-interpretation. Update Purpose after archive.
+从当前报告及其当前 revision 的派生资产构建有界、可追溯的多模态证据包，供 AI 解读使用。
+
 ## Requirements
 ### Requirement: System builds a bounded multimodal evidence bundle from current report assets
 

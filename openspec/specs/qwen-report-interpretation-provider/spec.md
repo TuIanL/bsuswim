@@ -1,7 +1,8 @@
 # qwen-report-interpretation-provider Specification
 
 ## Purpose
-TBD - created by archiving change add-qwen-multimodal-report-interpretation. Update Purpose after archive.
+通过服务端配置接入 Qwen 兼容 API 生成报告解读，凭据不出服务端、不进日志与产物。
+
 ## Requirements
 ### Requirement: AI interpretation supports a Qwen-compatible provider configuration
 

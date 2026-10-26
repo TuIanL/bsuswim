@@ -8,12 +8,11 @@
 
 ## What Changes
 
-- 新增 `kinematics-golden.v1` 真实衍生 fixture 包：经授权和脱敏处理的侧面视频片段、真实 CVAT Skeleton XML、可选的 CVAT image manifest、fixture manifest、文件校验和与预期契约。
-- 明确 golden fixture 的固定 FPS、有效标注帧范围、17 点 schema 和 annotation-to-video frame mapping（affine，offset=32，stride=1，verified=user_confirmed）。
+- 新增 `kinematics-golden.v1` 真实衍生 fixture 包：经授权和脱敏处理的侧面视频片段、真实 CVAT Skeleton XML、显式帧映射表、fixture manifest、文件校验和与结构化预期契约。
+- 明确 golden fixture 的固定 FPS（60）、有效标注帧范围（0..104 / 104 帧）、17 点 schema，以及 annotation→video 的**显式帧号表**映射（非 affine；`source_original_offset=270`，有效标注帧率 15fps，verified=user_confirmed）。
 - 新增真实上传、绑定、ingest、分析、报告和 PDF 导出的端到端测试。
-- 为指标输出增加有限值、合理范围和逐帧连续性断言。
-- 验证 representative frame 只引用有效标注帧和有效视频帧。
-- 验证五类视觉资产均能生成或按契约降级，ready 资产可以通过 URL 访问。
+- 为指标与报告输出增加有限值（无 NaN/Infinity）断言。
+- 验证五类视觉资产均能生成或按契约降级，ready 资产的**文件、大小、校验和与 MIME 元数据**可核验，URL 指向其存储路径。
 - 验证所有指标、资产、发现和报告均可追溯至同一 annotation revision。
 - 新增缺失关节点变体，验证单个模块降级而不是整条任务失败。
 - 验证结构化报告严格包含 5 个 section，打印 PDF 严格为 5 页。
@@ -26,21 +25,17 @@
 
 ### New Capabilities
 
-- `kinematics-golden-dataset-e2e-validation`: 系统 SHALL 使用版本化真实衍生 fixture 验证完整二维运动学报告链路；golden fixture SHALL 具有不可变输入校验和和人工批准的预期契约；完整 E2E SHALL 覆盖 HTML 和实际 Playwright PDF，而不是 mock renderer。
+- `kinematics-golden-dataset-e2e-validation`: 系统 SHALL 使用版本化真实衍生 fixture 验证完整二维运动学报告链路；golden fixture SHALL 具有不可变输入校验和与结构化预期契约；完整 E2E SHALL 覆盖 HTML 和实际 Playwright PDF，而不是 mock renderer。
 
 ### Modified Capabilities
 
 以下能力在本 Change 中发生需求级变更，均提供 delta spec（`specs/<capability>/spec.md`）：
 
 - `cvat-xml-parse`: 真实 golden XML 暴露的 ingestion 最小修复（warnings 变量覆盖）与骨架契约断言。
-- `automatic-annotation-ingestion-workflow`: 上传到 normalized annotation 的真实 API 链路断言。
-- `side-2d-kinematics-metrics`: 四类指标安全性与连续性断言。
-- `kinematics-visual-artifact-generation`: 五类资产文件/校验和/URL 断言与模块级 quality note 作用域。
-- `2d-kinematics-review-findings`: finding 证据有效性断言。
-- `five-page-kinematics-report`: 严格 5 页、模块级 quality note 作用域、视频元数据投影来源（SessionVideo.fps/resolution 而非 VideoFile 未声明属性）。
-- `annotation-driven-analysis-pipeline`: pipeline 完成态与 source revision 贯穿断言。
-- `swim-interactive-performance-report`: HTML/PDF 一致性语义比较。
+- `five-page-kinematics-report`: 严格 5 页、模块级 quality note 过滤、视频元数据投影来源（`SessionVideo.fps`/`resolution` 而非 `VideoFile` 未声明属性）。
 - `pdf-export-service`: PDF 页数严格等于 5、布局溢出即失败、print-ready 不得无条件设置。
+
+> 其余曾被提及的能力（`automatic-annotation-ingestion-workflow`、`side-2d-kinematics-metrics`、`kinematics-visual-artifact-generation`、`2d-kinematics-review-findings`、`annotation-driven-analysis-pipeline`、`swim-interactive-performance-report`）实际未产生 delta 变更，已从本 Change 范围移除；相关断言落在新能力的 golden contract 中，不修改这些能力自身的主规格。
 
 ## Impact
 
@@ -70,7 +65,7 @@
 ### CI
 
 - 新增 golden contract job（每个 PR 硬门禁）
-- 新增 full-stack golden E2E job（发布级硬门禁，稳定后升级为每 PR required）
+- 新增 full-stack golden E2E job（nightly + 手动触发，不作为每 PR 门禁）
 - 安装 PostgreSQL、Chromium 和必要的视频解码依赖
 
 ## Non-goals

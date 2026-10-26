@@ -1,7 +1,8 @@
 # freestyle-arm-phase-profile Specification
 
 ## Purpose
-TBD - created by archiving change add-manual-temporal-reference-labeling-workspace. Update Purpose after archive.
+自由泳单臂周期的四阶段环节定义 profile，声明 id、version、cycle_definition 与 phases。
+
 ## Requirements
 ### Requirement: freestyle_arm_phase_v1 profile 定义
 

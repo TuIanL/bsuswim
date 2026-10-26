@@ -1,7 +1,8 @@
 # swim-visual-analysis-workspace Specification
 
 ## Purpose
-TBD - created by archiving change port-pickleball-platform-to-swim-analysis. Update Purpose after archive.
+以侧视视频复盘与分析状态为中心的游泳可视化工作区。
+
 ## Requirements
 ### Requirement: Video-first swim workspace
 The system SHALL provide a swim visual-analysis workspace centered on side-view video review and analysis status.

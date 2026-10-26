@@ -1,7 +1,8 @@
 # report-data-assembly Specification
 
 ## Purpose
-TBD - created by change assemble-swim-report-data. Update Purpose after archive.
+把 annotation_metrics 的事实指标与 diagnostics 的诊断结果装配为 swim-report.v1 结构的 ReportData。
+
 
 ## Requirements
 

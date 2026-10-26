@@ -2,9 +2,7 @@
 
 ## Purpose
 解析 CVAT Task XML 格式的骨架标注文件，提取 COCO 17 点骨架关键点，处理 outside/occluded 可见性语义，按 frame 分组多 track 骨架，输出原始 keypoint_frames（无时间戳、无轨迹、无派生数据）。
-
 ## Requirements
-
 ### Requirement: Parse CVAT Task XML skeleton annotations
 系统 SHALL 支持解析符合 CVAT 1.1 Task XML 规范的标注文件，从 `<track>` 元素中提取 `<skeleton>` 和 `<points>` 子结构。
 
@@ -103,6 +101,27 @@ Parser SHALL 按不可信输入处理用户上传的 XML 文件。
 #### Scenario: NaN or Infinity coordinates rejected
 - **WHEN** points 坐标包含 NaN、Infinity 或负数
 - **THEN** 系统 MUST 拒绝并报错
+
+### Requirement: Real golden CVAT XML ingestion preserves the skeleton contract
+
+系统 SHALL 在使用真实 CVAT Skeleton XML（`kinematics-golden.v1` fixture）经由 annotation ingest API 处理时保持以下骨架契约，且 ingestion 过程不得因未定义变量而失败。
+
+#### Scenario: Baseline golden XML is ingested without NameError
+
+- **WHEN** 系统通过 annotation ingest API 处理真实 golden `annotations.xml`（CVAT 1.1 image 格式，XML 含 105 个 `<image>`，其中 104 帧带骨架）
+- **THEN** active annotated frame count SHALL 为 104
+- **AND** active annotation frame range SHALL 为 0..104
+- **AND** 每个 active frame SHALL 包含 17 个 COCO17 关节点
+- **AND** baseline 中每个 active point visibility SHALL 非 `missing`
+- **AND** all-outside track termination MUST NOT 形成额外 active frame
+- **AND** ingestion SHALL NOT raise `NameError` from an undefined warning variable in the ingestion path
+
+#### Scenario: Warnings aggregation uses a single reliable source
+
+- **WHEN** ingestion path 汇总 parser warnings 与派生 warnings
+- **THEN** 汇总 SHALL 使用真实存在的局部变量（`cvat_parsed.warnings` 与 `derived_warnings`）
+- **AND** MUST NOT 引用未定义的裸 `warnings` 变量
+- **AND** 持久化的 parse warnings SHALL 与该汇总一致
 
 ## ADDED Requirements
 

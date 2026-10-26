@@ -1,7 +1,8 @@
 # label-event-adapter Specification
 
 ## Purpose
-TBD - created by archiving change add-manual-temporal-reference-labeling-workspace. Update Purpose after archive.
+以 AnalysisTask 的显式引用裁决人工区间与导入事件谁是权威输入的适配层，不做两套数据同步。
+
 ## Requirements
 ### Requirement: source_of_truth 由 AnalysisTask 显式引用驱动
 

@@ -1,7 +1,8 @@
 # reference-revision-resolution Specification
 
 ## Purpose
-TBD - created by archiving change add-manual-temporal-reference-labeling-workspace. Update Purpose after archive.
+按 annotation_set_id + revision_id 显式解析人工参考标注的统一 resolver，拒绝隐式「取最新」。
+
 ## Requirements
 ### Requirement: 显式 resolver 按 set 与 revision 解析
 

@@ -1,7 +1,8 @@
 # reference-label-lifecycle Specification
 
 ## Purpose
-TBD - created by archiving change add-manual-temporal-reference-labeling-workspace. Update Purpose after archive.
+annotation revision 的 draft → in_review → reviewed → frozen 状态机与 rejected 回退规则。
+
 ## Requirements
 ### Requirement: revision 生命周期状态机
 

@@ -1,7 +1,8 @@
 # swim-interactive-performance-report Specification
 
 ## Purpose
-TBD - created by archiving change port-pickleball-platform-to-swim-analysis. Update Purpose after archive.
+基于 demo 数据或任务级数据的交互式游泳分析报告：会话上下文、汇总指标、关键发现与来源标识。
+
 ## Requirements
 ### Requirement: Swim performance report
 The system SHALL provide interactive swim analysis reports based on demo or job-specific report data.

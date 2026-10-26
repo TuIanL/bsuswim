@@ -55,6 +55,3 @@ Pages 2, 3 and 4 SHALL group content by analysis module category: page 2 covers
 - **WHEN** an artifact is skipped or degraded and produces a quality note
 - **THEN** the note SHALL carry `module_key`, `artifact_key` and `metric_keys`
 - **AND** the note SHALL be shown only on pages whose `source_module_keys` contain that `module_key`
-- **AND** an upper-limb artifact degradation SHALL appear on page 3 `upper_limb_kinematics`
-- **AND** page 2 `body_posture_control` and page 4 `lower_limb_kinematics` MUST NOT show an upper-limb specific degradation note
-- **AND** page 5 `review_and_retest` MAY aggregate the degradation but is not the primary assertion target

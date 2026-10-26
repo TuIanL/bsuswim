@@ -1,7 +1,8 @@
 # backend-platform-core Specification
 
 ## Purpose
-TBD - created by archiving change refactor-backend-platform-core-postgres. Update Purpose after archive.
+业务后端以 PostgreSQL 为默认持久化，提供本地开发配置入口与平台核心数据表。
+
 ## Requirements
 ### Requirement: PostgreSQL backend runtime
 业务后端 SHALL 默认使用 PostgreSQL 作为持久化数据库，并提供本地开发所需的数据库配置入口。

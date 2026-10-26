@@ -1,7 +1,8 @@
 # manual-labeling-workspace Specification
 
 ## Purpose
-TBD - created by archiving change add-manual-temporal-reference-labeling-workspace. Update Purpose after archive.
+人工时序参考标注工作台页面：绑定 session_video，在统一时间线上标注媒体片段区间。
+
 ## Requirements
 ### Requirement: 人工标注工作台页面
 

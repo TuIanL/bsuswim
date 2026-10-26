@@ -1,7 +1,8 @@
 # swim-video-analysis-job-flow Specification
 
 ## Purpose
-TBD - created by archiving change port-pickleball-platform-to-swim-analysis. Update Purpose after archive.
+面向训练会话的游泳多机位视频上传与作业提交入口，含机位元数据与同步偏移。
+
 ## Requirements
 ### Requirement: Swim video upload entry
 The system SHALL provide a swim-specific multi-camera video upload entry point for an existing training session.

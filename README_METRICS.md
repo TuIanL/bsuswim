@@ -185,3 +185,17 @@
 - 报告结果必须能够追溯到 `normalized_annotation_id`、annotation revision、计算器版本和帧映射状态。
 - 性能阈值只有在专项样本校准完成后才能从“待校准”改为正式版本。
 
+## 9. 关键点精度评估（离线工具，不属于生产指标）
+
+`backend/tools/eval_keypoints.py` 用于回答"关键点估计得准不准"，与本文档第 3 节的指标不是同一类东西：
+
+| 维度 | 本文档的指标 | `eval_keypoints` |
+|---|---|---|
+| 回答的问题 | 动作表现如何 | 关键点离真值差多少 |
+| 输入 | 一份标注 + 视频 | 两份关键点（reference + candidate） |
+| 输出 | 五页报告 | `accuracy-report.v1` JSON + markdown 表 |
+| 是否进入生产链路 | 是 | 否，离线只读 |
+
+**口径一致性**：评估用的参考体长与生产 `compute_reference_body_length()` 完全同口径（双肩中点→双踝中点距离的中位数），由 `tests/test_keypoint_metrics.py::test_reference_body_length_parity_with_production` 对拍保证差 ≤0.01 px。这样报告的 `rmse_norm` 可以直接换算成对指标的影响量级。
+
+用法、指标定义与已知限制见 `backend/tools/README.md`。

@@ -4,17 +4,17 @@
 
 ### Requirement: Real golden CVAT XML ingestion preserves the skeleton contract
 
-系统 SHALL 在使用真实 CVAT Skeleton XML（如 `kinematics-golden.v1` fixture）经由 annotation ingest API 处理时，保持以下骨架契约，且 ingestion 过程不得因未定义变量而失败。
+系统 SHALL 在使用真实 CVAT Skeleton XML（`kinematics-golden.v1` fixture）经由 annotation ingest API 处理时保持以下骨架契约，且 ingestion 过程不得因未定义变量而失败。
 
 #### Scenario: Baseline golden XML is ingested without NameError
 
-- **WHEN** 系统通过 annotation ingest API 处理真实 golden annotations.xml（CVAT sequence 356 帧、active 56 帧、COCO17 17 点、baseline 全 visible）
-- **THEN** CVAT sequence frame count SHALL 为 356
-- **AND** active annotated frame count SHALL 为 56
-- **AND** active annotation frame range SHALL 为 0..55
+- **WHEN** 系统通过 annotation ingest API 处理真实 golden `annotations.xml`（CVAT 1.1 image 格式，XML 含 105 个 `<image>`，其中 104 帧带骨架）
+- **THEN** active annotated frame count SHALL 为 104
+- **AND** active annotation frame range SHALL 为 0..104
 - **AND** 每个 active frame SHALL 包含 17 个 COCO17 关节点
+- **AND** baseline 中每个 active point visibility SHALL 非 `missing`
 - **AND** all-outside track termination MUST NOT 形成额外 active frame
-- **AND** ingestion SHALL NOT raise NameError from an undefined warning variable in the ingestion path
+- **AND** ingestion SHALL NOT raise `NameError` from an undefined warning variable in the ingestion path
 
 #### Scenario: Warnings aggregation uses a single reliable source
 

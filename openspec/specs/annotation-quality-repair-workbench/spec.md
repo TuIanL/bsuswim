@@ -1,7 +1,8 @@
 # annotation-quality-repair-workbench Specification
 
 ## Purpose
-TBD - created by archiving change add-annotation-quality-repair-workbench. Update Purpose after archive.
+把标注质量问题转成可执行的修复动作：每条问题携带稳定的 action 类型与 payload，前端据此直接打开对应修复步骤。
+
 ## Requirements
 ### Requirement: Quality issues expose executable repair actions
 质量报告中的可修复问题 SHALL 包含稳定的 `suggested_action.type`、展示 label 和必要的 payload；前端 SHALL 能根据 action 打开对应修复步骤。
